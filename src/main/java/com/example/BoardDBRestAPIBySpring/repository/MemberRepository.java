@@ -12,4 +12,5 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
 
     // findBy는 규칙=>Username문법
     // select * from USER where username=?
+    public Member findByMemberID(String memberID);  // JPA Query Method
 }

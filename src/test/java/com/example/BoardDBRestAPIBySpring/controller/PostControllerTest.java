@@ -47,7 +47,7 @@ class PostControllerTest {
 	void getAllBoardsTest() throws Exception {
 		// given
 		Member member = Member.builder()
-			.name("park")
+			.member_name("park")
 			.build();
 		memberRepository.save(member);
 

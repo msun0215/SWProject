@@ -21,10 +21,21 @@ public class WebConfig {
 	//}
 	@Bean
 	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception{
-		http.csrf(CsrfConfigurer::disable);
-		http.formLogin(formLogin->{
-			formLogin.loginProcessingUrl("/login")
-					.defaultSuccessUrl("/boards");
+		http.csrf(cs->cs.disable());
+//		http.authorizeHttpRequests(authorize ->
+//				authorize
+//						.requestMatchers("/user/**").hasAnyRole(1,2,3)    // 인증만 되면 들어갈 수 있는 주소
+//						.requestMatchers("/manager/**").hasAnyRole("ADMIN", "MANAGER")
+//						.requestMatchers("/admin/**").hasAnyRole("ADMIN")
+//
+//						.anyRequest().permitAll()	// 그 외에는 모두 혀용
+//		)
+		http.authorizeHttpRequests(a->
+				a.anyRequest().permitAll()
+		).formLogin(formLogin->{
+			formLogin.loginPage("/loginForm")
+					.loginProcessingUrl("/login")
+					.defaultSuccessUrl("/");
 		});
 		return http.build();
 	}

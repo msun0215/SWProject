@@ -38,7 +38,7 @@ class PostRepositoryTest {
 	void saveTest() {
 		// given
 		Member member = Member.builder()
-			.name("name")
+			.member_name("name")
 			.build();
 		memberRepository.save(member);
 

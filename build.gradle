@@ -27,14 +27,16 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 
-	implementation 'org.springframework.boot:spring-boot-starter-security:3.1.5'
+	implementation 'org.springframework.boot:spring-boot-starter-security'
 	implementation 'org.springframework.security:spring-security-test:6.1.5'
-	implementation 'org.springframework.boot:spring-boot-starter-mustache:3.1.5'
+	implementation 'org.springframework.boot:spring-boot-starter-mustache'
 	// 소스코드 변경시 SpringBoot 자동 재시작
 	implementation 'org.springframework.boot:spring-boot-devtools'
 
 	// 유효성 검사
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
+
+	implementation 'org.projectlombok:lombok'
 
 	compileOnly 'org.projectlombok:lombok'
 	runtimeOnly 'com.h2database:h2'

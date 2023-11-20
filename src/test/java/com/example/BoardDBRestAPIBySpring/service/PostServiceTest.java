@@ -36,7 +36,7 @@ class PostServiceTest {
 	void getAllPostsTest() {
 		// given
 		Member member = Member.builder()
-			.name("park")
+			.member_name("park")
 			.build();
 		memberRepository.save(member);
 
@@ -64,7 +64,7 @@ class PostServiceTest {
 	void getAllPostsByPagingTest() {
 		// given
 		Member member = Member.builder()
-			.name("park")
+			.member_name("park")
 			.build();
 		memberRepository.save(member);
 

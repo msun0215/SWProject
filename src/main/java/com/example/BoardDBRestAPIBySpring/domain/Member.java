@@ -1,18 +1,12 @@
 package com.example.BoardDBRestAPIBySpring.domain;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.sql.Timestamp;
 
-@Entity
-@Data
-@NoArgsConstructor
+
 //public class Member {
 //
 //	@Id
@@ -27,14 +21,16 @@ import java.sql.Timestamp;
 //		this.name = name;
 //	}
 //}
+@Entity
+@Data
+@NoArgsConstructor
 public class Member {
 	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long id;
-	private String username;
-	private String password;
-	private String email;
-	private String role;
+	private String member_id;	// Email Type
+	private String member_pw;
+	private String member_name;
+	private String member_nickname;
+	private int member_role_id;
 
 	// OAuth 제공자
 	private String provider;
@@ -44,11 +40,12 @@ public class Member {
 	private Timestamp createDate;
 
 	@Builder
-	public Member(String username, String password, String email, String role, String provider, String providerId, Timestamp createDate) {
-		this.username = username;
-		this.password = password;
-		this.email = email;
-		this.role = role;
+	public Member(String member_id, String member_pw, String member_name, String member_nickname, int member_role_id, String provider, String providerId, Timestamp createDate) {
+		this.member_id = member_id;
+		this.member_pw = member_pw;
+		this.member_name = member_name;
+		this.member_nickname = member_nickname;
+		this.member_role_id=member_role_id;
 		this.provider = provider;
 		this.providerId = providerId;
 		this.createDate = createDate;
