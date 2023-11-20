@@ -1,0 +1,2 @@
+### file download
+GET http://localhost:8080/boards/postFile/a64de077-2582-433a-a7b9-bf5c8c38d815_createPostTestFile2.txt
