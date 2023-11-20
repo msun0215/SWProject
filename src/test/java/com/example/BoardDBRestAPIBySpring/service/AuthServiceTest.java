@@ -32,7 +32,7 @@ class AuthServiceTest {
 	void getAllPostsTest() {
 		// given
 		Member member = Member.builder()
-			.name("park")
+			.username("park")
 			.build();
 		doReturn(member).when(memberRepository).save(any(Member.class));
 		memberRepository.save(member);
@@ -62,7 +62,7 @@ class AuthServiceTest {
 	void getAllPostsByPagingTest() {
 		// given
 		Member member = Member.builder()
-			.name("park")
+			.username("park")
 			.build();
 		doReturn(member).when(memberRepository).save(any(Member.class));
 		memberRepository.save(member);
