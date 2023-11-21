@@ -8,9 +8,10 @@ import org.springframework.stereotype.Repository;
 // @Repository라는 annotation이 없어도 IoC가 된다.
 // JpaRepository를 상속했기 때문에
 @Repository
-public interface MemberRepository extends JpaRepository<Member, Long> {
+public interface MemberRepository extends JpaRepository<Member, String> {
 
     // findBy는 규칙=>Username문법
     // select * from USER where username=?
     public Member findByMemberID(String memberID);  // JPA Query Method
+
 }

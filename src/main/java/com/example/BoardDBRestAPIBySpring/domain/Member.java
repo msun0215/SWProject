@@ -26,11 +26,14 @@ import java.sql.Timestamp;
 @NoArgsConstructor
 public class Member {
 	@Id
-	private String member_id;	// Email Type
-	private String member_pw;
-	private String member_name;
-	private String member_nickname;
-	private int member_role_id;
+	private String memberID;	// Email Type
+	private String memberPW;
+	private String memberName;
+	private String memberNickname;
+
+	@ManyToOne
+	@JoinColumn(name = "ROLE_ID")
+	private Role roles;   // USER, MANAGER, ADMIN
 
 	// OAuth 제공자
 	private String provider;
@@ -40,12 +43,12 @@ public class Member {
 	private Timestamp createDate;
 
 	@Builder
-	public Member(String member_id, String member_pw, String member_name, String member_nickname, int member_role_id, String provider, String providerId, Timestamp createDate) {
-		this.member_id = member_id;
-		this.member_pw = member_pw;
-		this.member_name = member_name;
-		this.member_nickname = member_nickname;
-		this.member_role_id=member_role_id;
+	public Member(String memberID, String memberPW, String memberName, String memberNickname, Role memberRoleId, String provider, String providerId, Timestamp createDate) {
+		this.memberID = memberID;
+		this.memberPW = memberPW;
+		this.memberName = memberName;
+		this.memberNickname = memberNickname;
+		this.roles=memberRoleId;
 		this.provider = provider;
 		this.providerId = providerId;
 		this.createDate = createDate;

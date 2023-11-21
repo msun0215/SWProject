@@ -30,6 +30,8 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-security'
 	implementation 'org.springframework.security:spring-security-test:6.1.5'
 	implementation 'org.springframework.boot:spring-boot-starter-mustache'
+	implementation 'com.auth0:java-jwt:4.4.0'
+	implementation 'io.jsonwebtoken:jjwt:0.9.1'
 	// 소스코드 변경시 SpringBoot 자동 재시작
 	implementation 'org.springframework.boot:spring-boot-devtools'
 

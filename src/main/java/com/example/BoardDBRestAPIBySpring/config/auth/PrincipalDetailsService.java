@@ -16,8 +16,7 @@ import org.springframework.stereotype.Service;
 public class PrincipalDetailsService implements UserDetailsService {
 
     //@Autowired
-    private MemberRepository memberRepository;
-    //private final UserRepository userRepository;
+    private final MemberRepository memberRepository;
 
     // Security Session = Authentication = UserDetails
     // Security Session(내부 Authentication(내부 UserDetails))

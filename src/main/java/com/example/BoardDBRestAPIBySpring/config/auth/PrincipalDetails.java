@@ -45,7 +45,7 @@ public class PrincipalDetails implements UserDetails {
         collect.add(new GrantedAuthority() {
             @Override
             public String getAuthority() {
-                return member.getMember_role_id().toString();
+                return member.getRoles().toString();
             }
         });
         return collect;
@@ -53,12 +53,12 @@ public class PrincipalDetails implements UserDetails {
 
     @Override
     public String getPassword() {
-        return user.getPassword();
+        return member.getMemberPW();
     }
 
     @Override
     public String getUsername() {
-        return user.getUsername();
+        return member.getMemberID();
     }
 
     // 계정 만료되지 않았는가?
@@ -89,14 +89,4 @@ public class PrincipalDetails implements UserDetails {
         return true;
     }
 
-    @Override
-    public Map<String, Object> getAttribute(String name) {
-        return attributes;
-    }
-
-    @Override
-    public String getName() {
-        //return attributes.get("sub");
-        return null;
-    }
 }
