@@ -21,10 +21,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import java.io.*;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /*
      Spring Security의 UsernamePasswordAuthenticationFilter 사용
@@ -41,7 +38,6 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {
         System.out.println("JWTAuthenticationFilter : 로그인 시도중");
-
 
         // 1. username, password를 받아서
         try {
@@ -115,7 +111,7 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
             //다른 방식으로 넘어오면 parsing하는 방식이 바뀌기 때문에 사용하지 않음
 
 
-            System.out.println("member.getMemberPW()"+member.getMemberPW());
+            System.out.println("member.getMemberPW() : "+member.getMemberPW());
             // Token 생성
             UsernamePasswordAuthenticationToken authenticationToken
                     =new UsernamePasswordAuthenticationToken(member.getMemberID(), member.getMemberPW());
@@ -163,15 +159,18 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
                                                 .sign(Algorithm.HMAC512(JWTProperties.SECRET));  // HMAC512는 SECRET KEY를 필요로 함
         response.addHeader(JWTProperties.HEADER_STRING, JWTProperties.TOKEN_PREFIX+jwtToken);
         System.out.println("response : "+response);
+        System.out.println("response.getHeader() : "+response.getHeader(JWTProperties.HEADER_STRING));
 
-        response.addHeader("X-Redirect", "/SuccessLogin");
+        //response.addHeader("X-Redirect", "/successLogin");
         // Client에게 JWT Token을 응답
         //response.getWriter().write("<script>window.location='/';</script>");
         //response.getWriter().flush();
         //response.getWriter().close();
 
         // Client를 /엔드포인트로 리다이렉트
-        //response.sendRedirect("/");
+        response.sendRedirect("/successLogin");
+
+
     }
 
     private static Map<String, String> splitFormData(String formData){

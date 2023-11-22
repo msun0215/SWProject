@@ -38,10 +38,10 @@ public class LoginController {
         return modelAndView;
     }
 
-    @RequestMapping("/login")
-    public ModelAndView login(){
+    @GetMapping("successLogin")
+    public ModelAndView successLogin(){
         ModelAndView mv=new ModelAndView();
-        mv.setViewName("SuccessLogin");
+        mv.setViewName("successLogin");
         return mv;
     }
 

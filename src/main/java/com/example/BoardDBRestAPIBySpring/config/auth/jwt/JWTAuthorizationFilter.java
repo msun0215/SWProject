@@ -16,15 +16,14 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 
 import java.io.IOException;
+import java.util.Enumeration;
 
 // Security가 가지고 있는 filter들 중 BasicAuthenticationFilter라는 것이 있음
 // 권한이나 인증이 필요한 특정 주소를 요청했을 때 위 filter를 무조건 타게 되어있음.
 // 만약에 권한이 인증이 필요한 주소가 아니라면 이 filter를 타지 않는다.
 // 인가
 
-public class
-
-JWTAuthorizationFilter extends BasicAuthenticationFilter {
+public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
     private MemberRepository memberRepository;
 
     public JWTAuthorizationFilter(AuthenticationManager authenticationManager, MemberRepository memberRepository){
@@ -40,6 +39,13 @@ JWTAuthorizationFilter extends BasicAuthenticationFilter {
         //String header=request.getHeader("Authorization");
         String header=request.getHeader(JWTProperties.HEADER_STRING);
         System.out.println("JWTHeader : "+header);  // JWT Token
+
+        Enumeration<String> headerNames = request.getHeaderNames();
+        while (headerNames.hasMoreElements()) {
+            String headerName = headerNames.nextElement();
+            System.out.println("Header: " + headerName + ", Value: " + request.getHeader(headerName));
+        }
+
 
         // header가 있는지(유효한지) 확인
         if(header==null||!header.startsWith(JWTProperties.TOKEN_PREFIX)){
