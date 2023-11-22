@@ -3,6 +3,7 @@ package com.example.BoardDBRestAPIBySpring.config.auth;
 import com.example.BoardDBRestAPIBySpring.domain.Member;
 import com.example.BoardDBRestAPIBySpring.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -29,4 +30,6 @@ public class PrincipalDetailsService implements UserDetailsService {
         }
         return null;
     }
+
+
 }

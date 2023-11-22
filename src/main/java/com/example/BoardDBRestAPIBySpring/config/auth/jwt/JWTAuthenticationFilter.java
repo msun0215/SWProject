@@ -42,6 +42,7 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {
         System.out.println("JWTAuthenticationFilter : 로그인 시도중");
 
+
         // 1. username, password를 받아서
         try {
             /*
@@ -67,33 +68,54 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
             */
 
             // BufferedReader를 사용하여 데이터 읽기
-            StringBuilder requestData = new StringBuilder();
-            try (BufferedReader reader = new BufferedReader(new InputStreamReader(
-                    request.getInputStream(), StandardCharsets.UTF_8))) {
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    requestData.append(line);
-                }
-            }
-
+//            StringBuilder requestData = new StringBuilder();
+//            try (BufferedReader reader = new BufferedReader(new InputStreamReader(
+//                    request.getInputStream(), StandardCharsets.UTF_8))) {
+//                String line;
+//                while ((line = reader.readLine()) != null) {
+//                    requestData.append(line);
+//                }
+//            }
             // x-www-form-urlencoded 형식의 데이터를 Member 객체로 변환
-            String formData = requestData.toString();
-            ObjectMapper objectMapper = new ObjectMapper();
-            Member member = objectMapper.readValue(formData, Member.class);
+//            String formData = requestData.toString();
+//            ObjectMapper objectMapper = new ObjectMapper();
+//            Member member = objectMapper.readValue(formData, Member.class);
+            BufferedReader reader=request.getReader();
+            StringBuilder requestData=new StringBuilder();
+            String line;
+            System.out.println("1. reader : "+reader);
+            while((line=reader.readLine())!=null){
+                System.out.println("line : "+line);
+                requestData.append(line);
+            }
+            System.out.println("2. requestData : "+requestData);
+
+            // StringBuilder->String
+            String requestDataString = requestData.toString();
+            Map<String, String> dataMap = splitFormData(requestDataString);
+
+            String memberID = dataMap.get("memberID");
+            String memberPW = dataMap.get("memberPW");
+
+            System.out.println("memberID : "+memberID);
+            System.out.println("memberPW : "+memberPW);
+
+            Member member=new Member();
+            member.setMemberID(memberID);
+            member.setMemberPW(memberPW);
+
+//            ObjectMapper oj=new ObjectMapper();
+//            Member member=oj.readValue(requestData.toString(), Member.class);
+
 
             // 변환된 Member 객체 사용
-            System.out.println("Member: " + member);
+            System.out.println("3. Member : " + member);
 
             //=> request가 x-www-form-urlencoded 방식으로 넘어오면 &를 사용해서 parsing하면 되지만
             //다른 방식으로 넘어오면 parsing하는 방식이 바뀌기 때문에 사용하지 않음
 
-//            System.out.println("getInputStream() : "+request.getInputStream().toString());
-//            ObjectMapper om=new ObjectMapper();
-//            Member member=om.readValue(request.getInputStream(), Member.class);
-//            System.out.println("member : "+member);
 
-
-            System.out.println("user.getPassword()"+member.getMemberPW());
+            System.out.println("member.getMemberPW()"+member.getMemberPW());
             // Token 생성
             UsernamePasswordAuthenticationToken authenticationToken
                     =new UsernamePasswordAuthenticationToken(member.getMemberID(), member.getMemberPW());
@@ -140,8 +162,43 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
                                         .withClaim("username", principalDetails.getMember().getMemberName())    // 비공개 Claim
                                                 .sign(Algorithm.HMAC512(JWTProperties.SECRET));  // HMAC512는 SECRET KEY를 필요로 함
         response.addHeader(JWTProperties.HEADER_STRING, JWTProperties.TOKEN_PREFIX+jwtToken);
+        System.out.println("response : "+response);
+
+        response.addHeader("X-Redirect", "/SuccessLogin");
+        // Client에게 JWT Token을 응답
+        //response.getWriter().write("<script>window.location='/';</script>");
+        //response.getWriter().flush();
+        //response.getWriter().close();
+
+        // Client를 /엔드포인트로 리다이렉트
+        //response.sendRedirect("/");
     }
 
+    private static Map<String, String> splitFormData(String formData){
+        Map<String, String> dataMap = new HashMap<>();
+        String[] keyValuePairs = formData.split("&"); // "&"를 기준으로 memberID=~ 와 memberPW=~를 나눔
+
+        for(String pair : keyValuePairs){
+            String[] entry = pair.split("=");   // memberID=~를 =기준으로 나눠서 memberID와 ~를 가짐
+            String key = entry[0];
+            String value = entry.length>1?entry[1]:"";
+
+            // URL Decoding
+            value = urlDecode(value);
+            dataMap.put(key, value);
+        }
+        return dataMap;
+    }
+
+    // URL Decoding Method
+    private static String urlDecode(String value){
+        try{
+            return URLDecoder.decode(value, "UTF-8");
+        }catch (UnsupportedEncodingException e){
+            e.printStackTrace();
+            return value;
+        }
+    }
 
     /*
     <Spring Security>

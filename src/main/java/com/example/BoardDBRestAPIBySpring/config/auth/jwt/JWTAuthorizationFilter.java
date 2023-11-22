@@ -51,7 +51,8 @@ JWTAuthorizationFilter extends BasicAuthenticationFilter {
         // JWT Token을 검증해서 정상적인 사용자인지 확인
         String token = request.getHeader(JWTProperties.HEADER_STRING).replace(JWTProperties.TOKEN_PREFIX, "");
         String memberID = JWT.require(Algorithm.HMAC512(JWTProperties.SECRET)).build().verify(token).getClaim("memberID").asString();  // verify()를 통해서 서명
-
+        System.out.println("token : "+token);
+        System.out.println("memberID : "+memberID);
         // 서명이 정상적으로 동작했을 경우
         if(memberID!=null){
             Member memberEntity = memberRepository.findByMemberID(memberID);
