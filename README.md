@@ -14,3 +14,4 @@ login에 성공하고 redirectURL에 response를 날려서
 AuthorizationFilter에서 받아내는데,
 왜 AuthorizationFilter에서 response.getHeader()의 값이 null인가?
 ![img_2.png](img_2.png)
+=>Chain걸기

@@ -24,7 +24,9 @@ public class PrincipalDetailsService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String memberID) throws UsernameNotFoundException {
         // String username은 loginForm.html에서 넘어온 input name="username"
+        System.out.println("PrincipalDetailsService의 loadUserByusername() : "  +memberID);
         Member memberEntity = memberRepository.findByMemberID(memberID);
+        System.out.println("PrincipalDetailsService에서 찾은 Member Entity : "+memberEntity);
         if(memberEntity!=null){       // username으로 찾은 userEntity가 존재한다면
             return new PrincipalDetails(memberEntity);
         }

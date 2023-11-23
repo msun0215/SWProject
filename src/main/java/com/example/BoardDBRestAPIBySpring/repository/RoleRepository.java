@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 // JpaRepository를 상속했기 때문에
 public interface RoleRepository extends JpaRepository<Role, Long> {
     // findBy는 규칙=>Username문법
-    // select * from USER where username=?
-    public Role findByRoleId(Long roleId);    // JPA Query Method
+    // select * from ROLE where roleID=?
+    public Role findByRoleID(long roleID);    // JPA Query Method
+    //public String findRoleNameByRoldID(long roleID);
 }

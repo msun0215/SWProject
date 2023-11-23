@@ -9,6 +9,7 @@ package com.example.BoardDBRestAPIBySpring.config.auth;
 //import com.cos.security1.model.User;
 
 import com.example.BoardDBRestAPIBySpring.domain.Member;
+import com.example.BoardDBRestAPIBySpring.domain.Role;
 import lombok.Data;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -23,32 +24,54 @@ import java.util.Map;
 public class PrincipalDetails implements UserDetails {
 
     private Member member;  // Composition
+    private Role role;
     private Map<String, Object> attributes;
 
     // 일반 로그인 객체
     public PrincipalDetails(Member member){
         this.member=member;
-    }
+    }   // Composition
 
-    // OAuth 로그인 객체
-    public PrincipalDetails(Member member, Map<String, Object> attributes){
-        this.member=member;
-        this.attributes=attributes;
-    }
+    public PrincipalDetails(Role role){this.role=role;}
+
+    public Member getMember(){return member;}
+
+//    // OAuth 로그인 객체
+//    public PrincipalDetails(Member member, Map<String, Object> attributes){
+//        this.member=member;
+//        this.attributes=attributes;
+//    }
 
 
-    // 해당 User의 권한을 return하는 곳
+//    // 해당 User의 권한을 return하는 곳
+//    @Override
+//    public Collection<? extends GrantedAuthority> getAuthorities() {
+//        // User의 Roll을 return하는데, User.getRoll()의 타입은 String
+//        Collection<GrantedAuthority> collect=new ArrayList<>();
+//        collect.add(new GrantedAuthority() {
+//            @Override
+//            public String getAuthority() {
+//                return member.getRoles().toString();
+//            }
+//        });
+//        return collect;
+//    }
+
     @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        // User의 Roll을 return하는데, User.getRoll()의 타입은 String
-        Collection<GrantedAuthority> collect=new ArrayList<>();
-        collect.add(new GrantedAuthority() {
+    public Collection <? extends GrantedAuthority> getAuthorities(){
+        Collection<GrantedAuthority> authorities=new ArrayList<GrantedAuthority>();
+        authorities.add(new GrantedAuthority() {
             @Override
             public String getAuthority() {
-                return member.getRoles().toString();
+                System.out.println("getRoleName().toString() : "+member.getRoles().getRoleName().toString());
+                return member.getRoles().getRoleName().toString();
             }
         });
-        return collect;
+
+//        member.getRoles().getRoleList().forEach(r->{
+//            authorities.add(()->r);
+//        });
+        return authorities;
     }
 
     @Override

@@ -28,6 +28,9 @@ public class LoginController {
     @Autowired
     private RoleRepository roleRepository;
 
+//    Role role1=roleRepository.save(new Role(1,"ROLE_ADMIN"));
+//    Role role2=roleRepository.save(new Role(2,"ROLE_MANAGER"));
+//    Role role3=roleRepository.save(new Role(3,"ROLE_USER"));
 
     @GetMapping({"", "/"})
     // @RestController를 사용할 경우 ModelAndView를 사용해야 html 페이지로 이동할 수 있다.
@@ -38,7 +41,7 @@ public class LoginController {
         return modelAndView;
     }
 
-    @GetMapping("successLogin")
+    @GetMapping("login/successLogin")
     public ModelAndView successLogin(){
         ModelAndView mv=new ModelAndView();
         mv.setViewName("successLogin");
@@ -46,7 +49,8 @@ public class LoginController {
     }
 
     @PostMapping("/join")
-    public ModelAndView join(@RequestParam String memberID, @RequestParam String memberPW, @RequestParam String memberName, @RequestParam String memberNickname){
+    public ModelAndView join(@RequestParam Member reqmember){
+        // @RequestParam String memberID, @RequestParam String memberPW, @RequestParam String memberName, @RequestParam String memberNickname
         ModelAndView modelAndView=new ModelAndView();
         Member member=new Member();
         //member.setRole("ROLE_USER");
@@ -54,11 +58,11 @@ public class LoginController {
         // 회원가입은 잘 되나 저장한 비밀번호로 저장됨
         // =>Security로 로그인을 할 수가 없음
         // Password가 Encrypt 되지 않았기 때문
-        member.setMemberID(memberID);
-        member.setMemberPW(bCryptPasswordEncoder.encode(memberPW)); // 비밀번호 암호화
-        member.setMemberName(memberName);
-        member.setMemberNickname(memberNickname);
-        Role roleWithId3 = roleRepository.findByRoleId(3L);
+        member.setMemberID(reqmember.getMemberID());
+        member.setMemberPW(bCryptPasswordEncoder.encode(reqmember.getMemberPW())); // 비밀번호 암호화
+        member.setMemberName(reqmember.getMemberName());
+        member.setMemberNickname(reqmember.getMemberNickname());
+        Role roleWithId3 = roleRepository.findByRoleID(3L);     // 기본적으로 회원가입 할 경우 ROLE_USER로 등록
         member.setRoles(roleWithId3);
         memberRepository.save(member);
 
@@ -102,14 +106,16 @@ public ResponseEntity<Void> logout(HttpServletRequest servletRequest) {
     }
 
 
+/*
+    @GetMapping("/user")
+    public String user(){return "user";}
 
-//    @GetMapping("/user")
-//    public String user(){return "user";}
-//
-//    @GetMapping("/manager")
-//    public String manager(){return "manager";}
-//
-//    @GetMapping("/admin")
-//    public String admin(){return "admin";}
+    @GetMapping("/manager")
+    public String manager(){return "manager";}
+
+    @GetMapping("/admin")
+    public String admin(){return "admin";}
+
+ */
 
 }

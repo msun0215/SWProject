@@ -1,4 +1,4 @@
-package com.example.BoardDBRestAPIBySpring.config.auth.jwt;
+package com.example.BoardDBRestAPIBySpring.config.jwt;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
@@ -6,7 +6,6 @@ import com.auth0.jwt.algorithms.Algorithm;
 //import com.example.jwt.model.User;
 import com.example.BoardDBRestAPIBySpring.config.auth.PrincipalDetails;
 import com.example.BoardDBRestAPIBySpring.domain.Member;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -20,7 +19,6 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 import java.io.*;
 import java.net.URLDecoder;
-import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 /*
@@ -120,17 +118,26 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
             // 함수 실행 이후 정상이면 authentication이 return됨.
             // DB에 있는 username과 password가 일치한다.
             System.out.println("authenticationToken : "+authenticationToken);
-            Authentication authentication=authenticationManager.authenticate(authenticationToken);  // login 정보
+            //Authentication authentication=authenticationManager.authenticate(authenticationToken);
 
-            // Principal 객체로 받아와서 getUser가 출력이 된다는 것은 로그인에 성공했다는 뜻임.
-            PrincipalDetails principalDetails = (PrincipalDetails) authentication.getPrincipal();
-            System.out.println("getUsername() : "+principalDetails.getMember().getMemberName());   // 로그인이 정상적으로 되었다는 뜻
-            // authentication 객체가 session 영역에 저장을 해야하고 그 방법이 return 해주면 됨
-            // return 이유는 권한관리를 security가 대신 해주기 때문에 편하려고 하는 것.
-            // 굳이 JWT Token을 사용하면서 Session을 만들 필요는 없으나, 권한 처리를 위해서 JWT Token을 사용함
+            // https://velog.io/@on5949/SpringSecurity-Authentication-%EA%B3%BC%EC%A0%95-%EC%A0%95%EB%A6%AC
+            try{
+                Authentication authentication=authenticationManager.authenticate(authenticationToken);  // login 정보
+                System.out.println("authentication : "+authentication);
+                // Principal 객체로 받아와서 getUser가 출력이 된다는 것은 로그인에 성공했다는 뜻임.
+                PrincipalDetails principalDetails = (PrincipalDetails) authentication.getPrincipal();
+                System.out.println("getUsername() : "+principalDetails.getMember().getMemberName());   // 로그인이 정상적으로 되었다는 뜻
+                // authentication 객체가 session 영역에 저장을 해야하고 그 방법이 return 해주면 됨
+                // return 이유는 권한관리를 security가 대신 해주기 때문에 편하려고 하는 것.
+                // 굳이 JWT Token을 사용하면서 Session을 만들 필요는 없으나, 권한 처리를 위해서 JWT Token을 사용함
 
-            // authentication 객체가 session 영역에 저장이 된다.
-            return authentication;
+                // authentication 객체가 session 영역에 저장이 된다.
+                return authentication;
+            }   catch(AuthenticationException e){
+                System.out.println("Authentication Failed : "+e.getMessage());
+            }
+
+
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -168,7 +175,7 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         //response.getWriter().close();
 
         // Client를 /엔드포인트로 리다이렉트
-        response.sendRedirect("/successLogin");
+        response.sendRedirect("/login/successLogin");
 
 
     }

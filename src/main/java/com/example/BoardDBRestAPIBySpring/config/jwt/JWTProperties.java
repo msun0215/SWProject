@@ -1,4 +1,4 @@
-package com.example.BoardDBRestAPIBySpring.config.auth.jwt;
+package com.example.BoardDBRestAPIBySpring.config.jwt;
 
 public interface JWTProperties {
     String SECRET = "cors";   // 우리 서버만 알고 있는 비밀 값

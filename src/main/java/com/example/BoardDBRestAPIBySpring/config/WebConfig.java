@@ -1,7 +1,7 @@
 package com.example.BoardDBRestAPIBySpring.config;
 
-import com.example.BoardDBRestAPIBySpring.config.auth.jwt.JWTAuthenticationFilter;
-import com.example.BoardDBRestAPIBySpring.config.auth.jwt.JWTAuthorizationFilter;
+import com.example.BoardDBRestAPIBySpring.config.jwt.JWTAuthenticationFilter;
+import com.example.BoardDBRestAPIBySpring.config.jwt.JWTAuthorizationFilter;
 import com.example.BoardDBRestAPIBySpring.controller.handler.CustomAuthFailureHandler;
 import com.example.BoardDBRestAPIBySpring.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
@@ -13,10 +13,10 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
-import org.springframework.security.config.annotation.web.configurers.CsrfConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 @Configuration
 @EnableWebSecurity
@@ -58,13 +58,17 @@ public class WebConfig {
 //                            .requestMatchers("/manager/**").hasAnyRole("hasRole('ROLE_MANAGER') or hasRole('ROLE_ADMIN')")
 //                            .requestMatchers("/admin/**").hasAnyRole("hasRole('ROLE_ADMIN')")
 
+//					.requestMatchers(new AntPathRequestMatcher("/login/**")).authenticated()
+//					.requestMatchers(new AntPathRequestMatcher("/login/**")).hasAnyRole("USER","MANAGER","ADMIN")
 //					.requestMatchers("/user/**").hasAnyRole("USER","MANAGER","ADMIN")
 //					.requestMatchers("/manager/**").hasAnyRole("MANAGER","ADMIN")
 //					.requestMatchers("/admin/**").hasAnyRole("ADMIN")
 					// hasAnyRole() 메소드는 자동으로 앞에 ROLE_을 추가해서 체크해준다
 
 					.anyRequest().permitAll();  // 이외의 요청은 모두 허용함
-		});
+		})
+		//		.logout(logout->logout.logoutSuccessUrl("/"))
+		;
 
         /* Spring Security 사용 시
         http.formLogin(f->f{
