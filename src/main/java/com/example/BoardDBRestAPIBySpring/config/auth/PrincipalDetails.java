@@ -10,7 +10,9 @@ package com.example.BoardDBRestAPIBySpring.config.auth;
 
 import com.example.BoardDBRestAPIBySpring.domain.Member;
 import com.example.BoardDBRestAPIBySpring.domain.Role;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.ToString;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 //import org.springframework.security.oauth2.core.user.OAuth2User;
@@ -21,18 +23,17 @@ import java.util.Map;
 
 // Security Session=> Authentication => UserDetails(PrincipalDetails)
 @Data
+@AllArgsConstructor
+@ToString
 public class PrincipalDetails implements UserDetails {
 
     private Member member;  // Composition
-    private Role role;
     private Map<String, Object> attributes;
 
     // 일반 로그인 객체
     public PrincipalDetails(Member member){
         this.member=member;
     }   // Composition
-
-    public PrincipalDetails(Role role){this.role=role;}
 
     public Member getMember(){return member;}
 
@@ -57,6 +58,7 @@ public class PrincipalDetails implements UserDetails {
 //        return collect;
 //    }
 
+    // 권한 목록
     @Override
     public Collection <? extends GrantedAuthority> getAuthorities(){
         Collection<GrantedAuthority> authorities=new ArrayList<GrantedAuthority>();
@@ -74,11 +76,14 @@ public class PrincipalDetails implements UserDetails {
         return authorities;
     }
 
+
+    // 비밀번호
     @Override
     public String getPassword() {
         return member.getMemberPW();
     }
 
+    // 아이디(PK가 통상적)
     @Override
     public String getUsername() {
         return member.getMemberID();
