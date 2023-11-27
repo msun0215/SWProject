@@ -28,6 +28,7 @@ public class PrincipalDetailsService implements UserDetailsService {
         Member memberEntity = memberRepository.findByMemberID(memberID);
         System.out.println("PrincipalDetailsService에서 찾은 Member Entity : "+memberEntity);
         if(memberEntity!=null){       // memberID로 찾은 memberEntity가 존재한다면
+            System.out.println("memberEntity [["+memberEntity+"]] return 성공!");
             return new PrincipalDetails(memberEntity);
         }
         return null;

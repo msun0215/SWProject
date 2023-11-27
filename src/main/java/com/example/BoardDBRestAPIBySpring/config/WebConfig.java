@@ -64,7 +64,7 @@ public class WebConfig {
 //					.requestMatchers("/manager/**").hasAnyRole("MANAGER","ADMIN")
 //					.requestMatchers("/admin/**").hasAnyRole("ADMIN")
 					// hasAnyRole() 메소드는 자동으로 앞에 ROLE_을 추가해서 체크해준다
-
+					//.requestMatchers(new AntPathRequestMatcher("/**")).authenticated()
 					.anyRequest().permitAll();  // 이외의 요청은 모두 허용함
 		})
 		//		.logout(logout->logout.logoutSuccessUrl("/"))
