@@ -7,10 +7,12 @@ import com.example.BoardDBRestAPIBySpring.controller.handler.CustomLoginSuccessH
 import com.example.BoardDBRestAPIBySpring.repository.MemberRepository;
 import jakarta.servlet.Filter;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -21,6 +23,7 @@ import org.springframework.security.web.authentication.AuthenticationFailureHand
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
+@Log4j2
 @Configuration
 @EnableWebSecurity
 //@EnableGlobalMethodSecurity(securedEnabled = true, prePostEnabled = true)
@@ -33,19 +36,17 @@ public class WebConfig {
 	//public void addCorsMappings(final CorsRegistry registry) {
 		//registry.addMapping("/**");
 	//}
-	private CustomAuthFailureHandler customAuthFailureHandler;
-	private AuthenticationFailureHandler customFailureHandler;
-	private JWTAuthenticationFilter jwtAuthenticationFilter;
-	public WebConfig(CustomAuthFailureHandler customAuthFailureHandler, AuthenticationFailureHandler authenticationFailureHandler, JWTAuthenticationFilter jwtAuthenticationFilter){
-		this.customFailureHandler=customAuthFailureHandler;
-		this.customAuthFailureHandler=customAuthFailureHandler;
-		this.jwtAuthenticationFilter=jwtAuthenticationFilter;
-	}
+	private final CustomAuthFailureHandler customAuthFailureHandler;
+	private final AuthenticationFailureHandler customFailureHandler;
+	private final JWTAuthenticationFilter jwtAuthenticationFilter;
+	private final CorsConfig corsConfig;
+	private final MemberRepository memberRepository;
 
-	@Bean
-	public AuthenticationManager authenticationManagerBean() throws Exception{
-		return super.authenticationManagerBean();
-	}
+
+//	@Bean
+//	public AuthenticationManager authenticationManagerBean(AuthenticationManagerBuilder builder) throws Exception{
+//		return builder.userDetailsService(userDetailsService)
+//	}
 
 	@Bean
 	public JWTAuthenticationFilter JwtAuthenticationFilter(HttpSecurity http) throws  Exception{
@@ -59,12 +60,6 @@ public class WebConfig {
 	public CustomLoginSuccessHandler customLoginSuccessHandler(){
 		return new CustomLoginSuccessHandler();
 	}
-
-	@Autowired
-	private CorsConfig corsConfig;
-
-	@Autowired
-	private MemberRepository memberRepository;
 
 
 	@Bean

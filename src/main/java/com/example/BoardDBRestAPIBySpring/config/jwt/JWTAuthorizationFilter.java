@@ -9,6 +9,7 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -22,6 +23,7 @@ import java.io.IOException;
 // 만약에 권한이 인증이 필요한 주소가 아니라면 이 filter를 타지 않는다.
 // 인가
 
+@Log4j2
 public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
     private MemberRepository memberRepository;
 

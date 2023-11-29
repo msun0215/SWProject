@@ -1,11 +1,13 @@
 package com.example.BoardDBRestAPIBySpring.config;
 
+import lombok.extern.log4j.Log4j2;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
 
+@Log4j2
 @Configuration
 public class CorsConfig {
     @Bean

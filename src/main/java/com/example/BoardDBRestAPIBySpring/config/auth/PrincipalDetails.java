@@ -13,6 +13,7 @@ import com.example.BoardDBRestAPIBySpring.domain.Role;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.ToString;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 //import org.springframework.security.oauth2.core.user.OAuth2User;
@@ -22,6 +23,7 @@ import java.util.Collection;
 import java.util.Map;
 
 // Security Session=> Authentication => UserDetails(PrincipalDetails)
+@Log4j2
 @Data
 @AllArgsConstructor
 @ToString

@@ -8,6 +8,8 @@ import com.example.BoardDBRestAPIBySpring.domain.Role;
 import com.example.BoardDBRestAPIBySpring.repository.MemberRepository;
 import com.example.BoardDBRestAPIBySpring.repository.RoleRepository;
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.extern.log4j.Log4j2;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -18,6 +20,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
+@Slf4j
 @RestController
 public class LoginController {
     @Autowired
