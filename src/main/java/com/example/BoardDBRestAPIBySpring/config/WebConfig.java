@@ -3,7 +3,9 @@ package com.example.BoardDBRestAPIBySpring.config;
 import com.example.BoardDBRestAPIBySpring.config.jwt.JWTAuthenticationFilter;
 import com.example.BoardDBRestAPIBySpring.config.jwt.JWTAuthorizationFilter;
 import com.example.BoardDBRestAPIBySpring.controller.handler.CustomAuthFailureHandler;
+import com.example.BoardDBRestAPIBySpring.controller.handler.CustomLoginSuccessHandler;
 import com.example.BoardDBRestAPIBySpring.repository.MemberRepository;
+import jakarta.servlet.Filter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -16,11 +18,12 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 @Configuration
 @EnableWebSecurity
-@EnableGlobalMethodSecurity(securedEnabled = true, prePostEnabled = true)
+//@EnableGlobalMethodSecurity(securedEnabled = true, prePostEnabled = true)
 @RequiredArgsConstructor
 public class WebConfig {
 
@@ -30,8 +33,32 @@ public class WebConfig {
 	//public void addCorsMappings(final CorsRegistry registry) {
 		//registry.addMapping("/**");
 	//}
-	private final CustomAuthFailureHandler customAuthFailureHandler;
-	private final AuthenticationFailureHandler customFailureHandler;
+	private CustomAuthFailureHandler customAuthFailureHandler;
+	private AuthenticationFailureHandler customFailureHandler;
+	private JWTAuthenticationFilter jwtAuthenticationFilter;
+	public WebConfig(CustomAuthFailureHandler customAuthFailureHandler, AuthenticationFailureHandler authenticationFailureHandler, JWTAuthenticationFilter jwtAuthenticationFilter){
+		this.customFailureHandler=customAuthFailureHandler;
+		this.customAuthFailureHandler=customAuthFailureHandler;
+		this.jwtAuthenticationFilter=jwtAuthenticationFilter;
+	}
+
+	@Bean
+	public AuthenticationManager authenticationManagerBean() throws Exception{
+		return super.authenticationManagerBean();
+	}
+
+	@Bean
+	public JWTAuthenticationFilter JwtAuthenticationFilter(HttpSecurity http) throws  Exception{
+		AuthenticationManager authenticationManager=http.getSharedObject(AuthenticationManager.class);
+		JWTAuthenticationFilter jwtAuthenticationFilter=new JWTAuthenticationFilter(authenticationManager);
+		jwtAuthenticationFilter.setAuthenticationSuccessHandler(customLoginSuccessHandler());
+		jwtAuthenticationFilter.afterPropertiesSet();
+		return jwtAuthenticationFilter;
+	}
+
+	public CustomLoginSuccessHandler customLoginSuccessHandler(){
+		return new CustomLoginSuccessHandler();
+	}
 
 	@Autowired
 	private CorsConfig corsConfig;
@@ -39,13 +66,15 @@ public class WebConfig {
 	@Autowired
 	private MemberRepository memberRepository;
 
+
 	@Bean
 	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception{
 		http.csrf(cs-> cs.disable())
-				.sessionManagement(s->s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+				.sessionManagement(s->s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))		// 세션에 저장을 하지 않는다
 				.formLogin(f->f.disable())
 				.httpBasic(h->h.disable())
 				.apply(new MyCustomDs1());
+						//.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 		//.authorizeHttpRequests(authorize->{
 
 		//});   // custom Filter
@@ -87,9 +116,19 @@ public class WebConfig {
 			http.addFilter(corsConfig.corsFilter())
 					.addFilter(new JWTAuthenticationFilter(authenticationManager))  // AuthenticationManager를 Parameter로 넘겨줘야 함(로그인을 진행하는 데이터이기 때문)
 					.addFilter(new JWTAuthorizationFilter(authenticationManager,memberRepository));
+
 			System.out.println("authenticationManager3 : " + authenticationManager);    // log
 		}
+
 	}
+
+/*
+	@Bean
+	public CustomLoginSuccessHandler customLoginSuccessHandler(){
+		return new CustomLoginSuccessHandler();
+	}
+
+ */
     /*
     기존: WebSecurityConfigurerAdapter를 상속하고 configure매소드를 오버라이딩하여 설정하는 방법
     => 현재: SecurityFilterChain을 리턴하는 메소드를 빈에 등록하는 방식(컴포넌트 방식으로 컨테이너가 관리)

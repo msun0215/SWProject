@@ -11,7 +11,10 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
@@ -30,23 +33,26 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
      but, formLogin().disable() 설정을 하면서 이 Filter가 동작을 하지 않음
      따라서 이 Filter를 SecurityConfig에 다시 등록을 해주어야 한다.
 */
-@RequiredArgsConstructor
+@Log4j2
+//@RequiredArgsConstructor
 public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
-    private final AuthenticationManager authenticationManager;  // 로그인을 실행하기 위한 역할
+    //private final AuthenticationManager authenticationManager;  // 로그인을 실행하기 위한 역할
 
     //private static final AntPathRequestMatcher DEFAULT_ANT_PATH_REQUEST_MATCHER = new AntPathRequestMatcher("/loginForm", "POST");
 
     // /login 요청을 하면 로그인 시도를 위해서 실행되는 함수
 
-//    public JWTAuthenticationFilter(AuthenticationManager authenticationManager){
-//        super.setAuthenticationManager(authenticationManager);
-//    }
+    private AuthenticationProvider authenticationProvider;
+
+    public JWTAuthenticationFilter(AuthenticationManager authenticationManager){
+        super.setAuthenticationManager(authenticationManager);
+    }
+
 
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {
         System.out.println("JWTAuthenticationFilter : 로그인 시도중");
         System.out.println("=========================================");
-
 
 //        System.out.println("memberID : "+request.getAttribute("memberID"));
 //        System.out.println("memberPW : "+request.getAttribute("memberPW"));
@@ -144,7 +150,8 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
             System.out.println("authenticationToken : "+authenticationToken);
 
 
-            Authentication authentication=authenticationManager.authenticate(authenticationToken);
+            //Authentication authentication=authenticationManager.authenticate(authenticationToken);
+            Authentication authentication = getAuthenticationManager().authenticate(authenticationToken);
             System.out.println("authentication : "+authentication);
 
             System.out.println("authenticate : "+authentication.getPrincipal());
@@ -152,6 +159,7 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
             PrincipalDetails principalDetails = (PrincipalDetails) authentication.getPrincipal();
             System.out.println("principalDetails : "+principalDetails);
             System.out.println("getUserName() : "+principalDetails.getUsername());
+            setDetails(request,authenticationToken);
 
             return authentication;
 

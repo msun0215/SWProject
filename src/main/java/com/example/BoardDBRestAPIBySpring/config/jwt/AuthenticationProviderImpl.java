@@ -1,4 +1,6 @@
+/*
 package com.example.BoardDBRestAPIBySpring.config.jwt;
+
 
 import com.example.BoardDBRestAPIBySpring.config.auth.PrincipalDetails;
 import com.example.BoardDBRestAPIBySpring.config.auth.PrincipalDetailsService;
@@ -16,7 +18,7 @@ import org.springframework.stereotype.Component;
 @Component
 @RequiredArgsConstructor
 public class AuthenticationProviderImpl implements AuthenticationProvider {
-    //private final UserDetailsService userDetailsService;
+
     @Autowired
     private PrincipalDetailsService principalDetailsService;
 
@@ -54,3 +56,4 @@ public class AuthenticationProviderImpl implements AuthenticationProvider {
         return authentication.equals(UsernamePasswordAuthenticationToken.class);
     }
 }
+*/

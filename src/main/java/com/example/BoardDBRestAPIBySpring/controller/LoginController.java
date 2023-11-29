@@ -2,6 +2,7 @@ package com.example.BoardDBRestAPIBySpring.controller;
 
 import com.example.BoardDBRestAPIBySpring.config.auth.PrincipalDetails;
 import com.example.BoardDBRestAPIBySpring.domain.Member;
+import com.example.BoardDBRestAPIBySpring.domain.MemberResponseDTO;
 import com.example.BoardDBRestAPIBySpring.domain.Message;
 import com.example.BoardDBRestAPIBySpring.domain.Role;
 import com.example.BoardDBRestAPIBySpring.repository.MemberRepository;
@@ -41,6 +42,14 @@ public class LoginController {
         return modelAndView;
     }
 
+
+    @GetMapping("/user/list")
+    public ResponseEntity<MemberResponseDTO> findAll(){
+        final MemberResponseDTO memberResponseDTO=MemberResponseDTO.builder()
+                .memberList(memberRepository.findAll()).build();
+
+        return ResponseEntity.ok(memberResponseDTO);
+    }
     @GetMapping("login/successLogin")
     public ModelAndView successLogin(){
         ModelAndView mv=new ModelAndView();
