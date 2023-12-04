@@ -12,6 +12,11 @@
 operation::login-controller-test/login[snippets="http-request,form-parameters,http-response,response-headers"]
 
 
+== 회원가입
+
+operation::login-controller-test/signup[snippets="http-request,form-parameters"]
+
+
 == 게시글 조회
 
 - page 기본값: 0, size 기본값: 10

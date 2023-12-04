@@ -68,4 +68,32 @@ class LoginControllerTest extends AbstractRestDocsTest {
                         )
                 ));
     }
+
+    @Test
+    void signup() throws Exception {
+        // given
+        var memberID = "test@test.com";
+        var memberPW = "test";
+        var memberName = "test";
+        var memberNickname = "t";
+        String content =
+                "memberID=" + memberID + "&memberPW=" + memberPW + "&memberName=" + memberName + "&memberNickname="
+                        + memberNickname;
+        var url = "/join";
+
+        // expected
+        mockMvc.perform(post(url)
+                        .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                        .content(content))
+                .andExpect(status().isOk())
+                .andDo(print())
+                .andDo(restDocs.document(
+                        formParameters(
+                                parameterWithName("memberID").description("이메일"),
+                                parameterWithName("memberPW").description("비밀번호"),
+                                parameterWithName("memberName").description("이름"),
+                                parameterWithName("memberNickname").description("별명")
+                        )
+                ));
+    }
 }
