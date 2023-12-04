@@ -1,10 +1,12 @@
 package com.example.BoardDBRestAPIBySpring.controller;
 
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.payload.PayloadDocumentation.relaxedResponseFields;
+import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
 import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
+import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
 import static org.springframework.restdocs.request.RequestDocumentation.queryParameters;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -15,8 +17,8 @@ import com.example.BoardDBRestAPIBySpring.domain.Role;
 import com.example.BoardDBRestAPIBySpring.repository.MemberRepository;
 import com.example.BoardDBRestAPIBySpring.repository.PostRepository;
 import com.example.BoardDBRestAPIBySpring.repository.RoleRepository;
-import java.util.List;
 import java.util.stream.LongStream;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
@@ -39,18 +41,17 @@ class PostControllerTest extends AbstractRestDocsTest {
     private RoleRepository roleRepository;
     @Autowired
     private BCryptPasswordEncoder bCryptPasswordEncoder;
-
     @Autowired
 	private PostRepository postRepository;
 
-	@Test
-	void getAllBoardsTest() throws Exception {
-		// given
+    private Member member;
+
+    @BeforeEach
+    void init() {
         var memberID = "test@test.com";
         var memberPW = "test";
-        var url = "/boards";
 
-        var member = new Member();
+        member = new Member();
         member.setMemberID(memberID);
         member.setMemberPW(bCryptPasswordEncoder.encode(memberPW));
         member.setMemberName("test");
@@ -61,8 +62,14 @@ class PostControllerTest extends AbstractRestDocsTest {
         member.setRoles(role);
 
         memberRepository.save(member);
+    }
 
-		List<Board> boards = LongStream.rangeClosed(1, 20)
+	@Test
+	void getAllBoards() throws Exception {
+		// given
+        var url = "/boards";
+
+		var boards = LongStream.rangeClosed(1, 20)
 			.mapToObj(index -> {
                 Board board = Board.from("제목입니다." + index, "내용입니다." + index);
                 board.setMember(member);
@@ -91,4 +98,38 @@ class PostControllerTest extends AbstractRestDocsTest {
                         )
                 ));
 	}
+
+    @Test
+    void findBoard() throws Exception {
+        // given
+        var url = "/boards/{id}";
+        var boardId = 1L;
+
+        var boards = LongStream.rangeClosed(1, 20)
+                .mapToObj(index -> {
+                    Board board = Board.from("제목입니다." + index, "내용입니다." + index);
+                    board.setMember(member);
+                    return board;
+                })
+                .toList();
+        postRepository.saveAll(boards);
+
+        // expected
+        mockMvc.perform(get(url, boardId))
+                .andExpect(status().isOk())
+                .andDo(print())
+                .andDo(restDocs.document(
+                        pathParameters(
+                                parameterWithName("id").description("게시글 번호")
+                        ),
+                        responseFields(
+                                fieldWithPath("id").description("번호"),
+                                fieldWithPath("title").description("제목"),
+                                fieldWithPath("content").description("내용"),
+                                fieldWithPath("createDate").description("생성일"),
+                                fieldWithPath("modifyDate").description("수정일"),
+                                fieldWithPath("memberName").description("작성자 이름")
+                        )
+                ));
+    }
 }
