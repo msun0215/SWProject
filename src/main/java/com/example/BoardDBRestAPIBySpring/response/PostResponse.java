@@ -8,34 +8,30 @@ import lombok.Getter;
 @Getter
 public class PostResponse {
 
-	private final Long board_no;
+	private final Long id;
 	private final String title;
-	private final String text;
-	private final int count;
-	private final int del_flg;
-	private final LocalDate reg_dtm;
-	private final LocalDate mod_dtm;
+	private final String content;
+	private final LocalDate createDate;
+	private final LocalDate modifyDate;
+	private final String memberName;
 
 	public PostResponse(final Board board) {
-		this.board_no = board.getBoard_no();
+		this.id = board.getId();
 		this.title = board.getTitle();
-		this.text = board.getText();
-		this.count = board.getCount();
-		this.del_flg = board.getDel_flg();
-		this.reg_dtm = board.getReg_dtm();
-		this.mod_dtm = board.getMod_dtm();
+		this.content = board.getContent();
+		this.createDate = board.getCreateDate();
+		this.modifyDate = board.getModifyDate();
+		this.memberName = board.getMember().getMemberName();
 	}
 
 	@Builder
-	public PostResponse(final Long board_no, final String title, final String text, final int count,
-		final int del_flg,
-		final LocalDate reg_dtm, final LocalDate mod_dtm) {
-		this.board_no = board_no;
+	public PostResponse(final Long id, final String title, final String content, final LocalDate createDate,
+						final LocalDate modifyDate, final String memberName) {
+		this.id = id;
 		this.title = title;
-		this.text = text;
-		this.count = count;
-		this.del_flg = del_flg;
-		this.reg_dtm = reg_dtm;
-		this.mod_dtm = mod_dtm;
+		this.content = content;
+		this.createDate = createDate;
+		this.modifyDate = modifyDate;
+		this.memberName = memberName;
 	}
 }

@@ -23,26 +23,23 @@ public class PostCreateRequest {
 	private final String title;
 
 	@NotBlank(message = "내용은 필수입니다.")
-	private final String text;
+	private final String content;
 
 	private List<MultipartFile> files = new ArrayList<>();
 
 	@Builder
-	public PostCreateRequest(final String mem_id, final String title, final String text) {
+	public PostCreateRequest(final String mem_id, final String title, final String content) {
 		this.mem_id = mem_id;
 		this.title = title;
-		this.text = text;
+		this.content = content;
 	}
 
 	public Board toEntity() {
 		return Board.builder()
 			.title(title)
-			.text(text)
-			.count(0)
-			.del_flg(0)
-			.reg_dtm(LocalDate.now())
-			.mod_dtm(LocalDate.now())
-			.mem_id(mem_id)
+			.content(content)
+			.createDate(LocalDate.now())
+			.modifyDate(LocalDate.now())
 			.build();
 	}
 }

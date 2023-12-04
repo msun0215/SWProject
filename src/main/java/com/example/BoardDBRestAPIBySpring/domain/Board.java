@@ -1,5 +1,7 @@
 package com.example.BoardDBRestAPIBySpring.domain;
 
+import static jakarta.persistence.FetchType.LAZY;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -11,42 +13,44 @@ import jakarta.persistence.ManyToOne;
 import java.time.LocalDate;
 import lombok.AccessLevel;
 import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Data
+@Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Board {
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "board_no", updatable = false)
-	private Long board_no;
+	private Long id;
 	@Column(nullable = false)
 	private String title;
 	@Lob
 	@Column(nullable = false)
-	private String text;
-	private int count;
-	private int del_flg;
-	private LocalDate reg_dtm;
-	private LocalDate mod_dtm;
-	private String mem_id;
+	private String content;
+	private LocalDate createDate;
+	private LocalDate modifyDate;
 
-	@ManyToOne
-	@JoinColumn(name = "member_id")
+	@ManyToOne(fetch = LAZY)
+	@JoinColumn(name = "member_id", nullable = false)
 	private Member member;
 
 	@Builder
-	public Board(final String title, final String text, final int count, final int del_flg,
-		final LocalDate reg_dtm, final LocalDate mod_dtm, final String mem_id) {
+	public Board(final String title, final String content, final LocalDate createDate, final LocalDate modifyDate) {
 		this.title = title;
-		this.text = text;
-		this.count = count;
-		this.del_flg = del_flg;
-		this.reg_dtm = reg_dtm;
-		this.mod_dtm = mod_dtm;
-		this.mem_id = mem_id;
+		this.content = content;
+		this.createDate = createDate;
+		this.modifyDate = modifyDate;
+	}
+
+	public static Board from(final String title, final String content) {
+		return Board.builder()
+				.title(title)
+				.content(content)
+				.createDate(LocalDate.now())
+				.modifyDate(LocalDate.now())
+				.build();
 	}
 
 	// 연관관계 편의 메서드
