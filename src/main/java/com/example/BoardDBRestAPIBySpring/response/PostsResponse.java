@@ -9,17 +9,17 @@ import org.springframework.data.domain.Page;
 @Getter
 public class PostsResponse {
 
-	private final List<PostResponse> postResponses;
+	private final List<PostResponse> postsResponse;
 	private final int totalPages;
 	private final long totalElements;
 	private final int pageNumber;
 	private final int pageSize;
 
 	@Builder
-	public PostsResponse(final List<PostResponse> postResponses, final int totalPages, final long totalElements,
+	public PostsResponse(final List<PostResponse> postsResponse, final int totalPages, final long totalElements,
 						 final int pageNumber,
 						 final int pageSize) {
-		this.postResponses = postResponses;
+		this.postsResponse = postsResponse;
 		this.totalPages = totalPages;
 		this.totalElements = totalElements;
 		this.pageNumber = pageNumber;
@@ -27,11 +27,11 @@ public class PostsResponse {
 	}
 
 	public static PostsResponse of(final Page<Board> boards) {
-		List<PostResponse> postResponses = boards.getContent().stream()
+		List<PostResponse> postsResponse = boards.getContent().stream()
 				.map(PostResponse::new)
 				.toList();
 		return PostsResponse.builder()
-				.postResponses(postResponses)
+				.postsResponse(postsResponse)
 				.totalPages(boards.getTotalPages())
 				.totalElements(boards.getTotalElements())
 				.pageSize(boards.getSize())

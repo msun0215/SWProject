@@ -97,7 +97,7 @@ class PostControllerTest extends AbstractRestDocsTest {
                                 parameterWithName("size").description("페이지 크기")
                         ),
                         relaxedResponseFields(
-                                fieldWithPath("postResponses").description("조회된 게시글"),
+                                fieldWithPath("postsResponse").description("조회된 게시글"),
                                 fieldWithPath("totalPages").description("전체 페이지 수"),
                                 fieldWithPath("totalElements").description("전체 게시글 수"),
                                 fieldWithPath("pageNumber").description("현재 페이지 번호"),

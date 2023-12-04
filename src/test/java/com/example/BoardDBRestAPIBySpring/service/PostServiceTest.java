@@ -82,7 +82,7 @@ class PostServiceTest {
             assertEquals(boards.size(), actual.getTotalElements());
             assertEquals(pageRequest.getPageNumber(), actual.getPageNumber());
             assertEquals(pageRequest.getPageSize(), actual.getPageSize());
-            assertEquals(pageRequest.getPageSize(), actual.getPostResponses().size());
+            assertEquals(pageRequest.getPageSize(), actual.getPostsResponse().size());
         });
 	}
 
