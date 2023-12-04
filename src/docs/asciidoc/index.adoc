@@ -10,3 +10,8 @@
 == 로그인
 
 operation::login-controller-test/login[snippets="http-request,form-parameters,http-response,response-headers"]
+
+
+== 게시글 조회
+
+operation::post-controller-test/get-all-boards-test[snippets="http-request,query-parameters,response-body,response-fields"]
