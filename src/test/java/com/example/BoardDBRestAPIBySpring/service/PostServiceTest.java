@@ -62,11 +62,6 @@ class PostServiceTest {
     @DisplayName("페이징으로 게시글들 조회 테스트")
 	void findAllPostsByTest() {
 		// given
-        var member = new Member();
-        member.setMemberID("test@test.com");
-        member.setMemberName("test");
-        memberRepository.save(member);
-
 		var boards = LongStream.rangeClosed(1, 20)
 			.mapToObj(index -> {
                 Board board = Board.from("제목입니다." + index, "내용입니다." + index);
@@ -95,11 +90,6 @@ class PostServiceTest {
     @DisplayName("게시글 단건 조회 테스트")
     void findPostTest() {
         // given
-        var member = new Member();
-        member.setMemberID("test@test.com");
-        member.setMemberName("test");
-        memberRepository.save(member);
-
         var boards = LongStream.rangeClosed(1, 20)
                 .mapToObj(index -> {
                     Board board = Board.from("제목입니다." + index, "내용입니다." + index);
