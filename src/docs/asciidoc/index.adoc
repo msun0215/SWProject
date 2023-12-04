@@ -25,3 +25,9 @@ operation::post-controller-test/find-board[snippets="http-request,path-parameter
 == 게시글 생성
 
 operation::post-controller-test/create-board[snippets="http-request,request-headers,request-fields,response-body"]
+
+== 댓글 조회
+
+- page 기본값: 0, size 기본값: 10
+
+operation::reply-controller-test/get-all-replies[snippets="http-request,path-parameters,query-parameters,response-body,response-fields"]
