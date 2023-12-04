@@ -60,7 +60,7 @@ class ReplyRepositoryTest {
         board.setMember(member);
         postRepository.save(board);
 
-        String content = "댓글 내용입니다.";
+        var content = "댓글 내용입니다.";
         var reply = Reply.of(content);
         reply.setBoard(board);
         reply.setMember(member);

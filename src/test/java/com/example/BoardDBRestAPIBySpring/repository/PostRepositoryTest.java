@@ -53,11 +53,11 @@ class PostRepositoryTest {
 	@DisplayName("게시글 생성 테스트")
 	void saveBoardTest() {
 		// given
-        Board board = Board.from("제목입니다.", "내용입니다.");
+        var board = Board.from("제목입니다.", "내용입니다.");
 		board.setMember(member);
 
 		// when
-		Board result = postRepository.save(board);
+        var result = postRepository.save(board);
 
 		// then
         assertAll(() -> {

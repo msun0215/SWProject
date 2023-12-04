@@ -117,7 +117,7 @@ class PostServiceTest {
     @Transactional(readOnly = true)
     void createBoardTest() {
         // given
-        PostCreateRequest request = PostCreateRequest.builder()
+        var request = PostCreateRequest.builder()
                 .title("제목입니다.")
                 .content("내용입니다.")
                 .build();
@@ -126,7 +126,7 @@ class PostServiceTest {
         postService.createBoard(member, request);
 
         // then
-        Board actual = postRepository.findById(1L).get();
+        var actual = postRepository.findById(1L).get();
         assertAll(() -> {
             assertEquals(request.getTitle(), actual.getTitle());
             assertEquals(request.getContent(), actual.getContent());
