@@ -21,3 +21,7 @@ operation::post-controller-test/get-all-boards[snippets="http-request,query-para
 == 게시글 단건 조회
 
 operation::post-controller-test/find-board[snippets="http-request,path-parameters,response-body,response-fields"]
+
+== 게시글 생성
+
+operation::post-controller-test/create-board[snippets="http-request,request-headers,request-fields,response-body"]

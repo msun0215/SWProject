@@ -39,8 +39,8 @@ public class PostController {
 	}
 
 	@PostMapping
-	public ResponseEntity<Void> createBoard(@AuthenticationPrincipal PrincipalDetails principalDetails, @RequestBody
-	PostCreateRequest request) {
+	public ResponseEntity<Void> createBoard(@AuthenticationPrincipal PrincipalDetails principalDetails,
+											@RequestBody PostCreateRequest request) {
 
 		Member member = principalDetails.getMember();
 		postService.createBoard(member, request);

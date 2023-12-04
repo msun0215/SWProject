@@ -1,8 +1,12 @@
 package com.example.BoardDBRestAPIBySpring.controller;
 
+import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
+import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.payload.PayloadDocumentation.relaxedResponseFields;
+import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
 import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
 import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
@@ -11,12 +15,16 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.example.BoardDBRestAPIBySpring.config.AbstractRestDocsTest;
+import com.example.BoardDBRestAPIBySpring.config.jwt.JWTProperties;
+import com.example.BoardDBRestAPIBySpring.config.jwt.TokenUtils;
 import com.example.BoardDBRestAPIBySpring.domain.Board;
 import com.example.BoardDBRestAPIBySpring.domain.Member;
 import com.example.BoardDBRestAPIBySpring.domain.Role;
 import com.example.BoardDBRestAPIBySpring.repository.MemberRepository;
 import com.example.BoardDBRestAPIBySpring.repository.PostRepository;
 import com.example.BoardDBRestAPIBySpring.repository.RoleRepository;
+import com.example.BoardDBRestAPIBySpring.request.PostCreateRequest;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.stream.LongStream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -24,6 +32,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.MediaType;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
@@ -43,6 +52,8 @@ class PostControllerTest extends AbstractRestDocsTest {
     private BCryptPasswordEncoder bCryptPasswordEncoder;
     @Autowired
 	private PostRepository postRepository;
+    @Autowired
+    private ObjectMapper objectMapper;
 
     private Member member;
 
@@ -129,6 +140,39 @@ class PostControllerTest extends AbstractRestDocsTest {
                                 fieldWithPath("createDate").description("생성일"),
                                 fieldWithPath("modifyDate").description("수정일"),
                                 fieldWithPath("memberName").description("작성자 이름")
+                        )
+                ));
+    }
+
+    @Test
+    void createBoard() throws Exception {
+        // given
+        var url = "/boards";
+
+        var postCreateRequest = PostCreateRequest.builder()
+                .title("제목입니다.")
+                .content("내용입니다.")
+                .build();
+
+        var jwtToken = TokenUtils.generateJwtToken(member);
+        var authorizationHeader = JWTProperties.TOKEN_PREFIX.concat(jwtToken);
+
+        var json = objectMapper.writeValueAsString(postCreateRequest);
+
+        // expected
+        mockMvc.perform(post(url)
+                        .header("Authorization", authorizationHeader)
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .content(json))
+                .andExpect(status().isCreated())
+                .andDo(print())
+                .andDo(restDocs.document(
+                        requestHeaders(
+                                headerWithName("Authorization").description("JWT Token")
+                        ),
+                        requestFields(
+                                fieldWithPath("title").description("제목"),
+                                fieldWithPath("content").description("내용")
                         )
                 ));
     }
