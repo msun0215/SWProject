@@ -1,7 +1,9 @@
 package com.example.BoardDBRestAPIBySpring.service;
 
 import com.example.BoardDBRestAPIBySpring.domain.Board;
+import com.example.BoardDBRestAPIBySpring.domain.Member;
 import com.example.BoardDBRestAPIBySpring.repository.PostRepository;
+import com.example.BoardDBRestAPIBySpring.request.PostCreateRequest;
 import com.example.BoardDBRestAPIBySpring.response.PostResponse;
 import com.example.BoardDBRestAPIBySpring.response.PostsResponse;
 import lombok.RequiredArgsConstructor;
@@ -33,6 +35,13 @@ public class PostService {
 	public PostResponse findById(final Long id) {
 		Board board = postRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 게시글입니다."));
 		return new PostResponse(board);
+	}
+
+	public void createBoard(final Member member, final PostCreateRequest request) {
+		Board board = request.toEntity();
+		board.setMember(member);
+
+		postRepository.save(board);
 	}
 }
 

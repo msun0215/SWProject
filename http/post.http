@@ -59,4 +59,20 @@ Content-Type: application/json
 
 ### test
 GET http://localhost:8080/joinForm
-Authorization: Bearer eyJyZWdEYXRlIjoxNzAxNDA3NTM2NzY0LCJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJtZW1iZXJOYW1lIjoiYiIsImV4cCI6MTcwMzk5OTUzNiwibWVtYmVySUQiOiJiQGIuY29tIn0.AFnOgmyJlyvuOQSfUPk4Jhu_dtwY-7LPQhfDrSG1Nro
+Authorization: Bearer eyJyZWdEYXRlIjoxNzAxNjU5NTg3MDYyLCJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJtZW1iZXJOYW1lIjoiYiIsImV4cCI6MTcwNDI1MTU4NywibWVtYmVySUQiOiJiQGIuY29tIn0.b95p5hWUG7Ct-SkDlGIyAsLbjXTOMab0aLPOE2B6eVQ
+
+
+### 게시글 조회
+GET http://localhost:8080/boards
+Authorization: Bearer eyJyZWdEYXRlIjoxNzAxNjU5NTg3MDYyLCJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJtZW1iZXJOYW1lIjoiYiIsImV4cCI6MTcwNDI1MTU4NywibWVtYmVySUQiOiJiQGIuY29tIn0.b95p5hWUG7Ct-SkDlGIyAsLbjXTOMab0aLPOE2B6eVQ
+
+
+### 게시글 생성
+POST http://localhost:8080/boards
+Authorization: Bearer eyJyZWdEYXRlIjoxNzAxNjU5NTg3MDYyLCJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJtZW1iZXJOYW1lIjoiYiIsImV4cCI6MTcwNDI1MTU4NywibWVtYmVySUQiOiJiQGIuY29tIn0.b95p5hWUG7Ct-SkDlGIyAsLbjXTOMab0aLPOE2B6eVQ
+Content-Type: application/json
+
+{
+  "title": "제목입니다.",
+  "content": "내용입니다."
+}
