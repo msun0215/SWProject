@@ -9,18 +9,16 @@ package com.example.BoardDBRestAPIBySpring.config.auth;
 //import com.cos.security1.model.User;
 
 import com.example.BoardDBRestAPIBySpring.domain.Member;
-import com.example.BoardDBRestAPIBySpring.domain.Role;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Map;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.ToString;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-//import org.springframework.security.oauth2.core.user.OAuth2User;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Map;
 
 // Security Session=> Authentication => UserDetails(PrincipalDetails)
 @Log4j2
@@ -64,13 +62,16 @@ public class PrincipalDetails implements UserDetails {
     @Override
     public Collection <? extends GrantedAuthority> getAuthorities(){
         Collection<GrantedAuthority> authorities=new ArrayList<GrantedAuthority>();
-        authorities.add(new GrantedAuthority() {
-            @Override
-            public String getAuthority() {
-                System.out.println("getRoleName().toString() : "+member.getRoles().getRoleName().toString());
-                return member.getRoles().getRoleName().toString();
-            }
-        });
+//        authorities.add(new GrantedAuthority() {
+//            @Override
+//            public String getAuthority() {
+//                System.out.println("getRoleName().toString() : "+member.getRoles().getRoleName().toString());
+//                return member.getRoles().getRoleName().toString();
+//            }
+//        });
+
+        SimpleGrantedAuthority simpleGrantedAuthority = new SimpleGrantedAuthority("ROLE_".concat(member.getRoles().getRoleName()));
+        authorities.add(simpleGrantedAuthority);
 
 //        member.getRoles().getRoleList().forEach(r->{
 //            authorities.add(()->r);

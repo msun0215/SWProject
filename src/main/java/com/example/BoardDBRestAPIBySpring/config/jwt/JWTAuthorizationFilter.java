@@ -1,22 +1,20 @@
 package com.example.BoardDBRestAPIBySpring.config.jwt;
 
-import com.auth0.jwt.JWT;
-import com.auth0.jwt.algorithms.Algorithm;
 import com.example.BoardDBRestAPIBySpring.config.auth.PrincipalDetails;
 import com.example.BoardDBRestAPIBySpring.domain.Member;
 import com.example.BoardDBRestAPIBySpring.repository.MemberRepository;
+import io.jsonwebtoken.Jwts;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
-
-import java.io.IOException;
 
 // Security가 가지고 있는 filter들 중 BasicAuthenticationFilter라는 것이 있음
 // 권한이나 인증이 필요한 특정 주소를 요청했을 때 위 filter를 무조건 타게 되어있음.
@@ -59,7 +57,13 @@ public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
 
         // JWT Token을 검증해서 정상적인 사용자인지 확인
         String token = request.getHeader(JWTProperties.HEADER_STRING).replace(JWTProperties.TOKEN_PREFIX, "");
-        String memberID = JWT.require(Algorithm.HMAC512(JWTProperties.SECRET)).build().verify(token).getClaim("memberID").asString();  // verify()를 통해서 서명
+//        String memberID = JWT.require(Algorithm.HMAC512(JWTProperties.SECRET)).build().verify(token).getClaim("memberID").asString();  // verify()를 통해서 서명
+
+        boolean validToken = TokenUtils.isValidToken(token);
+        System.out.println("validToken = " + validToken);
+        String memberID = Jwts.parser().setSigningKey(JWTProperties.SECRET).parseClaimsJws(token).getBody()
+                .get("memberID", String.class);
+
         System.out.println("token : "+token);
         System.out.println("memberID : "+memberID);
         // 서명이 정상적으로 동작했을 경우

@@ -46,3 +46,17 @@ Content-Disposition: form-data; name="files"; filename="createPostTestFile2.txt"
 Content-Disposition: form-data; name="files"; filename="img.png"
 
 < ./
+
+### test
+POST http://localhost:8080/login
+Content-Type: application/json
+
+{
+  "memberID": "b@b.com",
+  "memberPW": "b"
+}
+
+
+### test
+GET http://localhost:8080/joinForm
+Authorization: Bearer eyJyZWdEYXRlIjoxNzAxNDA3NTM2NzY0LCJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJtZW1iZXJOYW1lIjoiYiIsImV4cCI6MTcwMzk5OTUzNiwibWVtYmVySUQiOiJiQGIuY29tIn0.AFnOgmyJlyvuOQSfUPk4Jhu_dtwY-7LPQhfDrSG1Nro

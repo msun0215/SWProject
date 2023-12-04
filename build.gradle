@@ -2,6 +2,7 @@ plugins {
 	id 'java'
 	id 'org.springframework.boot' version '3.0.12-SNAPSHOT'
 	id 'io.spring.dependency-management' version '1.1.3'
+	id "org.asciidoctor.jvm.convert" version "3.3.2"  // (1)
 }
 
 group = 'com.example'
@@ -15,6 +16,7 @@ configurations {
 	compileOnly {
 		extendsFrom annotationProcessor
 	}
+	asciidoctorExt // (2)
 }
 
 repositories {
@@ -38,6 +40,8 @@ dependencies {
 	implementation 'io.jsonwebtoken:jjwt-impl:0.11.5'
 	implementation 'io.jsonwebtoken:jjwt-jackson:0.11.5'
 
+	implementation 'javax.xml.bind:jaxb-api:2.1'
+
 	// 소스코드 변경시 SpringBoot 자동 재시작
 	implementation 'org.springframework.boot:spring-boot-devtools'
 
@@ -56,6 +60,9 @@ dependencies {
 
 	implementation 'org.projectlombok:lombok'
 
+	asciidoctorExt 'org.springframework.restdocs:spring-restdocs-asciidoctor' // (3)
+	testImplementation 'org.springframework.restdocs:spring-restdocs-mockmvc' // (4)
+
 	compileOnly 'org.projectlombok:lombok'
 	runtimeOnly 'com.h2database:h2'
 	runtimeOnly 'com.mysql:mysql-connector-j'
@@ -65,4 +72,30 @@ dependencies {
 
 tasks.named('test') {
 	useJUnitPlatform()
+	outputs.dir snippetsDir // (6)
+}
+
+ext {
+	snippetsDir = file('build/generated-snippets') // (5)
+}
+
+asciidoctor {
+	configurations 'asciidoctorExt' // (7)
+	baseDirFollowsSourceFile() // (8)
+	inputs.dir snippetsDir // (9)
+	dependsOn test // (10)
+}
+
+asciidoctor.doFirst {
+	delete file('src/main/resources/static/docs')  // (11)
+}
+
+task copyDocument(type: Copy) { // (12)
+	dependsOn asciidoctor
+	from file("build/docs/asciidoc")
+	into file("src/main/resources/static/docs")
+}
+
+build {
+	dependsOn copyDocument
 }

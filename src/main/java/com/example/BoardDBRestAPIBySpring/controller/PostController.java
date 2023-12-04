@@ -3,7 +3,6 @@ package com.example.BoardDBRestAPIBySpring.controller;
 import com.example.BoardDBRestAPIBySpring.domain.Board;
 import com.example.BoardDBRestAPIBySpring.request.PostCreateRequest;
 import com.example.BoardDBRestAPIBySpring.response.PostResponse;
-import com.example.BoardDBRestAPIBySpring.service.PostFileService;
 import com.example.BoardDBRestAPIBySpring.service.PostService;
 import jakarta.validation.Valid;
 import java.util.List;
@@ -24,7 +23,6 @@ import org.springframework.web.bind.annotation.RestController;
 public class PostController {
 
 	private final PostService postService;
-	private final PostFileService postFileService;
 
 	@GetMapping
 	public List<PostResponse> getAllPosts() {
@@ -56,6 +54,5 @@ public class PostController {
 		log.info("postCreateRequest.files size = {}", request.getFiles().size());
 
 		Board board = postService.save(request);
-		postFileService.save(board, request.getFiles());
 	}
 }

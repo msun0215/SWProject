@@ -1,30 +1,24 @@
 package com.example.BoardDBRestAPIBySpring.config.jwt;
 
-import com.auth0.jwt.JWT;
-import com.auth0.jwt.algorithms.Algorithm;
-//import com.example.jwt.config.auth.PrincipalDetails;
-//import com.example.jwt.model.User;
 import com.example.BoardDBRestAPIBySpring.config.auth.PrincipalDetails;
 import com.example.BoardDBRestAPIBySpring.domain.Member;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import lombok.RequiredArgsConstructor;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.util.HashMap;
+import java.util.Map;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-
-import java.io.*;
-import java.net.URLDecoder;
-import java.util.*;
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 /*
      Spring Security의 UsernamePasswordAuthenticationFilter 사용
@@ -48,6 +42,31 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         super.setAuthenticationManager(authenticationManager);
     }
 
+    private static Map<String, String> splitFormData(String formData){
+        Map<String, String> dataMap = new HashMap<>();
+        String[] keyValuePairs = formData.split("&"); // "&"를 기준으로 memberID=~ 와 memberPW=~를 나눔
+
+        for(String pair : keyValuePairs){
+            String[] entry = pair.split("=");   // memberID=~를 =기준으로 나눠서 memberID와 ~를 가짐
+            String key = entry[0];
+            String value = entry.length>1?entry[1]:"";
+
+            // URL Decoding
+            value = urlDecode(value);
+            dataMap.put(key, value);
+        }
+        return dataMap;
+    }
+
+    // URL Decoding Method
+    private static String urlDecode(String value){
+        try{
+            return URLDecoder.decode(value, "UTF-8");
+        }catch (UnsupportedEncodingException e){
+            e.printStackTrace();
+            return value;
+        }
+    }
 
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {
@@ -208,12 +227,13 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         System.out.println("Authentication이 실행됨 : 인증이 완료되었다는 뜻임");
 
         // RSA방식이 아닌, Hash암호방식
-        String jwtToken = JWT.create()
-                .withSubject(principalDetails.getUsername())    // token 별명 느낌?
-                        .withExpiresAt(new Date(System.currentTimeMillis()+JWTProperties.EXPIRATION_TIME))  // Token 만료 시간 -> 현재시간 + 만료시간
-                                .withClaim("id", principalDetails.getMember().getMemberID())    // 비공개 Claim -> 넣고싶은거 아무거나 넣으면 됨
-                                        .withClaim("username", principalDetails.getMember().getMemberName())    // 비공개 Claim
-                                                .sign(Algorithm.HMAC512(JWTProperties.SECRET));  // HMAC512는 SECRET KEY를 필요로 함
+//        String jwtToken = JWT.create()
+//                .withSubject(principalDetails.getUsername())    // token 별명 느낌?
+//                        .withExpiresAt(new Date(System.currentTimeMillis()+JWTProperties.EXPIRATION_TIME))  // Token 만료 시간 -> 현재시간 + 만료시간
+//                                .withClaim("id", principalDetails.getMember().getMemberID())    // 비공개 Claim -> 넣고싶은거 아무거나 넣으면 됨
+//                                        .withClaim("username", principalDetails.getMember().getMemberName())    // 비공개 Claim
+//                                                .sign(Algorithm.HMAC512(JWTProperties.SECRET));  // HMAC512는 SECRET KEY를 필요로 함
+        String jwtToken = TokenUtils.generateJwtToken(principalDetails.getMember());
         response.addHeader(JWTProperties.HEADER_STRING, JWTProperties.TOKEN_PREFIX+jwtToken);
         System.out.println("response : "+response);
         System.out.println("JWTAuthenticationFilter에서의 response.getHeader() : "+response.getHeader(JWTProperties.HEADER_STRING));
@@ -225,35 +245,9 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         //response.getWriter().close();
 
         // Client를 /엔드포인트로 리다이렉트
-        response.sendRedirect("/login/successLogin");
+//        response.sendRedirect("/login/successLogin");
 
 
-    }
-
-    private static Map<String, String> splitFormData(String formData){
-        Map<String, String> dataMap = new HashMap<>();
-        String[] keyValuePairs = formData.split("&"); // "&"를 기준으로 memberID=~ 와 memberPW=~를 나눔
-
-        for(String pair : keyValuePairs){
-            String[] entry = pair.split("=");   // memberID=~를 =기준으로 나눠서 memberID와 ~를 가짐
-            String key = entry[0];
-            String value = entry.length>1?entry[1]:"";
-
-            // URL Decoding
-            value = urlDecode(value);
-            dataMap.put(key, value);
-        }
-        return dataMap;
-    }
-
-    // URL Decoding Method
-    private static String urlDecode(String value){
-        try{
-            return URLDecoder.decode(value, "UTF-8");
-        }catch (UnsupportedEncodingException e){
-            e.printStackTrace();
-            return value;
-        }
     }
 
     /*

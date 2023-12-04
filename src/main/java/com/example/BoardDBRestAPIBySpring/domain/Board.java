@@ -1,6 +1,5 @@
 package com.example.BoardDBRestAPIBySpring.domain;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -9,12 +8,11 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Data
@@ -35,9 +33,6 @@ public class Board {
 	private LocalDate mod_dtm;
 	private String mem_id;
 
-	@OneToMany(mappedBy = "board", cascade = {CascadeType.ALL}, orphanRemoval = true)
-	private List<PostFile> postFiles = new ArrayList<>();
-
 	@ManyToOne
 	@JoinColumn(name = "member_id")
 	private Member member;
@@ -57,14 +52,5 @@ public class Board {
 	// 연관관계 편의 메서드
 	public void setMember(final Member member) {
 		this.member = member;
-	}
-
-	// 연관관계 편의 메서드
-	public void addPostFile(final PostFile postFile) {
-		this.postFiles.add(postFile);
-
-		if (postFile.getBoard() != this) {
-			postFile.setBoard(this);
-		}
 	}
 }
