@@ -2,8 +2,8 @@ package com.example.BoardDBRestAPIBySpring.controller;
 
 import com.example.BoardDBRestAPIBySpring.config.auth.PrincipalDetails;
 import com.example.BoardDBRestAPIBySpring.domain.Member;
-import com.example.BoardDBRestAPIBySpring.request.ReplyCreateDto;
 import com.example.BoardDBRestAPIBySpring.request.ReplyCreateRequest;
+import com.example.BoardDBRestAPIBySpring.request.ReplyEditDto;
 import com.example.BoardDBRestAPIBySpring.request.ReplyEditRequest;
 import com.example.BoardDBRestAPIBySpring.response.RepliesResponse;
 import com.example.BoardDBRestAPIBySpring.service.ReplyService;
@@ -54,7 +54,7 @@ public class ReplyController {
                                           @RequestBody final ReplyEditRequest request) {
 
         Member member = principalDetails.getMember();
-        ReplyCreateDto dto = ReplyCreateDto.builder()
+        ReplyEditDto dto = ReplyEditDto.builder()
                 .replyId(id)
                 .boardId(boardId)
                 .member(member)

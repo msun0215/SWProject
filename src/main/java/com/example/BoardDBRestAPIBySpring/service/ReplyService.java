@@ -5,8 +5,8 @@ import com.example.BoardDBRestAPIBySpring.domain.Member;
 import com.example.BoardDBRestAPIBySpring.domain.Reply;
 import com.example.BoardDBRestAPIBySpring.repository.PostRepository;
 import com.example.BoardDBRestAPIBySpring.repository.ReplyRepository;
-import com.example.BoardDBRestAPIBySpring.request.ReplyCreateDto;
 import com.example.BoardDBRestAPIBySpring.request.ReplyCreateRequest;
+import com.example.BoardDBRestAPIBySpring.request.ReplyEditDto;
 import com.example.BoardDBRestAPIBySpring.response.RepliesResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -46,7 +46,7 @@ public class ReplyService {
     }
 
     @Transactional
-    public void editReply(final ReplyCreateDto dto) {
+    public void editReply(final ReplyEditDto dto) {
         Reply reply = replyRepository.findById(dto.getReplyId())
                 .orElseThrow(() -> new IllegalArgumentException("존자해지 않는 댓글입니다."));
         if (reply.isNotSameBoardId(dto.getBoardId())) {

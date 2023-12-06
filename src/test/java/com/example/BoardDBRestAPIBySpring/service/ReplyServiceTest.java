@@ -13,8 +13,8 @@ import com.example.BoardDBRestAPIBySpring.repository.MemberRepository;
 import com.example.BoardDBRestAPIBySpring.repository.PostRepository;
 import com.example.BoardDBRestAPIBySpring.repository.ReplyRepository;
 import com.example.BoardDBRestAPIBySpring.repository.RoleRepository;
-import com.example.BoardDBRestAPIBySpring.request.ReplyCreateDto;
 import com.example.BoardDBRestAPIBySpring.request.ReplyCreateRequest;
+import com.example.BoardDBRestAPIBySpring.request.ReplyEditDto;
 import com.example.BoardDBRestAPIBySpring.request.ReplyEditRequest;
 import java.util.stream.LongStream;
 import org.junit.jupiter.api.BeforeEach;
@@ -153,7 +153,7 @@ class ReplyServiceTest {
 
         var replyId = reply.getId();
 
-        var dto = ReplyCreateDto.builder()
+        var dto = ReplyEditDto.builder()
                 .replyId(replyId)
                 .boardId(board.getId())
                 .member(member)

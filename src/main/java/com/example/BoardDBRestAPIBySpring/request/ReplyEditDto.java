@@ -5,7 +5,7 @@ import lombok.Builder;
 import lombok.Getter;
 
 @Getter
-public class ReplyCreateDto {
+public class ReplyEditDto {
 
     private final long replyId;
     private final long boardId;
@@ -13,8 +13,8 @@ public class ReplyCreateDto {
     private final ReplyEditRequest request;
 
     @Builder
-    public ReplyCreateDto(final long replyId, final long boardId, final Member member,
-                          final ReplyEditRequest request) {
+    public ReplyEditDto(final long replyId, final long boardId, final Member member,
+                        final ReplyEditRequest request) {
         this.replyId = replyId;
         this.boardId = boardId;
         this.member = member;
