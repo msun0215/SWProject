@@ -136,7 +136,7 @@ class ReplyControllerTest extends AbstractRestDocsTest {
 
         // expected
         mockMvc.perform(post(baseURL, boardId)
-                        .header("Authorization", authorizationHeader)
+                        .header(AUTHORIZATION, authorizationHeader)
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
                         .content(json))
                 .andExpect(status().isCreated())
@@ -146,7 +146,7 @@ class ReplyControllerTest extends AbstractRestDocsTest {
                                 parameterWithName("boardId").description("게시글 번호")
                         ),
                         requestHeaders(
-                                headerWithName("Authorization").description("JWT Token")
+                                headerWithName(AUTHORIZATION).description(JWT_TOKEN)
                         ),
                         requestFields(
                                 fieldWithPath("content").description("내용")
@@ -176,14 +176,14 @@ class ReplyControllerTest extends AbstractRestDocsTest {
 
         // expected
         mockMvc.perform(put(url, boardId, replyId)
-                        .header("Authorization", authorizationHeader)
+                        .header(AUTHORIZATION, authorizationHeader)
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
                         .content(json))
                 .andExpect(status().isOk())
                 .andDo(print())
                 .andDo(restDocs.document(
                         requestHeaders(
-                                headerWithName("Authorization").description("JWT Token")
+                                headerWithName(AUTHORIZATION).description(JWT_TOKEN)
                         ),
                         pathParameters(
                                 parameterWithName("boardId").description("게시글 번호"),
@@ -212,12 +212,12 @@ class ReplyControllerTest extends AbstractRestDocsTest {
 
         // expected
         mockMvc.perform(delete(url, boardId, replyId)
-                        .header("Authorization", authorizationHeader))
+                        .header(AUTHORIZATION, authorizationHeader))
                 .andExpect(status().isOk())
                 .andDo(print())
                 .andDo(restDocs.document(
                         requestHeaders(
-                                headerWithName("Authorization").description("JWT Token")
+                                headerWithName(AUTHORIZATION).description(JWT_TOKEN)
                         ),
                         pathParameters(
                                 parameterWithName("boardId").description("게시글 번호"),

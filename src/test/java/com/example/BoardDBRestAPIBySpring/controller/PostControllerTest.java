@@ -43,6 +43,7 @@ import org.springframework.test.web.servlet.MockMvc;
 @SpringBootTest
 @AutoConfigureMockMvc
 class PostControllerTest extends AbstractRestDocsTest {
+    private final String baseURL = "/boards";
 	@Autowired
 	private MockMvc mockMvc;
     @Autowired
@@ -55,7 +56,6 @@ class PostControllerTest extends AbstractRestDocsTest {
 	private PostRepository postRepository;
     @Autowired
     private ObjectMapper objectMapper;
-
     private Member member;
 
     @BeforeEach
@@ -79,8 +79,6 @@ class PostControllerTest extends AbstractRestDocsTest {
 	@Test
 	void getAllBoards() throws Exception {
 		// given
-        var url = "/boards";
-
 		var boards = LongStream.rangeClosed(1, 20)
 			.mapToObj(index -> {
                 Board board = Board.from("제목입니다." + index, "내용입니다." + index);
@@ -91,7 +89,7 @@ class PostControllerTest extends AbstractRestDocsTest {
 		postRepository.saveAll(boards);
 
 		// expected
-        mockMvc.perform(get(url)
+        mockMvc.perform(get(baseURL)
                         .param("page", "1")
                         .param("size", "5"))
                 .andExpect(status().isOk())
@@ -114,7 +112,7 @@ class PostControllerTest extends AbstractRestDocsTest {
     @Test
     void findBoard() throws Exception {
         // given
-        var url = "/boards/{id}";
+        var url = baseURL.concat("/{id}");
         var boardId = 1L;
 
         var boards = LongStream.rangeClosed(1, 20)
@@ -148,8 +146,6 @@ class PostControllerTest extends AbstractRestDocsTest {
     @Test
     void createBoard() throws Exception {
         // given
-        var url = "/boards";
-
         var postCreateRequest = PostCreateRequest.builder()
                 .title("제목입니다.")
                 .content("내용입니다.")
@@ -161,15 +157,15 @@ class PostControllerTest extends AbstractRestDocsTest {
         var json = objectMapper.writeValueAsString(postCreateRequest);
 
         // expected
-        mockMvc.perform(post(url)
-                        .header("Authorization", authorizationHeader)
+        mockMvc.perform(post(baseURL)
+                        .header(AUTHORIZATION, authorizationHeader)
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
                         .content(json))
                 .andExpect(status().isCreated())
                 .andDo(print())
                 .andDo(restDocs.document(
                         requestHeaders(
-                                headerWithName("Authorization").description("JWT Token")
+                                headerWithName(AUTHORIZATION).description(JWT_TOKEN)
                         ),
                         requestFields(
                                 fieldWithPath("title").description("제목"),
@@ -181,7 +177,7 @@ class PostControllerTest extends AbstractRestDocsTest {
     @Test
     void editBoard() throws Exception {
         // given
-        var url = "/boards/{id}";
+        var url = baseURL.concat("/{id}");
         var boardId = 1L;
 
         var boards = LongStream.rangeClosed(1, 20)
@@ -204,14 +200,14 @@ class PostControllerTest extends AbstractRestDocsTest {
 
         // expected
         mockMvc.perform(put(url, boardId)
-                        .header("Authorization", authorizationHeader)
+                        .header(AUTHORIZATION, authorizationHeader)
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
                         .content(json))
                 .andExpect(status().isOk())
                 .andDo(print())
                 .andDo(restDocs.document(
                         requestHeaders(
-                                headerWithName("Authorization").description("JWT Token")
+                                headerWithName(AUTHORIZATION).description(JWT_TOKEN)
                         ),
                         pathParameters(
                                 parameterWithName("id").description("수정할 게시글 번호")
@@ -226,7 +222,7 @@ class PostControllerTest extends AbstractRestDocsTest {
     @Test
     void deleteBoard() throws Exception {
         // given
-        var url = "/boards/{id}";
+        var url = baseURL.concat("/{id}");
         var boardId = 1L;
 
         var boards = LongStream.rangeClosed(1, 20)
@@ -243,12 +239,12 @@ class PostControllerTest extends AbstractRestDocsTest {
 
         // expected
         mockMvc.perform(delete(url, boardId)
-                        .header("Authorization", authorizationHeader))
+                        .header(AUTHORIZATION, authorizationHeader))
                 .andExpect(status().isOk())
                 .andDo(print())
                 .andDo(restDocs.document(
                         requestHeaders(
-                                headerWithName("Authorization").description("JWT Token")
+                                headerWithName(AUTHORIZATION).description(JWT_TOKEN)
                         ),
                         pathParameters(
                                 parameterWithName("id").description("삭제할 게시글 번호")
@@ -259,7 +255,7 @@ class PostControllerTest extends AbstractRestDocsTest {
     @Test
     void createRoleChangeBoard() throws Exception {
         // given
-        var url = "/boards/users/roles";
+        var url = baseURL.concat("/users/roles");
 
         var postCreateRequest = PostRoleChangeRequest.builder()
                 .changeRole(RoleName.MANAGER.toString())
@@ -272,14 +268,14 @@ class PostControllerTest extends AbstractRestDocsTest {
 
         // expected
         mockMvc.perform(post(url)
-                        .header("Authorization", authorizationHeader)
+                        .header(AUTHORIZATION, authorizationHeader)
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
                         .content(json))
                 .andExpect(status().isCreated())
                 .andDo(print())
                 .andDo(restDocs.document(
                         requestHeaders(
-                                headerWithName("Authorization").description("JWT Token")
+                                headerWithName(AUTHORIZATION).description(JWT_TOKEN)
                         ),
                         requestFields(
                                 fieldWithPath("changeRole").description("바꿀 권한")

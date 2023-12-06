@@ -25,6 +25,9 @@ import org.springframework.web.filter.CharacterEncodingFilter;
 @ExtendWith(DatabaseClearExtension.class)
 public abstract class AbstractRestDocsTest {
 
+    protected final String AUTHORIZATION = "Authorization";
+    protected final String JWT_TOKEN = "Jwt Token";
+
     @Autowired
     protected RestDocumentationResultHandler restDocs;
 
