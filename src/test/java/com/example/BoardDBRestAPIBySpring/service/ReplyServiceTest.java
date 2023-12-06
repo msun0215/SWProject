@@ -13,7 +13,9 @@ import com.example.BoardDBRestAPIBySpring.repository.MemberRepository;
 import com.example.BoardDBRestAPIBySpring.repository.PostRepository;
 import com.example.BoardDBRestAPIBySpring.repository.ReplyRepository;
 import com.example.BoardDBRestAPIBySpring.repository.RoleRepository;
+import com.example.BoardDBRestAPIBySpring.request.ReplyCreateDto;
 import com.example.BoardDBRestAPIBySpring.request.ReplyCreateRequest;
+import com.example.BoardDBRestAPIBySpring.request.ReplyEditRequest;
 import java.util.stream.LongStream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -134,4 +136,86 @@ class ReplyServiceTest {
         // expected
         assertThrows(IllegalArgumentException.class, () -> replyService.createReply(boardId, member, request));
     }
+
+    @Test
+    @DisplayName("댓글 수정 테스트")
+    @Transactional(readOnly = true)
+    void editReplyTest() {
+        // given
+        var reply = Reply.of("내용입니다.");
+        reply.setBoard(board);
+        reply.setMember(member);
+        replyRepository.save(reply);
+
+        var request = ReplyEditRequest.builder()
+                .content("수정된 내용입니다.")
+                .build();
+
+        var replyId = reply.getId();
+
+        var dto = ReplyCreateDto.builder()
+                .replyId(replyId)
+                .boardId(board.getId())
+                .member(member)
+                .request(request)
+                .build();
+
+        // when
+        replyService.editReply(dto);
+
+        // then
+        var actual = replyRepository.findById(replyId).get();
+        assertAll(() -> {
+            assertEquals(request.getContent(), actual.getContent());
+            assertEquals(board, actual.getBoard());
+            assertEquals(member, actual.getMember());
+        });
+    }
+
+//    @Test
+//    @DisplayName("존재하지 않는 게시글 수정 테스트")
+//    void editBoardByNotExistTest() {
+//        // given
+//        var board = Board.from("제목입니다.", "내용입니다.");
+//        board.setMember(member);
+//        postRepository.save(board);
+//
+//        var request = PostEditRequest.builder()
+//                .title("수정된 제목입니다.")
+//                .content("수정된 내용입니다.")
+//                .build();
+//
+//        var boardId = 2L;
+//
+//        // expected
+//        assertThrows(IllegalArgumentException.class, () -> postService.editBoard(boardId, member, request));
+//    }
+//
+//    @Test
+//    @DisplayName("작성자가 아닌 게시글 수정 테스트")
+//    void editBoardByNotOwnerTest() {
+//        // given
+//        var board = Board.from("제목입니다.", "내용입니다.");
+//        board.setMember(member);
+//        postRepository.save(board);
+//
+//        var otherMember = new Member();
+//        otherMember.setMemberID("other@other.com");
+//        otherMember.setMemberPW(bCryptPasswordEncoder.encode("other"));
+//        otherMember.setMemberName("other");
+//        otherMember.setMemberNickname("otherk");
+//        otherMember.setRoles(role);
+//
+//        memberRepository.save(otherMember);
+//
+//        var request = PostEditRequest.builder()
+//                .title("수정된 제목입니다.")
+//                .content("수정된 내용입니다.")
+//                .build();
+//
+//        var boardId = 1L;
+//
+//        // expected
+//        assertThrows(IllegalStateException.class, () -> postService.editBoard(boardId, otherMember, request));
+//    }
 }

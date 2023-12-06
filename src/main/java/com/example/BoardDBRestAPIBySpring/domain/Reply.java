@@ -2,6 +2,7 @@ package com.example.BoardDBRestAPIBySpring.domain;
 
 import static jakarta.persistence.FetchType.LAZY;
 
+import com.example.BoardDBRestAPIBySpring.request.ReplyCreateDto;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -52,5 +53,17 @@ public class Reply {
 
     public void setBoard(final Board board) {
         this.board = board;
+    }
+
+    public boolean isNotSameBoardId(final long boardId) {
+        return this.board.getId() != boardId;
+    }
+
+    public boolean isNotSameMember(final Member member) {
+        return !this.member.isSame(member);
+    }
+
+    public void edit(final ReplyCreateDto dto) {
+        this.content = dto.getContent();
     }
 }
