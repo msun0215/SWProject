@@ -39,6 +39,7 @@ import org.springframework.test.web.servlet.MockMvc;
 @SpringBootTest
 @AutoConfigureMockMvc
 class ReplyControllerTest extends AbstractRestDocsTest {
+    private final String baseURL = "/boards/{boardId}/replies";
     @Autowired
     private MockMvc mockMvc;
     @Autowired
@@ -53,8 +54,8 @@ class ReplyControllerTest extends AbstractRestDocsTest {
     private ReplyRepository replyRepository;
     @Autowired
     private ObjectMapper objectMapper;
-
     private Member member;
+    private Board board;
 
     @BeforeEach
     void init() {
@@ -72,16 +73,15 @@ class ReplyControllerTest extends AbstractRestDocsTest {
         member.setRoles(role);
 
         memberRepository.save(member);
+
+        board = Board.from("제목입니다.", "내용입니다.");
+        board.setMember(member);
+        postRepository.save(board);
     }
 
     @Test
     void getAllReplies() throws Exception {
         // given
-        var url = "/boards/{boardId}/replies";
-
-        var board = Board.from("제목입니다.", "내용입니다.");
-        board.setMember(member);
-        postRepository.save(board);
         var boardId = board.getId();
 
         var replies = LongStream.rangeClosed(1, 20)
@@ -95,7 +95,7 @@ class ReplyControllerTest extends AbstractRestDocsTest {
         replyRepository.saveAll(replies);
 
         // expected
-        mockMvc.perform(get(url, boardId)
+        mockMvc.perform(get(baseURL, boardId)
                         .param("page", "1")
                         .param("size", "5"))
                 .andExpect(status().isOk())
@@ -121,11 +121,6 @@ class ReplyControllerTest extends AbstractRestDocsTest {
     @Test
     void createReply() throws Exception {
         // given
-        var url = "/boards/{boardId}/replies";
-
-        var board = Board.from("제목입니다.", "내용입니다.");
-        board.setMember(member);
-        postRepository.save(board);
         var boardId = board.getId();
 
         var replyCreateRequest = ReplyCreateRequest.builder()
@@ -137,7 +132,7 @@ class ReplyControllerTest extends AbstractRestDocsTest {
         var authorizationHeader = JWTProperties.TOKEN_PREFIX.concat(jwtToken);
 
         // expected
-        mockMvc.perform(post(url, boardId)
+        mockMvc.perform(post(baseURL, boardId)
                         .header("Authorization", authorizationHeader)
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
                         .content(json))
