@@ -9,6 +9,7 @@ import com.example.BoardDBRestAPIBySpring.config.db.DatabaseClearExtension;
 import com.example.BoardDBRestAPIBySpring.domain.Board;
 import com.example.BoardDBRestAPIBySpring.domain.Member;
 import com.example.BoardDBRestAPIBySpring.domain.Role;
+import com.example.BoardDBRestAPIBySpring.domain.RoleName;
 import com.example.BoardDBRestAPIBySpring.repository.MemberRepository;
 import com.example.BoardDBRestAPIBySpring.repository.PostRepository;
 import com.example.BoardDBRestAPIBySpring.repository.RoleRepository;
@@ -280,7 +281,7 @@ class PostServiceTest {
     void createRoleChangeBoardTest() {
         // given
         var request = PostRoleChangeRequest.builder()
-                .changeRole("MANAGER")
+                .changeRole(RoleName.MANAGER.toString())
                 .build();
 
         // when
