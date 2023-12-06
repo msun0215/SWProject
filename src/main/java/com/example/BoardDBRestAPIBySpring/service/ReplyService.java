@@ -3,6 +3,7 @@ package com.example.BoardDBRestAPIBySpring.service;
 import com.example.BoardDBRestAPIBySpring.domain.Board;
 import com.example.BoardDBRestAPIBySpring.domain.Member;
 import com.example.BoardDBRestAPIBySpring.domain.Reply;
+import com.example.BoardDBRestAPIBySpring.dto.ReplyDeletetDto;
 import com.example.BoardDBRestAPIBySpring.repository.PostRepository;
 import com.example.BoardDBRestAPIBySpring.repository.ReplyRepository;
 import com.example.BoardDBRestAPIBySpring.request.ReplyCreateRequest;
@@ -57,5 +58,19 @@ public class ReplyService {
         }
 
         reply.edit(dto);
+    }
+
+    @Transactional(readOnly = true)
+    public void deleteReply(final ReplyDeletetDto dto) {
+        Reply reply = replyRepository.findById(dto.getReplyId())
+                .orElseThrow(() -> new IllegalArgumentException("존자해지 않는 댓글입니다."));
+        if (reply.isNotSameBoardId(dto.getBoardId())) {
+            throw new IllegalArgumentException("게시글의 댓글이 아닙니다.");
+        }
+        if (reply.isNotSameMember(dto.getMember())) {
+            throw new IllegalArgumentException("댓글 작성자가 아닙니다.");
+        }
+
+        replyRepository.delete(reply);
     }
 }

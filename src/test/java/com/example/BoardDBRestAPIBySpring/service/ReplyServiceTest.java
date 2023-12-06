@@ -3,12 +3,14 @@ package com.example.BoardDBRestAPIBySpring.service;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.example.BoardDBRestAPIBySpring.config.db.DatabaseClearExtension;
 import com.example.BoardDBRestAPIBySpring.domain.Board;
 import com.example.BoardDBRestAPIBySpring.domain.Member;
 import com.example.BoardDBRestAPIBySpring.domain.Reply;
 import com.example.BoardDBRestAPIBySpring.domain.Role;
+import com.example.BoardDBRestAPIBySpring.dto.ReplyDeletetDto;
 import com.example.BoardDBRestAPIBySpring.repository.MemberRepository;
 import com.example.BoardDBRestAPIBySpring.repository.PostRepository;
 import com.example.BoardDBRestAPIBySpring.repository.ReplyRepository;
@@ -254,5 +256,99 @@ class ReplyServiceTest {
 
         // expected
         assertThrows(IllegalArgumentException.class, () -> replyService.editReply(dto));
+    }
+
+    @Test
+    @DisplayName("댓글 삭제 테스트")
+    @Transactional(readOnly = true)
+    void deleteReplyTest() {
+        // given
+        var reply = Reply.of("내용입니다.");
+        reply.setBoard(board);
+        reply.setMember(member);
+        replyRepository.save(reply);
+
+        var replyId = reply.getId();
+
+        var dto = ReplyDeletetDto.builder()
+                .replyId(replyId)
+                .boardId(board.getId())
+                .member(member)
+                .build();
+
+        // when
+        replyService.deleteReply(dto);
+
+        // then
+        var actual = replyRepository.findById(replyId).isEmpty();
+        assertTrue(actual);
+    }
+
+    @Test
+    @DisplayName("존재하지 않는 댓글 삭제 테스트")
+    void deleteReplyByNotExistTest() {
+        // given
+        var reply = Reply.of("내용입니다.");
+        reply.setBoard(board);
+        reply.setMember(member);
+        replyRepository.save(reply);
+
+        var dto = ReplyDeletetDto.builder()
+                .replyId(2L)
+                .boardId(board.getId())
+                .member(member)
+                .build();
+
+        // expected
+        assertThrows(IllegalArgumentException.class, () -> replyService.deleteReply(dto));
+    }
+
+    @Test
+    @DisplayName("게시글의 댓글이 아닌 댓글 삭제 테스트")
+    void deleteReplyByNotBoardReplyTest() {
+        // given
+        var reply = Reply.of("내용입니다.");
+        reply.setBoard(board);
+        reply.setMember(member);
+        replyRepository.save(reply);
+
+        var replyId = reply.getId();
+
+        var dto = ReplyDeletetDto.builder()
+                .replyId(replyId)
+                .boardId(2L)
+                .member(member)
+                .build();
+
+        // expected
+        assertThrows(IllegalArgumentException.class, () -> replyService.deleteReply(dto));
+    }
+
+    @Test
+    @DisplayName("작성자가 아닌 댓글 삭제 테스트")
+    void deleteBoardByNotOwnerTest() {
+        // given
+        var reply = Reply.of("내용입니다.");
+        reply.setBoard(board);
+        reply.setMember(member);
+        replyRepository.save(reply);
+
+        var otherMember = new Member();
+        otherMember.setMemberID("other@other.com");
+        otherMember.setMemberPW(bCryptPasswordEncoder.encode("other"));
+        otherMember.setMemberName("other");
+        otherMember.setMemberNickname("otherk");
+        otherMember.setRoles(role);
+
+        memberRepository.save(otherMember);
+
+        var dto = ReplyDeletetDto.builder()
+                .replyId(reply.getId())
+                .boardId(board.getId())
+                .member(otherMember)
+                .build();
+
+        // expected
+        assertThrows(IllegalArgumentException.class, () -> replyService.deleteReply(dto));
     }
 }
