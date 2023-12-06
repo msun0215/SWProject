@@ -277,12 +277,10 @@ class PostServiceTest {
 
     @Test
     @DisplayName("권한 변경 게시글 생성 테스트")
-    @Transactional(readOnly = true)
     void createRoleChangeBoardTest() {
         // given
         var request = PostRoleChangeRequest.builder()
-                .currentRole("회원")
-                .changeRole("매니저")
+                .changeRole("MANAGER")
                 .build();
 
         // when
@@ -291,5 +289,17 @@ class PostServiceTest {
         // then
         var actual = postRepository.findById(1L).get();
         assertTrue(actual.getTitle().contains("[권한 변경]"));
+    }
+
+    @Test
+    @DisplayName("같은 권한으로 변경 게시글 생성 테스트")
+    void createSameRoleChangeBoardTest() {
+        // given
+        var request = PostRoleChangeRequest.builder()
+                .changeRole(member.getRoleName())
+                .build();
+
+        // expected
+        assertThrows(IllegalArgumentException.class, () -> postService.createRoleChangeBoard(member, request));
     }
 }

@@ -45,4 +45,12 @@ public class Member {
 	public boolean isSame(final Member member) {
 		return memberID.equals(member.memberID);
 	}
+
+	public String getRoleName() {
+		return roles.getRoleName();
+	}
+
+	public boolean isSameRole(final String roleName) {
+		return roles.isSame(roleName);
+	}
 }

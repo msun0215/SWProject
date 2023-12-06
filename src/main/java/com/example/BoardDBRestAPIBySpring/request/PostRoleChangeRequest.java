@@ -11,15 +11,15 @@ import lombok.ToString;
 @ToString
 public class PostRoleChangeRequest {
 
-	@NotBlank(message = "현재 권한 이름은 필수입니다.")
-	private final String currentRole;
 
 	@NotBlank(message = "바꿀 권한 이름은 필수입니다.")
-	private final String changeRole;
+	private String changeRole;
+
+	private PostRoleChangeRequest() {
+	}
 
 	@Builder
-	public PostRoleChangeRequest(final String currentRole, final String changeRole) {
-		this.currentRole = currentRole;
+	public PostRoleChangeRequest(final String changeRole) {
 		this.changeRole = changeRole;
 	}
 }

@@ -1,14 +1,15 @@
 package com.example.BoardDBRestAPIBySpring.domain;
 
-import jakarta.persistence.*;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
-import java.sql.Timestamp;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data   // GETTER & SETTER
 @Entity
@@ -42,4 +43,8 @@ public class Role {
         return new ArrayList<>();
     }
 
+
+    public boolean isSame(final String roleName) {
+        return this.roleName.equals(roleName);
+    }
 }

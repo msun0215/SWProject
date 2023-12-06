@@ -2,6 +2,7 @@ package com.example.BoardDBRestAPIBySpring.service;
 
 import com.example.BoardDBRestAPIBySpring.domain.Board;
 import com.example.BoardDBRestAPIBySpring.domain.Member;
+import com.example.BoardDBRestAPIBySpring.domain.RoleName;
 import com.example.BoardDBRestAPIBySpring.repository.PostRepository;
 import com.example.BoardDBRestAPIBySpring.request.PostCreateRequest;
 import com.example.BoardDBRestAPIBySpring.request.PostEditRequest;
@@ -67,9 +68,14 @@ public class PostService {
 	}
 
 	public void createRoleChangeBoard(final Member member, final PostRoleChangeRequest request) {
-		String title = String.format("[권한 변경] %s -> %s", request.getCurrentRole(), request.getChangeRole());
-		String content = String.format("%s의 현재 권한 %s을 %s로 변경하고 싶습니다.", member.getMemberName(), request.getCurrentRole(),
-				request.getChangeRole());
+		if (member.isSameRole(request.getChangeRole())) {
+			throw new IllegalArgumentException("같은 권한으로 바꿀 수 없습니다.");
+		}
+		RoleName currentRoleName = RoleName.findBy(member.getRoleName());
+		RoleName changeRoleName = RoleName.findBy(request.getChangeRole());
+		String title = String.format("[권한 변경] %s -> %s", currentRoleName, changeRoleName);
+		String content = String.format("%s의 현재 권한 %s을 %s로 변경하고 싶습니다.", member.getMemberName(), currentRoleName,
+				changeRoleName);
 		Board board = Board.from(title, content);
 		board.setMember(member);
 
