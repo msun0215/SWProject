@@ -29,15 +29,15 @@ operation::post-controller-test/find-board[snippets="http-request,path-parameter
 
 == 게시글 생성
 
-operation::post-controller-test/create-board[snippets="http-request,request-headers,request-fields,response-body"]
+operation::post-controller-test/create-board[snippets="http-request,request-headers,request-fields,http-response"]
 
 == 게시글 수정
 
-operation::post-controller-test/edit-board[snippets="http-request,path-parameters,request-headers,request-fields,response-body"]
+operation::post-controller-test/edit-board[snippets="http-request,path-parameters,request-headers,request-fields,http-response"]
 
 == 게시글 삭제
 
-operation::post-controller-test/delete-board[snippets="http-request,path-parameters,request-headers,response-body"]
+operation::post-controller-test/delete-board[snippets="http-request,path-parameters,request-headers,http-response"]
 
 
 == 댓글 조회
