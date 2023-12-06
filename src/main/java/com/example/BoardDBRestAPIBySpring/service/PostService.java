@@ -5,6 +5,7 @@ import com.example.BoardDBRestAPIBySpring.domain.Member;
 import com.example.BoardDBRestAPIBySpring.repository.PostRepository;
 import com.example.BoardDBRestAPIBySpring.request.PostCreateRequest;
 import com.example.BoardDBRestAPIBySpring.request.PostEditRequest;
+import com.example.BoardDBRestAPIBySpring.request.PostRoleChangeRequest;
 import com.example.BoardDBRestAPIBySpring.response.PostResponse;
 import com.example.BoardDBRestAPIBySpring.response.PostsResponse;
 import lombok.RequiredArgsConstructor;
@@ -63,6 +64,16 @@ public class PostService {
 			throw new IllegalStateException("게시글 작성자가 아닙니다.");
 		}
 		postRepository.delete(board);
+	}
+
+	public void createRoleChangeBoard(final Member member, final PostRoleChangeRequest request) {
+		String title = String.format("[권한 변경] %s -> %s", request.getCurrentRole(), request.getChangeRole());
+		String content = String.format("%s의 현재 권한 %s을 %s로 변경하고 싶습니다.", member.getMemberName(), request.getCurrentRole(),
+				request.getChangeRole());
+		Board board = Board.from(title, content);
+		board.setMember(member);
+
+		postRepository.save(board);
 	}
 }
 

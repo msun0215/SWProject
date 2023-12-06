@@ -4,6 +4,7 @@ import com.example.BoardDBRestAPIBySpring.config.auth.PrincipalDetails;
 import com.example.BoardDBRestAPIBySpring.domain.Member;
 import com.example.BoardDBRestAPIBySpring.request.PostCreateRequest;
 import com.example.BoardDBRestAPIBySpring.request.PostEditRequest;
+import com.example.BoardDBRestAPIBySpring.request.PostRoleChangeRequest;
 import com.example.BoardDBRestAPIBySpring.response.PostResponse;
 import com.example.BoardDBRestAPIBySpring.response.PostsResponse;
 import com.example.BoardDBRestAPIBySpring.service.PostService;
@@ -67,5 +68,15 @@ public class PostController {
 		postService.deleteBoard(id, member);
 
 		return ResponseEntity.ok().build();
+	}
+
+	@PostMapping("/users/roles")
+	public ResponseEntity<Void> createRoleChangeBoard(@AuthenticationPrincipal PrincipalDetails principalDetails,
+													  @RequestBody PostRoleChangeRequest request) {
+
+		Member member = principalDetails.getMember();
+		postService.createRoleChangeBoard(member, request);
+
+		return ResponseEntity.created(URI.create("/boards/users/roles")).build();
 	}
 }

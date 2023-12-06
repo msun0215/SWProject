@@ -14,6 +14,7 @@ import com.example.BoardDBRestAPIBySpring.repository.PostRepository;
 import com.example.BoardDBRestAPIBySpring.repository.RoleRepository;
 import com.example.BoardDBRestAPIBySpring.request.PostCreateRequest;
 import com.example.BoardDBRestAPIBySpring.request.PostEditRequest;
+import com.example.BoardDBRestAPIBySpring.request.PostRoleChangeRequest;
 import java.util.stream.LongStream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -272,5 +273,23 @@ class PostServiceTest {
 
         // expected
         assertThrows(IllegalStateException.class, () -> postService.deleteBoard(boardId, otherMember));
+    }
+
+    @Test
+    @DisplayName("권한 변경 게시글 생성 테스트")
+    @Transactional(readOnly = true)
+    void createRoleChangeBoardTest() {
+        // given
+        var request = PostRoleChangeRequest.builder()
+                .currentRole("회원")
+                .changeRole("매니저")
+                .build();
+
+        // when
+        postService.createRoleChangeBoard(member, request);
+
+        // then
+        var actual = postRepository.findById(1L).get();
+        assertTrue(actual.getTitle().contains("[권한 변경]"));
     }
 }
