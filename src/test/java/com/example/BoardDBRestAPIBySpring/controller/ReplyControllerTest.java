@@ -2,6 +2,7 @@ package com.example.BoardDBRestAPIBySpring.controller;
 
 import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
 import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.delete;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.put;
@@ -190,6 +191,37 @@ class ReplyControllerTest extends AbstractRestDocsTest {
                         ),
                         requestFields(
                                 fieldWithPath("content").description("내용")
+                        )
+                ));
+    }
+
+    @Test
+    void deleteReply() throws Exception {
+        // given
+        var url = baseURL.concat("/{id}");
+        var reply = Reply.of("내용입니다.");
+        reply.setBoard(board);
+        reply.setMember(member);
+        replyRepository.save(reply);
+
+        var replyId = reply.getId();
+        var boardId = board.getId();
+
+        var jwtToken = TokenUtils.generateJwtToken(member);
+        var authorizationHeader = JWTProperties.TOKEN_PREFIX.concat(jwtToken);
+
+        // expected
+        mockMvc.perform(delete(url, boardId, replyId)
+                        .header("Authorization", authorizationHeader))
+                .andExpect(status().isOk())
+                .andDo(print())
+                .andDo(restDocs.document(
+                        requestHeaders(
+                                headerWithName("Authorization").description("JWT Token")
+                        ),
+                        pathParameters(
+                                parameterWithName("boardId").description("게시글 번호"),
+                                parameterWithName("id").description("삭제할 댓글 번호")
                         )
                 ));
     }

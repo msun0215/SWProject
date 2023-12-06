@@ -529,6 +529,14 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <li><a href="#_댓글_수정_http_response">HTTP response</a></li>
 </ul>
 </li>
+<li><a href="#_댓글_삭제">댓글 삭제</a>
+<ul class="sectlevel2">
+<li><a href="#_댓글_삭제_http_request">HTTP request</a></li>
+<li><a href="#_댓글_삭제_path_parameters">Path parameters</a></li>
+<li><a href="#_댓글_삭제_request_headers">Request headers</a></li>
+<li><a href="#_댓글_삭제_http_response">HTTP response</a></li>
+</ul>
+</li>
 </ul>
 </div>
 </div>
@@ -582,7 +590,7 @@ memberID=test@test.com&amp;memberPW=test</code></pre>
 Vary: Origin
 Vary: Access-Control-Request-Method
 Vary: Access-Control-Request-Headers
-Authorization: Bearer eyJyZWdEYXRlIjoxNzAxODMzNjkzMjM5LCJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJtZW1iZXJOYW1lIjoidGVzdCIsImV4cCI6MTcwNDQyNTY5MywibWVtYmVySUQiOiJ0ZXN0QHRlc3QuY29tIn0.DE9Ot8x8FHuU27z4I4hWkbTTiBagNcZLB2XiGuuADuY
+Authorization: Bearer eyJyZWdEYXRlIjoxNzAxODM4Njk3NTQ5LCJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJtZW1iZXJOYW1lIjoidGVzdCIsImV4cCI6MTcwNDQzMDY5NywibWVtYmVySUQiOiJ0ZXN0QHRlc3QuY29tIn0.h-BAVLEXZoihf_00wO8QZhL_kfCv9HJC4eWn7UtmeCk
 X-Content-Type-Options: nosniff
 X-XSS-Protection: 0
 Cache-Control: no-cache, no-store, max-age=0, must-revalidate
@@ -914,7 +922,7 @@ Host: localhost:8080</code></pre>
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">POST /boards HTTP/1.1
 Content-Type: application/json;charset=UTF-8
-Authorization: Bearer eyJyZWdEYXRlIjoxNzAxODMzNjkzNjczLCJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJtZW1iZXJOYW1lIjoidGVzdCIsImV4cCI6MTcwNDQyNTY5MywibWVtYmVySUQiOiJ0ZXN0QHRlc3QuY29tIn0.F0AZKvwasaTK1a2Oawgw_1ZTPt1wjTkSU2BXaZtoKRI
+Authorization: Bearer eyJyZWdEYXRlIjoxNzAxODM4Njk3OTkxLCJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJtZW1iZXJOYW1lIjoidGVzdCIsImV4cCI6MTcwNDQzMDY5NywibWVtYmVySUQiOiJ0ZXN0QHRlc3QuY29tIn0.R4ri6uzb3HCGz1fxiI8GxYcyvKrYhzxw17mynL6MHx8
 Content-Length: 71
 Host: localhost:8080
 
@@ -1004,7 +1012,7 @@ X-Frame-Options: DENY</code></pre>
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">PUT /boards/1 HTTP/1.1
 Content-Type: application/json;charset=UTF-8
-Authorization: Bearer eyJyZWdEYXRlIjoxNzAxODMzNjkzMzY3LCJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJtZW1iZXJOYW1lIjoidGVzdCIsImV4cCI6MTcwNDQyNTY5MywibWVtYmVySUQiOiJ0ZXN0QHRlc3QuY29tIn0.GqC_qRBOhLBfXrjGOfyUFG8YQdRiFnpt5n6l24U9m-k
+Authorization: Bearer eyJyZWdEYXRlIjoxNzAxODM4Njk3Njg0LCJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJtZW1iZXJOYW1lIjoidGVzdCIsImV4cCI6MTcwNDQzMDY5NywibWVtYmVySUQiOiJ0ZXN0QHRlc3QuY29tIn0.0UK2sh5cjfDmElWpJzMbKhbaButXIS6eD9611cqMafw
 Content-Length: 91
 Host: localhost:8080
 
@@ -1114,7 +1122,7 @@ X-Frame-Options: DENY</code></pre>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">DELETE /boards/1 HTTP/1.1
-Authorization: Bearer eyJyZWdEYXRlIjoxNzAxODMzNjkzNDk0LCJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJtZW1iZXJOYW1lIjoidGVzdCIsImV4cCI6MTcwNDQyNTY5MywibWVtYmVySUQiOiJ0ZXN0QHRlc3QuY29tIn0.qInwR81E5YxLD-f1vzSzdXV0F-zU_XeV1Zt9qS3FWho
+Authorization: Bearer eyJyZWdEYXRlIjoxNzAxODM4Njk3ODE0LCJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJtZW1iZXJOYW1lIjoidGVzdCIsImV4cCI6MTcwNDQzMDY5NywibWVtYmVySUQiOiJ0ZXN0QHRlc3QuY29tIn0.u7-g9RvwZFioPe0mjlnTVmNph8ng3yrLp4YUvQykkTE
 Host: localhost:8080</code></pre>
 </div>
 </div>
@@ -1351,7 +1359,7 @@ Host: localhost:8080</code></pre>
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">POST /boards/1/replies HTTP/1.1
 Content-Type: application/json;charset=UTF-8
-Authorization: Bearer eyJyZWdEYXRlIjoxNzAxODMzNjk0MDAxLCJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJtZW1iZXJOYW1lIjoidGVzdCIsImV4cCI6MTcwNDQyNTY5NCwibWVtYmVySUQiOiJ0ZXN0QHRlc3QuY29tIn0.Ia9ayHyOHH-vaZ5b_zd_P4kFwBAto6WBjrbApOBkmIY
+Authorization: Bearer eyJyZWdEYXRlIjoxNzAxODM4Njk4MzkzLCJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJtZW1iZXJOYW1lIjoidGVzdCIsImV4cCI6MTcwNDQzMDY5OCwibWVtYmVySUQiOiJ0ZXN0QHRlc3QuY29tIn0.skdj4vXKiLw6mbRyn_cUSu_OqmpL_kDtJvhVN3fO9bw
 Content-Length: 38
 Host: localhost:8080
 
@@ -1457,7 +1465,7 @@ X-Frame-Options: DENY</code></pre>
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">PUT /boards/1/replies/1 HTTP/1.1
 Content-Type: application/json;charset=UTF-8
-Authorization: Bearer eyJyZWdEYXRlIjoxNzAxODMzNjkzOTIzLCJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJtZW1iZXJOYW1lIjoidGVzdCIsImV4cCI6MTcwNDQyNTY5MywibWVtYmVySUQiOiJ0ZXN0QHRlc3QuY29tIn0.SEPtk0TfW0m3cRiVSH3YLj7Lb4XM1vpK17zzeCjFy90
+Authorization: Bearer eyJyZWdEYXRlIjoxNzAxODM4Njk4MjQxLCJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJtZW1iZXJOYW1lIjoidGVzdCIsImV4cCI6MTcwNDQzMDY5OCwibWVtYmVySUQiOiJ0ZXN0QHRlc3QuY29tIn0.zcS-XdSV_d4Vj5_RCxmwiKkbjbxdCu8_hy31mSdczmw
 Content-Length: 48
 Host: localhost:8080
 
@@ -1557,11 +1565,90 @@ X-Frame-Options: DENY</code></pre>
 </div>
 </div>
 </div>
+<div class="sect1">
+<h2 id="_댓글_삭제"><a class="link" href="#_댓글_삭제">댓글 삭제</a></h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_댓글_삭제_http_request"><a class="link" href="#_댓글_삭제_http_request">HTTP request</a></h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">DELETE /boards/1/replies/1 HTTP/1.1
+Authorization: Bearer eyJyZWdEYXRlIjoxNzAxODM4Njk4MzE3LCJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJtZW1iZXJOYW1lIjoidGVzdCIsImV4cCI6MTcwNDQzMDY5OCwibWVtYmVySUQiOiJ0ZXN0QHRlc3QuY29tIn0.UG9B136IRbr1QVonNZYBp2e46g0gTTt6iY61vzfWcY8
+Host: localhost:8080</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_댓글_삭제_path_parameters"><a class="link" href="#_댓글_삭제_path_parameters">Path parameters</a></h3>
+<table class="tableblock frame-all grid-all stretch">
+<caption class="title">Table 1. /boards/{boardId}/replies/{id}</caption>
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Parameter</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>boardId</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">게시글 번호</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>id</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">삭제할 댓글 번호</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect2">
+<h3 id="_댓글_삭제_request_headers"><a class="link" href="#_댓글_삭제_request_headers">Request headers</a></h3>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Name</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Authorization</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">JWT Token</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect2">
+<h3 id="_댓글_삭제_http_response"><a class="link" href="#_댓글_삭제_http_response">HTTP response</a></h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 200 OK
+Vary: Origin
+Vary: Access-Control-Request-Method
+Vary: Access-Control-Request-Headers
+X-Content-Type-Options: nosniff
+X-XSS-Protection: 0
+Cache-Control: no-cache, no-store, max-age=0, must-revalidate
+Pragma: no-cache
+Expires: 0
+X-Frame-Options: DENY</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
 </div>
 <div id="footer">
 <div id="footer-text">
 Version 0.0.1-SNAPSHOT<br>
-Last updated 2023-12-06 12:34:42 +0900
+Last updated 2023-12-06 13:58:07 +0900
 </div>
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.18.3/highlight.min.js"></script>

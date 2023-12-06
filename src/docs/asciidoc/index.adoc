@@ -53,3 +53,7 @@ operation::reply-controller-test/create-reply[snippets="http-request,path-parame
 == 댓글 수정
 
 operation::reply-controller-test/edit-reply[snippets="http-request,path-parameters,request-headers,request-fields,http-response"]
+
+== 댓글 삭제
+
+operation::reply-controller-test/delete-reply[snippets="http-request,path-parameters,request-headers,http-response"]
