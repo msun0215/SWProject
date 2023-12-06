@@ -3,6 +3,7 @@ package com.example.BoardDBRestAPIBySpring.service;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.example.BoardDBRestAPIBySpring.config.db.DatabaseClearExtension;
 import com.example.BoardDBRestAPIBySpring.domain.Board;
@@ -216,5 +217,60 @@ class PostServiceTest {
 
         // expected
         assertThrows(IllegalStateException.class, () -> postService.editBoard(boardId, otherMember, request));
+    }
+
+    @Test
+    @DisplayName("게시글 삭제 테스트")
+    void deleteBoardTest() {
+        // given
+        var board = Board.from("제목입니다.", "내용입니다.");
+        board.setMember(member);
+        postRepository.save(board);
+
+        var boardId = 1L;
+
+        // when
+        postService.deleteBoard(boardId, member);
+
+        // then
+        var actual = postRepository.findById(boardId).isEmpty();
+        assertTrue(actual);
+    }
+
+    @Test
+    @DisplayName("존재하지 않는 게시글 삭제 테스트")
+    void deleteBoardByNotExistTest() {
+        // given
+        var board = Board.from("제목입니다.", "내용입니다.");
+        board.setMember(member);
+        postRepository.save(board);
+
+        var boardId = 2L;
+
+        // expected
+        assertThrows(IllegalArgumentException.class, () -> postService.deleteBoard(boardId, member));
+    }
+
+    @Test
+    @DisplayName("작성자가 아닌 게시글 삭제 테스트")
+    void deleteBoardByNotOwnerTest() {
+        // given
+        var board = Board.from("제목입니다.", "내용입니다.");
+        board.setMember(member);
+        postRepository.save(board);
+
+        var otherMember = new Member();
+        otherMember.setMemberID("other@other.com");
+        otherMember.setMemberPW(bCryptPasswordEncoder.encode("other"));
+        otherMember.setMemberName("other");
+        otherMember.setMemberNickname("otherk");
+        otherMember.setRoles(role);
+
+        memberRepository.save(otherMember);
+
+        var boardId = 1L;
+
+        // expected
+        assertThrows(IllegalStateException.class, () -> postService.deleteBoard(boardId, otherMember));
     }
 }

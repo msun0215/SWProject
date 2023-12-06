@@ -54,5 +54,15 @@ public class PostService {
 		}
 		board.edit(request);
 	}
+
+	@Transactional
+	public void deleteBoard(final Long boardId, final Member member) {
+		Board board = postRepository.findById(boardId)
+				.orElseThrow(() -> new IllegalArgumentException("존재하지 않는 게시글입니다."));
+		if (!board.isSameMember(member)) {
+			throw new IllegalStateException("게시글 작성자가 아닙니다.");
+		}
+		postRepository.delete(board);
+	}
 }
 

@@ -87,3 +87,8 @@ Content-Type: application/json
   "title": "수정된 제목입니다.",
   "content": "수정된 내용입니다."
 }
+
+
+### 게시글 삭제
+DELETE http://localhost:8080/boards/15
+Authorization: Bearer eyJyZWdEYXRlIjoxNzAxODIyMjQ5MTA5LCJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJtZW1iZXJOYW1lIjoiYiIsImV4cCI6MTcwNDQxNDI0OSwibWVtYmVySUQiOiJiQGIuY29tIn0.2SNUIPSbtJNuPMBXUrZBcU3uIFopvRn8T0bPsN5qtjI
