@@ -44,6 +44,7 @@ class ReplyServiceTest {
     private BCryptPasswordEncoder bCryptPasswordEncoder;
 
     private Member member;
+    private Board board;
 
     @BeforeEach
     void init() {
@@ -61,16 +62,16 @@ class ReplyServiceTest {
         member.setRoles(role);
 
         memberRepository.save(member);
+
+        board = Board.from("제목입니다.", "내용입니다.");
+        board.setMember(member);
+        postRepository.save(board);
     }
 
     @Test
     @DisplayName("페이징으로 게시글의 댓글들 조회 테스트")
     void findAllRepliesByTest() {
         // given
-        var board = Board.from("제목입니다.", "내용입니다.");
-        board.setMember(member);
-        postRepository.save(board);
-
         var replies = LongStream.rangeClosed(1, 20)
                 .mapToObj(index -> {
                     Reply reply = Reply.of("내용입니다." + index);
@@ -102,9 +103,6 @@ class ReplyServiceTest {
     @Transactional(readOnly = true)
     void createBoardTest() {
         // given
-        var board = Board.from("제목입니다.", "내용입니다.");
-        board.setMember(member);
-        postRepository.save(board);
         var boardId = board.getId();
 
         var request = ReplyCreateRequest.builder()
@@ -127,9 +125,6 @@ class ReplyServiceTest {
     @DisplayName("존재하지 않는 게시글에 댓글 생성 테스트")
     void createBoardByNotExistsBoardTest() {
         // given
-        var board = Board.from("제목입니다.", "내용입니다.");
-        board.setMember(member);
-        postRepository.save(board);
         var boardId = 2L;
 
         var request = ReplyCreateRequest.builder()
