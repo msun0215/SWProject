@@ -31,6 +31,11 @@ operation::post-controller-test/find-board[snippets="http-request,path-parameter
 
 operation::post-controller-test/create-board[snippets="http-request,request-headers,request-fields,response-body"]
 
+== 게시글 수정
+
+operation::post-controller-test/edit-board[snippets="http-request,path-parameters,request-headers,request-fields,response-body"]
+
+
 == 댓글 조회
 
 - page 기본값: 0, size 기본값: 10

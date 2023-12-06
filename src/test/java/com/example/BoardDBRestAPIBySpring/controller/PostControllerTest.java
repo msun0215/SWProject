@@ -4,6 +4,7 @@ import static org.springframework.restdocs.headers.HeaderDocumentation.headerWit
 import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.put;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.payload.PayloadDocumentation.relaxedResponseFields;
 import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
@@ -24,6 +25,7 @@ import com.example.BoardDBRestAPIBySpring.repository.MemberRepository;
 import com.example.BoardDBRestAPIBySpring.repository.PostRepository;
 import com.example.BoardDBRestAPIBySpring.repository.RoleRepository;
 import com.example.BoardDBRestAPIBySpring.request.PostCreateRequest;
+import com.example.BoardDBRestAPIBySpring.request.PostEditRequest;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.stream.LongStream;
 import org.junit.jupiter.api.BeforeEach;
@@ -165,6 +167,51 @@ class PostControllerTest extends AbstractRestDocsTest {
                 .andDo(restDocs.document(
                         requestHeaders(
                                 headerWithName("Authorization").description("JWT Token")
+                        ),
+                        requestFields(
+                                fieldWithPath("title").description("제목"),
+                                fieldWithPath("content").description("내용")
+                        )
+                ));
+    }
+
+    @Test
+    void editBoard() throws Exception {
+        // given
+        var url = "/boards/{id}";
+        var boardId = 1L;
+
+        var boards = LongStream.rangeClosed(1, 20)
+                .mapToObj(index -> {
+                    Board board = Board.from("제목입니다." + index, "내용입니다." + index);
+                    board.setMember(member);
+                    return board;
+                })
+                .toList();
+        postRepository.saveAll(boards);
+
+        var postEditRequest = PostEditRequest.builder()
+                .title("수정된 제목입니다.")
+                .content("수정된 내용입니다.")
+                .build();
+        var json = objectMapper.writeValueAsString(postEditRequest);
+
+        var jwtToken = TokenUtils.generateJwtToken(member);
+        var authorizationHeader = JWTProperties.TOKEN_PREFIX.concat(jwtToken);
+
+        // expected
+        mockMvc.perform(put(url, boardId)
+                        .header("Authorization", authorizationHeader)
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .content(json))
+                .andExpect(status().isOk())
+                .andDo(print())
+                .andDo(restDocs.document(
+                        requestHeaders(
+                                headerWithName("Authorization").description("JWT Token")
+                        ),
+                        pathParameters(
+                                parameterWithName("id").description("수정할 게시글 번호")
                         ),
                         requestFields(
                                 fieldWithPath("title").description("제목"),
