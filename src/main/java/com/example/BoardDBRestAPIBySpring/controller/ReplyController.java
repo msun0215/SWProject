@@ -42,7 +42,7 @@ public class ReplyController {
         Member member = principalDetails.getMember();
         replyService.createReply(boardId, member, request);
 
-        return ResponseEntity.created(URI.create("/boards/{boardId}/replies")).build();
+        return ResponseEntity.created(URI.create(String.format("/boards/%s/replies", boardId))).build();
     }
 
 }

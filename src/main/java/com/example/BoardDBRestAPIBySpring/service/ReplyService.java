@@ -33,7 +33,7 @@ public class ReplyService {
         return RepliesResponse.of(replies);
     }
 
-    @Transactional(readOnly = true)
+    @Transactional
     public void createReply(final long boardId, final Member member, final ReplyCreateRequest request) {
         Board board = postRepository.findById(boardId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 게시글입니다."));

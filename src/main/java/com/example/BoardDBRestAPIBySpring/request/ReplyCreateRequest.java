@@ -14,7 +14,11 @@ import lombok.ToString;
 public class ReplyCreateRequest {
 
 	@NotBlank(message = "내용은 필수입니다.")
-	private final String content;
+	private String content;
+
+	private ReplyCreateRequest() {
+
+	}
 
 	@Builder
 	public ReplyCreateRequest(final String content) {

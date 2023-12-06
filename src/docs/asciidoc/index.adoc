@@ -45,3 +45,7 @@ operation::post-controller-test/delete-board[snippets="http-request,path-paramet
 - page 기본값: 0, size 기본값: 10
 
 operation::reply-controller-test/get-all-replies[snippets="http-request,path-parameters,query-parameters,response-body,response-fields"]
+
+== 댓글 생성
+
+operation::reply-controller-test/create-reply[snippets="http-request,path-parameters,request-headers,request-fields,http-response"]

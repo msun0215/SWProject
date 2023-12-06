@@ -92,3 +92,13 @@ Content-Type: application/json
 ### 게시글 삭제
 DELETE http://localhost:8080/boards/15
 Authorization: Bearer eyJyZWdEYXRlIjoxNzAxODIyMjQ5MTA5LCJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJtZW1iZXJOYW1lIjoiYiIsImV4cCI6MTcwNDQxNDI0OSwibWVtYmVySUQiOiJiQGIuY29tIn0.2SNUIPSbtJNuPMBXUrZBcU3uIFopvRn8T0bPsN5qtjI
+
+
+### 댓글 생성
+POST http://localhost:8080/boards/14/replies
+Authorization: Bearer eyJyZWdEYXRlIjoxNzAxNjU5NTg3MDYyLCJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJtZW1iZXJOYW1lIjoiYiIsImV4cCI6MTcwNDI1MTU4NywibWVtYmVySUQiOiJiQGIuY29tIn0.b95p5hWUG7Ct-SkDlGIyAsLbjXTOMab0aLPOE2B6eVQ
+Content-Type: application/json
+
+{
+  "content": "내용입니다."
+}
