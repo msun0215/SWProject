@@ -494,6 +494,14 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <li><a href="#_게시글_수정_response_body">Response body</a></li>
 </ul>
 </li>
+<li><a href="#_게시글_삭제">게시글 삭제</a>
+<ul class="sectlevel2">
+<li><a href="#_게시글_삭제_http_request">HTTP request</a></li>
+<li><a href="#_게시글_삭제_path_parameters">Path parameters</a></li>
+<li><a href="#_게시글_삭제_request_headers">Request headers</a></li>
+<li><a href="#_게시글_삭제_response_body">Response body</a></li>
+</ul>
+</li>
 <li><a href="#_댓글_조회">댓글 조회</a>
 <ul class="sectlevel2">
 <li><a href="#_댓글_조회_http_request">HTTP request</a></li>
@@ -556,7 +564,7 @@ memberID=test@test.com&amp;memberPW=test</code></pre>
 Vary: Origin
 Vary: Access-Control-Request-Method
 Vary: Access-Control-Request-Headers
-Authorization: Bearer eyJyZWdEYXRlIjoxNzAxODIyNjIzNzY4LCJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJtZW1iZXJOYW1lIjoidGVzdCIsImV4cCI6MTcwNDQxNDYyMywibWVtYmVySUQiOiJ0ZXN0QHRlc3QuY29tIn0.cJTBd76JDtBUAVxTMcceqyn7nlpAyDL1YseqO37efBs
+Authorization: Bearer eyJyZWdEYXRlIjoxNzAxODIzMzg2NTY5LCJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJtZW1iZXJOYW1lIjoidGVzdCIsImV4cCI6MTcwNDQxNTM4NiwibWVtYmVySUQiOiJ0ZXN0QHRlc3QuY29tIn0.G-fvvcVRWcV2BMwhF8fslh0dkZMThzmwhWQpuVL3hpw
 X-Content-Type-Options: nosniff
 X-XSS-Protection: 0
 Cache-Control: no-cache, no-store, max-age=0, must-revalidate
@@ -888,7 +896,7 @@ Host: localhost:8080</code></pre>
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">POST /boards HTTP/1.1
 Content-Type: application/json;charset=UTF-8
-Authorization: Bearer eyJyZWdEYXRlIjoxNzAxODIyNjI0MTQ2LCJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJtZW1iZXJOYW1lIjoidGVzdCIsImV4cCI6MTcwNDQxNDYyNCwibWVtYmVySUQiOiJ0ZXN0QHRlc3QuY29tIn0.lFZzDEd8mgpyrsuYDJp7T8hrE6NEeBZtxOx-FGUIyiA
+Authorization: Bearer eyJyZWdEYXRlIjoxNzAxODIzMzg3MDE2LCJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJtZW1iZXJOYW1lIjoidGVzdCIsImV4cCI6MTcwNDQxNTM4NywibWVtYmVySUQiOiJ0ZXN0QHRlc3QuY29tIn0.SmwtVV37wt9Bkg1R6g54oi5dD1ZKvnkPhFs1J4bB0lg
 Content-Length: 71
 Host: localhost:8080
 
@@ -968,7 +976,7 @@ Host: localhost:8080
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">PUT /boards/1 HTTP/1.1
 Content-Type: application/json;charset=UTF-8
-Authorization: Bearer eyJyZWdEYXRlIjoxNzAxODIyNjIzOTA4LCJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJtZW1iZXJOYW1lIjoidGVzdCIsImV4cCI6MTcwNDQxNDYyMywibWVtYmVySUQiOiJ0ZXN0QHRlc3QuY29tIn0.OB5y9sp7altuSwywDk9381OiS3i5jYJujCHriiir128
+Authorization: Bearer eyJyZWdEYXRlIjoxNzAxODIzMzg2NzEyLCJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJtZW1iZXJOYW1lIjoidGVzdCIsImV4cCI6MTcwNDQxNTM4NiwibWVtYmVySUQiOiJ0ZXN0QHRlc3QuY29tIn0.PfnuEzcrIlyW3Gt8H-spH24M_0FLOK4Ss3CIgxeQ-hQ
 Content-Length: 91
 Host: localhost:8080
 
@@ -1053,6 +1061,72 @@ Host: localhost:8080
 </div>
 <div class="sect2">
 <h3 id="_게시글_수정_response_body"><a class="link" href="#_게시글_수정_response_body">Response body</a></h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight nowrap"><code class="language-none hljs"></code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_게시글_삭제"><a class="link" href="#_게시글_삭제">게시글 삭제</a></h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_게시글_삭제_http_request"><a class="link" href="#_게시글_삭제_http_request">HTTP request</a></h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">DELETE /boards/1 HTTP/1.1
+Authorization: Bearer eyJyZWdEYXRlIjoxNzAxODIzMzg2ODQxLCJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJtZW1iZXJOYW1lIjoidGVzdCIsImV4cCI6MTcwNDQxNTM4NiwibWVtYmVySUQiOiJ0ZXN0QHRlc3QuY29tIn0.MmlY7RVllBGTsVG4y7BZkZtA2CUDKPcM0wMXrZbuLLI
+Host: localhost:8080</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_게시글_삭제_path_parameters"><a class="link" href="#_게시글_삭제_path_parameters">Path parameters</a></h3>
+<table class="tableblock frame-all grid-all stretch">
+<caption class="title">Table 1. /boards/{id}</caption>
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Parameter</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>id</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">삭제할 게시글 번호</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect2">
+<h3 id="_게시글_삭제_request_headers"><a class="link" href="#_게시글_삭제_request_headers">Request headers</a></h3>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Name</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Authorization</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">JWT Token</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect2">
+<h3 id="_게시글_삭제_response_body"><a class="link" href="#_게시글_삭제_response_body">Response body</a></h3>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-none hljs"></code></pre>
@@ -1226,7 +1300,7 @@ Host: localhost:8080</code></pre>
 <div id="footer">
 <div id="footer-text">
 Version 0.0.1-SNAPSHOT<br>
-Last updated 2023-12-06 09:30:12 +0900
+Last updated 2023-12-06 09:42:41 +0900
 </div>
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.18.3/highlight.min.js"></script>

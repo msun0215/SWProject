@@ -35,6 +35,10 @@ operation::post-controller-test/create-board[snippets="http-request,request-head
 
 operation::post-controller-test/edit-board[snippets="http-request,path-parameters,request-headers,request-fields,response-body"]
 
+== 게시글 삭제
+
+operation::post-controller-test/delete-board[snippets="http-request,path-parameters,request-headers,response-body"]
+
 
 == 댓글 조회
 

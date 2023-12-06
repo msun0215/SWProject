@@ -2,6 +2,7 @@ package com.example.BoardDBRestAPIBySpring.controller;
 
 import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
 import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.delete;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.put;
@@ -216,6 +217,39 @@ class PostControllerTest extends AbstractRestDocsTest {
                         requestFields(
                                 fieldWithPath("title").description("제목"),
                                 fieldWithPath("content").description("내용")
+                        )
+                ));
+    }
+
+    @Test
+    void deleteBoard() throws Exception {
+        // given
+        var url = "/boards/{id}";
+        var boardId = 1L;
+
+        var boards = LongStream.rangeClosed(1, 20)
+                .mapToObj(index -> {
+                    Board board = Board.from("제목입니다." + index, "내용입니다." + index);
+                    board.setMember(member);
+                    return board;
+                })
+                .toList();
+        postRepository.saveAll(boards);
+
+        var jwtToken = TokenUtils.generateJwtToken(member);
+        var authorizationHeader = JWTProperties.TOKEN_PREFIX.concat(jwtToken);
+
+        // expected
+        mockMvc.perform(delete(url, boardId)
+                        .header("Authorization", authorizationHeader))
+                .andExpect(status().isOk())
+                .andDo(print())
+                .andDo(restDocs.document(
+                        requestHeaders(
+                                headerWithName("Authorization").description("JWT Token")
+                        ),
+                        pathParameters(
+                                parameterWithName("id").description("삭제할 게시글 번호")
                         )
                 ));
     }
