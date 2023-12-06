@@ -1,10 +1,13 @@
 package com.example.BoardDBRestAPIBySpring.domain;
 
-import jakarta.persistence.*;
-import lombok.*;
-import org.hibernate.annotations.CreationTimestamp;
-
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import java.sql.Timestamp;
+import lombok.Data;
+import org.hibernate.annotations.CreationTimestamp;
 
 @Entity
 @Data
@@ -38,4 +41,8 @@ public class Member {
 //		this.providerId = providerId;
 //		this.createDate = createDate;
 //	}
+
+	public boolean isSame(final Member member) {
+		return memberID.equals(member.memberID);
+	}
 }

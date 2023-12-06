@@ -2,6 +2,7 @@ package com.example.BoardDBRestAPIBySpring.service;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.example.BoardDBRestAPIBySpring.config.db.DatabaseClearExtension;
 import com.example.BoardDBRestAPIBySpring.domain.Board;
@@ -11,6 +12,7 @@ import com.example.BoardDBRestAPIBySpring.repository.MemberRepository;
 import com.example.BoardDBRestAPIBySpring.repository.PostRepository;
 import com.example.BoardDBRestAPIBySpring.repository.RoleRepository;
 import com.example.BoardDBRestAPIBySpring.request.PostCreateRequest;
+import com.example.BoardDBRestAPIBySpring.request.PostEditRequest;
 import java.util.stream.LongStream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -39,6 +41,7 @@ class PostServiceTest {
     private BCryptPasswordEncoder bCryptPasswordEncoder;
 
     private Member member;
+    private Role role;
 
     @BeforeEach
     void init() {
@@ -50,7 +53,7 @@ class PostServiceTest {
         member.setMemberPW(bCryptPasswordEncoder.encode(memberPW));
         member.setMemberName("test");
         member.setMemberNickname("testk");
-        var role = new Role();
+        role = new Role();
         role.setRoleName("USER");
         roleRepository.save(role);
         member.setRoles(role);
@@ -132,5 +135,86 @@ class PostServiceTest {
             assertEquals(request.getContent(), actual.getContent());
             assertEquals(member, actual.getMember());
         });
+    }
+
+    @Test
+    @DisplayName("게시글 수정 테스트")
+    @Transactional(readOnly = true)
+    void editBoardTest() {
+        // given
+        var boards = LongStream.rangeClosed(1, 20)
+                .mapToObj(index -> {
+                    Board board = Board.from("제목입니다." + index, "내용입니다." + index);
+                    board.setMember(member);
+                    return board;
+                })
+                .toList();
+        postRepository.saveAll(boards);
+
+        var request = PostEditRequest.builder()
+                .title("수정된 제목입니다.")
+                .content("수정된 내용입니다.")
+                .build();
+
+        var boardId = 1L;
+
+        // when
+        postService.editBoard(boardId, member, request);
+
+        // then
+        var actual = postRepository.findById(boardId).get();
+        assertAll(() -> {
+            assertEquals(boardId, actual.getId());
+            assertEquals(request.getTitle(), actual.getTitle());
+            assertEquals(request.getContent(), actual.getContent());
+            assertEquals(member, actual.getMember());
+        });
+    }
+
+    @Test
+    @DisplayName("존재하지 않는 게시글 수정 테스트")
+    void editBoardByNotExistTest() {
+        // given
+        var board = Board.from("제목입니다.", "내용입니다.");
+        board.setMember(member);
+        postRepository.save(board);
+
+        var request = PostEditRequest.builder()
+                .title("수정된 제목입니다.")
+                .content("수정된 내용입니다.")
+                .build();
+
+        var boardId = 2L;
+
+        // expected
+        assertThrows(IllegalArgumentException.class, () -> postService.editBoard(boardId, member, request));
+    }
+
+    @Test
+    @DisplayName("작성자가 아닌 게시글 수정 테스트")
+    void editBoardByNotOwnerTest() {
+        // given
+        var board = Board.from("제목입니다.", "내용입니다.");
+        board.setMember(member);
+        postRepository.save(board);
+
+        var otherMember = new Member();
+        otherMember.setMemberID("other@other.com");
+        otherMember.setMemberPW(bCryptPasswordEncoder.encode("other"));
+        otherMember.setMemberName("other");
+        otherMember.setMemberNickname("otherk");
+        otherMember.setRoles(role);
+
+        memberRepository.save(otherMember);
+
+        var request = PostEditRequest.builder()
+                .title("수정된 제목입니다.")
+                .content("수정된 내용입니다.")
+                .build();
+
+        var boardId = 1L;
+
+        // expected
+        assertThrows(IllegalStateException.class, () -> postService.editBoard(boardId, otherMember, request));
     }
 }

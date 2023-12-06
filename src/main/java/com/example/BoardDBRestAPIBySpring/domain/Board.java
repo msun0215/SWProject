@@ -2,6 +2,7 @@ package com.example.BoardDBRestAPIBySpring.domain;
 
 import static jakarta.persistence.FetchType.LAZY;
 
+import com.example.BoardDBRestAPIBySpring.request.PostEditRequest;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -56,5 +57,15 @@ public class Board {
 	// 연관관계 편의 메서드
 	public void setMember(final Member member) {
 		this.member = member;
+	}
+
+	public boolean isSameMember(final Member member) {
+		return this.member.isSame(member);
+    }
+
+	public void edit(final PostEditRequest request) {
+		this.title = request.getTitle();
+		this.content = request.getContent();
+		this.modifyDate = LocalDate.now();
 	}
 }

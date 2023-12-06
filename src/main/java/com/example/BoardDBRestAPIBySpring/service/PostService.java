@@ -4,6 +4,7 @@ import com.example.BoardDBRestAPIBySpring.domain.Board;
 import com.example.BoardDBRestAPIBySpring.domain.Member;
 import com.example.BoardDBRestAPIBySpring.repository.PostRepository;
 import com.example.BoardDBRestAPIBySpring.request.PostCreateRequest;
+import com.example.BoardDBRestAPIBySpring.request.PostEditRequest;
 import com.example.BoardDBRestAPIBySpring.response.PostResponse;
 import com.example.BoardDBRestAPIBySpring.response.PostsResponse;
 import lombok.RequiredArgsConstructor;
@@ -42,6 +43,16 @@ public class PostService {
 		board.setMember(member);
 
 		postRepository.save(board);
+	}
+
+	@Transactional
+	public void editBoard(final Long boardId, final Member member, final PostEditRequest request) {
+		Board board = postRepository.findById(boardId)
+				.orElseThrow(() -> new IllegalArgumentException("존재하지 않는 게시글입니다."));
+		if (!board.isSameMember(member)) {
+			throw new IllegalStateException("게시글 작성자가 아닙니다.");
+		}
+		board.edit(request);
 	}
 }
 
