@@ -22,11 +22,13 @@ import com.example.BoardDBRestAPIBySpring.config.jwt.TokenUtils;
 import com.example.BoardDBRestAPIBySpring.domain.Board;
 import com.example.BoardDBRestAPIBySpring.domain.Member;
 import com.example.BoardDBRestAPIBySpring.domain.Role;
+import com.example.BoardDBRestAPIBySpring.domain.RoleName;
 import com.example.BoardDBRestAPIBySpring.repository.MemberRepository;
 import com.example.BoardDBRestAPIBySpring.repository.PostRepository;
 import com.example.BoardDBRestAPIBySpring.repository.RoleRepository;
 import com.example.BoardDBRestAPIBySpring.request.PostCreateRequest;
 import com.example.BoardDBRestAPIBySpring.request.PostEditRequest;
+import com.example.BoardDBRestAPIBySpring.request.PostRoleChangeRequest;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.stream.LongStream;
 import org.junit.jupiter.api.BeforeEach;
@@ -250,6 +252,37 @@ class PostControllerTest extends AbstractRestDocsTest {
                         ),
                         pathParameters(
                                 parameterWithName("id").description("삭제할 게시글 번호")
+                        )
+                ));
+    }
+
+    @Test
+    void createRoleChangeBoard() throws Exception {
+        // given
+        var url = "/boards/users/roles";
+
+        var postCreateRequest = PostRoleChangeRequest.builder()
+                .changeRole(RoleName.MANAGER.toString())
+                .build();
+
+        var jwtToken = TokenUtils.generateJwtToken(member);
+        var authorizationHeader = JWTProperties.TOKEN_PREFIX.concat(jwtToken);
+
+        var json = objectMapper.writeValueAsString(postCreateRequest);
+
+        // expected
+        mockMvc.perform(post(url)
+                        .header("Authorization", authorizationHeader)
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .content(json))
+                .andExpect(status().isCreated())
+                .andDo(print())
+                .andDo(restDocs.document(
+                        requestHeaders(
+                                headerWithName("Authorization").description("JWT Token")
+                        ),
+                        requestFields(
+                                fieldWithPath("changeRole").description("바꿀 권한")
                         )
                 ));
     }

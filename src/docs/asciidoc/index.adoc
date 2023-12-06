@@ -39,6 +39,10 @@ operation::post-controller-test/edit-board[snippets="http-request,path-parameter
 
 operation::post-controller-test/delete-board[snippets="http-request,path-parameters,request-headers,http-response"]
 
+== 권한 변경 게시글 생성
+
+operation::post-controller-test/create-role-change-board[snippets="http-request,request-headers,request-fields,http-response"]
+
 
 == 댓글 조회
 
