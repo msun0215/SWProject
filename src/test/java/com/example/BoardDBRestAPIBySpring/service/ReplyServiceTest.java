@@ -47,6 +47,7 @@ class ReplyServiceTest {
 
     private Member member;
     private Board board;
+    private Role role;
 
     @BeforeEach
     void init() {
@@ -58,7 +59,7 @@ class ReplyServiceTest {
         member.setMemberPW(bCryptPasswordEncoder.encode(memberPW));
         member.setMemberName("test");
         member.setMemberNickname("testk");
-        var role = new Role();
+        role = new Role();
         role.setRoleName("USER");
         roleRepository.save(role);
         member.setRoles(role);
@@ -172,50 +173,86 @@ class ReplyServiceTest {
         });
     }
 
-//    @Test
-//    @DisplayName("존재하지 않는 게시글 수정 테스트")
-//    void editBoardByNotExistTest() {
-//        // given
-//        var board = Board.from("제목입니다.", "내용입니다.");
-//        board.setMember(member);
-//        postRepository.save(board);
-//
-//        var request = PostEditRequest.builder()
-//                .title("수정된 제목입니다.")
-//                .content("수정된 내용입니다.")
-//                .build();
-//
-//        var boardId = 2L;
-//
-//        // expected
-//        assertThrows(IllegalArgumentException.class, () -> postService.editBoard(boardId, member, request));
-//    }
-//
-//    @Test
-//    @DisplayName("작성자가 아닌 게시글 수정 테스트")
-//    void editBoardByNotOwnerTest() {
-//        // given
-//        var board = Board.from("제목입니다.", "내용입니다.");
-//        board.setMember(member);
-//        postRepository.save(board);
-//
-//        var otherMember = new Member();
-//        otherMember.setMemberID("other@other.com");
-//        otherMember.setMemberPW(bCryptPasswordEncoder.encode("other"));
-//        otherMember.setMemberName("other");
-//        otherMember.setMemberNickname("otherk");
-//        otherMember.setRoles(role);
-//
-//        memberRepository.save(otherMember);
-//
-//        var request = PostEditRequest.builder()
-//                .title("수정된 제목입니다.")
-//                .content("수정된 내용입니다.")
-//                .build();
-//
-//        var boardId = 1L;
-//
-//        // expected
-//        assertThrows(IllegalStateException.class, () -> postService.editBoard(boardId, otherMember, request));
-//    }
+    @Test
+    @DisplayName("존재하지 않는 댓글 수정 테스트")
+    void editReplyByNotExistTest() {
+        // given
+        var reply = Reply.of("내용입니다.");
+        reply.setBoard(board);
+        reply.setMember(member);
+        replyRepository.save(reply);
+
+        var request = ReplyEditRequest.builder()
+                .content("수정된 내용입니다.")
+                .build();
+
+        var dto = ReplyEditDto.builder()
+                .replyId(2L)
+                .boardId(board.getId())
+                .member(member)
+                .request(request)
+                .build();
+
+        // expected
+        assertThrows(IllegalArgumentException.class, () -> replyService.editReply(dto));
+    }
+
+    @Test
+    @DisplayName("게시글의 댓글이 아닌 댓글 수정 테스트")
+    void editReplyByNotBoardReplyTest() {
+        // given
+        var reply = Reply.of("내용입니다.");
+        reply.setBoard(board);
+        reply.setMember(member);
+        replyRepository.save(reply);
+
+        var request = ReplyEditRequest.builder()
+                .content("수정된 내용입니다.")
+                .build();
+
+        var replyId = reply.getId();
+
+        var dto = ReplyEditDto.builder()
+                .replyId(replyId)
+                .boardId(2L)
+                .member(member)
+                .request(request)
+                .build();
+
+        // expected
+        assertThrows(IllegalArgumentException.class, () -> replyService.editReply(dto));
+    }
+
+    @Test
+    @DisplayName("작성자가 아닌 댓글 수정 테스트")
+    void editBoardByNotOwnerTest() {
+        // given
+        var reply = Reply.of("내용입니다.");
+        reply.setBoard(board);
+        reply.setMember(member);
+        replyRepository.save(reply);
+
+        var request = ReplyEditRequest.builder()
+                .content("수정된 내용입니다.")
+                .build();
+
+        var otherMember = new Member();
+        otherMember.setMemberID("other@other.com");
+        otherMember.setMemberPW(bCryptPasswordEncoder.encode("other"));
+        otherMember.setMemberName("other");
+        otherMember.setMemberNickname("otherk");
+        otherMember.setRoles(role);
+
+        memberRepository.save(otherMember);
+
+        var dto = ReplyEditDto.builder()
+                .replyId(reply.getId())
+                .boardId(board.getId())
+                .member(otherMember)
+                .request(request)
+                .build();
+
+        // expected
+        assertThrows(IllegalArgumentException.class, () -> replyService.editReply(dto));
+    }
 }
