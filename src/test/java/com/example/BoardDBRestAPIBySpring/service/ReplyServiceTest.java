@@ -2,6 +2,7 @@ package com.example.BoardDBRestAPIBySpring.service;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.example.BoardDBRestAPIBySpring.config.db.DatabaseClearExtension;
 import com.example.BoardDBRestAPIBySpring.domain.Board;
@@ -12,6 +13,7 @@ import com.example.BoardDBRestAPIBySpring.repository.MemberRepository;
 import com.example.BoardDBRestAPIBySpring.repository.PostRepository;
 import com.example.BoardDBRestAPIBySpring.repository.ReplyRepository;
 import com.example.BoardDBRestAPIBySpring.repository.RoleRepository;
+import com.example.BoardDBRestAPIBySpring.request.ReplyCreateRequest;
 import java.util.stream.LongStream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -22,6 +24,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.transaction.annotation.Transactional;
 
 @ActiveProfiles("test")
 @SpringBootTest
@@ -92,5 +95,48 @@ class ReplyServiceTest {
             assertEquals(pageRequest.getPageSize(), actual.getPageSize());
             assertEquals(pageRequest.getPageSize(), actual.getRepliesResponse().size());
         });
+    }
+
+    @Test
+    @DisplayName("댓글 생성 테스트")
+    @Transactional(readOnly = true)
+    void createBoardTest() {
+        // given
+        var board = Board.from("제목입니다.", "내용입니다.");
+        board.setMember(member);
+        postRepository.save(board);
+        var boardId = board.getId();
+
+        var request = ReplyCreateRequest.builder()
+                .content("내용입니다.")
+                .build();
+
+        // when
+        replyService.createReply(boardId, member, request);
+
+        // then
+        var actual = replyRepository.findById(1L).get();
+        assertAll(() -> {
+            assertEquals(request.getContent(), actual.getContent());
+            assertEquals(member, actual.getMember());
+            assertEquals(board, actual.getBoard());
+        });
+    }
+
+    @Test
+    @DisplayName("존재하지 않는 게시글에 댓글 생성 테스트")
+    void createBoardByNotExistsBoardTest() {
+        // given
+        var board = Board.from("제목입니다.", "내용입니다.");
+        board.setMember(member);
+        postRepository.save(board);
+        var boardId = 2L;
+
+        var request = ReplyCreateRequest.builder()
+                .content("내용입니다.")
+                .build();
+
+        // expected
+        assertThrows(IllegalArgumentException.class, () -> replyService.createReply(boardId, member, request));
     }
 }
