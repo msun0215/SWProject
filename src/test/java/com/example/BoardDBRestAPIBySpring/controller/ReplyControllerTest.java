@@ -4,6 +4,7 @@ import static org.springframework.restdocs.headers.HeaderDocumentation.headerWit
 import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.put;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.payload.PayloadDocumentation.relaxedResponseFields;
 import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
@@ -25,6 +26,7 @@ import com.example.BoardDBRestAPIBySpring.repository.PostRepository;
 import com.example.BoardDBRestAPIBySpring.repository.ReplyRepository;
 import com.example.BoardDBRestAPIBySpring.repository.RoleRepository;
 import com.example.BoardDBRestAPIBySpring.request.ReplyCreateRequest;
+import com.example.BoardDBRestAPIBySpring.request.ReplyEditRequest;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.stream.LongStream;
 import org.junit.jupiter.api.BeforeEach;
@@ -144,6 +146,47 @@ class ReplyControllerTest extends AbstractRestDocsTest {
                         ),
                         requestHeaders(
                                 headerWithName("Authorization").description("JWT Token")
+                        ),
+                        requestFields(
+                                fieldWithPath("content").description("내용")
+                        )
+                ));
+    }
+
+    @Test
+    void editReply() throws Exception {
+        // given
+        var url = baseURL.concat("/{id}");
+        var reply = Reply.of("내용입니다.");
+        reply.setBoard(board);
+        reply.setMember(member);
+        replyRepository.save(reply);
+        var replyId = reply.getId();
+
+        var boardId = board.getId();
+
+        var request = ReplyEditRequest.builder()
+                .content("수정된 내용입니다.")
+                .build();
+        var json = objectMapper.writeValueAsString(request);
+
+        var jwtToken = TokenUtils.generateJwtToken(member);
+        var authorizationHeader = JWTProperties.TOKEN_PREFIX.concat(jwtToken);
+
+        // expected
+        mockMvc.perform(put(url, boardId, replyId)
+                        .header("Authorization", authorizationHeader)
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .content(json))
+                .andExpect(status().isOk())
+                .andDo(print())
+                .andDo(restDocs.document(
+                        requestHeaders(
+                                headerWithName("Authorization").description("JWT Token")
+                        ),
+                        pathParameters(
+                                parameterWithName("boardId").description("게시글 번호"),
+                                parameterWithName("id").description("수정할 댓글 번호")
                         ),
                         requestFields(
                                 fieldWithPath("content").description("내용")

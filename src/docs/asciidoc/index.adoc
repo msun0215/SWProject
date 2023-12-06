@@ -49,3 +49,7 @@ operation::reply-controller-test/get-all-replies[snippets="http-request,path-par
 == 댓글 생성
 
 operation::reply-controller-test/create-reply[snippets="http-request,path-parameters,request-headers,request-fields,http-response"]
+
+== 댓글 수정
+
+operation::reply-controller-test/edit-reply[snippets="http-request,path-parameters,request-headers,request-fields,http-response"]
