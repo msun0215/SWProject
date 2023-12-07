@@ -7,6 +7,7 @@ import com.example.BoardDBRestAPIBySpring.controller.handler.CustomAuthFailureHa
 import com.example.BoardDBRestAPIBySpring.controller.handler.CustomLoginSuccessHandler;
 import com.example.BoardDBRestAPIBySpring.repository.MemberRepository;
 import jakarta.servlet.Filter;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,7 +46,10 @@ public class WebConfig {
 	private final CorsConfig corsConfig;
 	private final MemberRepository memberRepository;
 
-	private CustomAuthenticationProvider customAuthenticationProvider;
+	@Bean
+	public CustomAuthenticationProvider mycustomAuthenticationProvider(){
+		return new CustomAuthenticationProvider();
+	}
 	//private static AuthenticationConfiguration authenticationConfiguration;
 
 
@@ -101,6 +105,17 @@ public class WebConfig {
 		//		.logout(logout->logout.logoutSuccessUrl("/"))
 		;
 
+		http.logout()
+				.logoutUrl("/logout")	// 로그인과 마찬가지로 POST 요청이 와야 함
+				.addLogoutHandler(((request, response, authentication) -> {
+					HttpSession session=request.getSession();
+					if(session!=null){
+						session.invalidate();	// 세션 삭제
+					}
+				})).logoutSuccessHandler(((request, response, authentication) -> {
+					response.sendRedirect("/");
+				}));
+
         /* Spring Security 사용 시
         http.formLogin(f->f{
             f.loginProcessingUrl("/login");     // 로그인 url 설정
@@ -114,11 +129,10 @@ public class WebConfig {
 	public class MyCustomDs1 extends AbstractHttpConfigurer<MyCustomDs1, HttpSecurity> { // custom Filter
 		@Override
 		public void configure(HttpSecurity http) throws Exception {
-			AuthenticationManager authenticationManager=http.getSharedObject(AuthenticationManager.class);
+			AuthenticationManager authenticationManager=http.getSharedObject(AuthenticationManager.class);	// null값으로 받아들임?
 			System.out.println("authenticationManager : "+authenticationManager);
-			System.out.println("customAuthenticaionProvider : "+customAuthenticationProvider);
 			http.addFilter(corsConfig.corsFilter())
-					.addFilter(new JWTAuthenticationFilter(authenticationManager, customAuthenticationProvider))  // AuthenticationManager를 Parameter로 넘겨줘야 함(로그인을 진행하는 데이터이기 때문)
+					.addFilter(new JWTAuthenticationFilter(authenticationManager, mycustomAuthenticationProvider()))  // AuthenticationManager를 Parameter로 넘겨줘야 함(로그인을 진행하는 데이터이기 때문)
 					.addFilter(new JWTAuthorizationFilter(authenticationManager,memberRepository));
 
 			System.out.println("authenticationManager3 : " + authenticationManager);    // log
