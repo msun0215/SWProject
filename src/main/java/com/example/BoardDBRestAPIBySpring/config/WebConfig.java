@@ -47,6 +47,8 @@ public class WebConfig {
 
 	private CustomAuthenticationProvider customAuthenticationProvider;
 	//private static AuthenticationConfiguration authenticationConfiguration;
+
+
 	@Bean
 	public static AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception{
 		return authenticationConfiguration.getAuthenticationManager();
@@ -116,7 +118,7 @@ public class WebConfig {
 			System.out.println("authenticationManager : "+authenticationManager);
 			System.out.println("customAuthenticaionProvider : "+customAuthenticationProvider);
 			http.addFilter(corsConfig.corsFilter())
-					.addFilter(new JWTAuthenticationFilter(authenticationManager))  // AuthenticationManager를 Parameter로 넘겨줘야 함(로그인을 진행하는 데이터이기 때문)
+					.addFilter(new JWTAuthenticationFilter(authenticationManager, customAuthenticationProvider))  // AuthenticationManager를 Parameter로 넘겨줘야 함(로그인을 진행하는 데이터이기 때문)
 					.addFilter(new JWTAuthorizationFilter(authenticationManager,memberRepository));
 
 			System.out.println("authenticationManager3 : " + authenticationManager);    // log

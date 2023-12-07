@@ -44,8 +44,8 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     // /login 요청을 하면 로그인 시도를 위해서 실행되는 함수
 
 
-    public JWTAuthenticationFilter(AuthenticationManager authenticationManager){
-
+    public JWTAuthenticationFilter(AuthenticationManager authenticationManager, CustomAuthenticationProvider customAuthenticationProvider){
+        this.customAuthenticationProvider=customAuthenticationProvider;
         this.authenticationManager=authenticationManager;
         super.setAuthenticationManager(authenticationManager);
     }
@@ -151,7 +151,7 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
             // DB에 있는 username과 password가 일치한다.
             System.out.println("authenticationToken : "+authenticationToken);
 
-            //CustomAuthenticationProvider customAuthenticationProvider=new CustomAuthenticationProvider();
+            CustomAuthenticationProvider customAuthenticationProvider=new CustomAuthenticationProvider();
             Authentication authentication=customAuthenticationProvider.authenticate(authenticationToken);
             //Authentication authentication = getAuthenticationManager().authenticate(authenticationToken);
             System.out.println("authentication : "+authentication);
