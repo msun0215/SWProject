@@ -43,7 +43,13 @@ public class WebConfig {
 	private final CustomAuthFailureHandler customAuthFailureHandler;
 	private final AuthenticationFailureHandler customFailureHandler;
 //	private final JWTAuthenticationFilter jwtAuthenticationFilter;
+
+	@Autowired
+	private final AuthenticationConfiguration authenticationConfiguration;
+
 	private final CorsConfig corsConfig;
+
+	@Autowired
 	private final MemberRepository memberRepository;
 
 	@Bean
@@ -54,24 +60,21 @@ public class WebConfig {
 
 
 	@Bean
-	public static AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception{
+	public AuthenticationManager authenticationManagerBean() throws Exception{
 		return authenticationConfiguration.getAuthenticationManager();
 	}
 
-//	@Bean
-//	public static JWTAuthenticationFilter JwtAuthenticationFilter(HttpSecurity http) throws  Exception{
-//
-//		JWTAuthenticationFilter jwtAuthenticationFilter=new JWTAuthenticationFilter(, customAuthenticationProvider);
-//		jwtAuthenticationFilter.setAuthenticationSuccessHandler(customLoginSuccessHandler());
-//		jwtAuthenticationFilter.afterPropertiesSet();
-//		return jwtAuthenticationFilter;
-//	}
+	@Bean
+	public JWTAuthenticationFilter JwtAuthenticationFilter() throws  Exception{
+		JWTAuthenticationFilter jwtAuthenticationFilter=new JWTAuthenticationFilter(authenticationManagerBean(), mycustomAuthenticationProvider());
+		jwtAuthenticationFilter.setAuthenticationSuccessHandler(customLoginSuccessHandler());
+		jwtAuthenticationFilter.afterPropertiesSet();
+		return jwtAuthenticationFilter;
+	}
 
 	public static CustomLoginSuccessHandler customLoginSuccessHandler(){
 		return new CustomLoginSuccessHandler();
 	}
-
-
 
 	@Bean
 	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception{

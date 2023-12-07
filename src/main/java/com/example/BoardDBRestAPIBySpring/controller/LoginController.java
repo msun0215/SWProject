@@ -53,6 +53,7 @@ public class LoginController {
 
         return ResponseEntity.ok(memberResponseDTO);
     }
+
     @GetMapping("login/successLogin")
     public ModelAndView successLogin(){
         ModelAndView mv=new ModelAndView();
@@ -61,7 +62,7 @@ public class LoginController {
     }
 
     @PostMapping("/join")
-    public ModelAndView join(@RequestParam Member reqmember){
+    public ModelAndView join(@ModelAttribute Member reqmember){
         // @RequestParam String memberID, @RequestParam String memberPW, @RequestParam String memberName, @RequestParam String memberNickname
         ModelAndView modelAndView=new ModelAndView();
         Member member=new Member();

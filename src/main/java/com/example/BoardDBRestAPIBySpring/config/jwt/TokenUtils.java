@@ -89,6 +89,7 @@ public class TokenUtils {
         return new SecretKeySpec(apiKeySecretBytes, SignatureAlgorithm.HS256.getJcaName());
     }
 
+    // Secret Key를 사용하여 Token Parsing
     private static Claims getClaimsFormToken(String token){
         return Jwts.parser().setSigningKey(DatatypeConverter.parseBase64Binary(secretKey)).parseClaimsJws(token).getBody();
     }

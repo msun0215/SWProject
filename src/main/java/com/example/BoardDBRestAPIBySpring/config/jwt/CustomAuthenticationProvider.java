@@ -51,12 +51,15 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
         //PrincipalDetails principalDetails= (PrincipalDetails)  principalDetailsService.loadUserByUsername(memberID);
         PrincipalDetails principalDetails=(PrincipalDetails) principalDetailsService.loadUserByUsername(memberID);
         System.out.println("CustomAuthenticationProvider에서 받은 principalDetails : "+principalDetails);
+        System.out.println("CustomAuthenticationProvider에서 받은 principalDetails의 memberPW : "+principalDetails.getPassword());
         // 비밀번호 확인
-        if(!encodePWD.matches(memberPW, principalDetails.getPassword()))
+        if(!encodePWD.matches(memberPW, principalDetails.getPassword())){
+            System.out.println("Doesn't Match");
             throw new BadCredentialsException(principalDetails.getUsername() + "Invalid password");
-        else{
+        }else{
             // 인증 성공 시 UsernamePasswordAuthenticationToken 반환
-            System.out.println("Token 반환 성공! "+new UsernamePasswordAuthenticationToken(principalDetails,"",principalDetails.getAuthorities()));
+            System.out.println("Token 반환 성공! ");
+            System.out.println("new : "+new UsernamePasswordAuthenticationToken(principalDetails,"",principalDetails.getAuthorities()));
             return new UsernamePasswordAuthenticationToken(principalDetails,principalDetails.getPassword(),principalDetails.getAuthorities());
         }
     }
