@@ -60,7 +60,7 @@ public class ReplyService {
         reply.edit(dto);
     }
 
-    @Transactional(readOnly = true)
+    @Transactional
     public void deleteReply(final ReplyDeletetDto dto) {
         Reply reply = replyRepository.findById(dto.getReplyId())
                 .orElseThrow(() -> new IllegalArgumentException("존자해지 않는 댓글입니다."));
