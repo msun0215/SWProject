@@ -1,5 +1,6 @@
 package com.example.BoardDBRestAPIBySpring.config;
 
+import com.example.BoardDBRestAPIBySpring.config.jwt.CustomAuthenticationProvider;
 import com.example.BoardDBRestAPIBySpring.config.jwt.JWTAuthenticationFilter;
 import com.example.BoardDBRestAPIBySpring.config.jwt.JWTAuthorizationFilter;
 import com.example.BoardDBRestAPIBySpring.controller.handler.CustomAuthFailureHandler;
@@ -13,11 +14,13 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
@@ -38,28 +41,30 @@ public class WebConfig {
 	//}
 	private final CustomAuthFailureHandler customAuthFailureHandler;
 	private final AuthenticationFailureHandler customFailureHandler;
-	private final JWTAuthenticationFilter jwtAuthenticationFilter;
+//	private final JWTAuthenticationFilter jwtAuthenticationFilter;
 	private final CorsConfig corsConfig;
 	private final MemberRepository memberRepository;
 
+	private CustomAuthenticationProvider customAuthenticationProvider;
+	//private static AuthenticationConfiguration authenticationConfiguration;
+	@Bean
+	public static AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception{
+		return authenticationConfiguration.getAuthenticationManager();
+	}
 
 //	@Bean
-//	public AuthenticationManager authenticationManagerBean(AuthenticationManagerBuilder builder) throws Exception{
-//		return builder.userDetailsService(userDetailsService)
+//	public static JWTAuthenticationFilter JwtAuthenticationFilter(HttpSecurity http) throws  Exception{
+//
+//		JWTAuthenticationFilter jwtAuthenticationFilter=new JWTAuthenticationFilter(, customAuthenticationProvider);
+//		jwtAuthenticationFilter.setAuthenticationSuccessHandler(customLoginSuccessHandler());
+//		jwtAuthenticationFilter.afterPropertiesSet();
+//		return jwtAuthenticationFilter;
 //	}
 
-	@Bean
-	public JWTAuthenticationFilter JwtAuthenticationFilter(HttpSecurity http) throws  Exception{
-		AuthenticationManager authenticationManager=http.getSharedObject(AuthenticationManager.class);
-		JWTAuthenticationFilter jwtAuthenticationFilter=new JWTAuthenticationFilter(authenticationManager);
-		jwtAuthenticationFilter.setAuthenticationSuccessHandler(customLoginSuccessHandler());
-		jwtAuthenticationFilter.afterPropertiesSet();
-		return jwtAuthenticationFilter;
-	}
-
-	public CustomLoginSuccessHandler customLoginSuccessHandler(){
+	public static CustomLoginSuccessHandler customLoginSuccessHandler(){
 		return new CustomLoginSuccessHandler();
 	}
+
 
 
 	@Bean
@@ -108,6 +113,8 @@ public class WebConfig {
 		@Override
 		public void configure(HttpSecurity http) throws Exception {
 			AuthenticationManager authenticationManager=http.getSharedObject(AuthenticationManager.class);
+			System.out.println("authenticationManager : "+authenticationManager);
+			System.out.println("customAuthenticaionProvider : "+customAuthenticationProvider);
 			http.addFilter(corsConfig.corsFilter())
 					.addFilter(new JWTAuthenticationFilter(authenticationManager))  // AuthenticationManager를 Parameter로 넘겨줘야 함(로그인을 진행하는 데이터이기 때문)
 					.addFilter(new JWTAuthorizationFilter(authenticationManager,memberRepository));

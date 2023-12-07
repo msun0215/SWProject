@@ -4,6 +4,7 @@ import com.example.BoardDBRestAPIBySpring.domain.Member;
 import com.example.BoardDBRestAPIBySpring.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -18,7 +19,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class PrincipalDetailsService implements UserDetailsService {
 
-    //@Autowired
+    @Autowired
     private final MemberRepository memberRepository;
 
     // Security Session = Authentication = UserDetails
@@ -31,7 +32,9 @@ public class PrincipalDetailsService implements UserDetailsService {
         System.out.println("PrincipalDetailsService에서 찾은 Member Entity : "+memberEntity);
         if(memberEntity!=null){       // memberID로 찾은 memberEntity가 존재한다면
             System.out.println("memberEntity [["+memberEntity+"]] return 성공!");
-            return new PrincipalDetails(memberEntity);
+            PrincipalDetails principalDetails=new PrincipalDetails(memberEntity);
+            System.out.println("loadUserByUsername에서 찾은 principalDetails : "+principalDetails);
+            return principalDetails;
         }
         return null;
     }

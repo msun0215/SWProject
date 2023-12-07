@@ -2,8 +2,6 @@ package com.example.BoardDBRestAPIBySpring.config.jwt;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
-//import com.example.jwt.config.auth.PrincipalDetails;
-//import com.example.jwt.model.User;
 import com.example.BoardDBRestAPIBySpring.config.auth.PrincipalDetails;
 import com.example.BoardDBRestAPIBySpring.domain.Member;
 import jakarta.servlet.FilterChain;
@@ -13,6 +11,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -20,11 +19,11 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.stereotype.Service;
 
 import java.io.*;
 import java.net.URLDecoder;
 import java.util.*;
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 /*
      Spring Security의 UsernamePasswordAuthenticationFilter 사용
@@ -34,17 +33,20 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
      따라서 이 Filter를 SecurityConfig에 다시 등록을 해주어야 한다.
 */
 @Log4j2
+@Service
 //@RequiredArgsConstructor
 public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
-    //private final AuthenticationManager authenticationManager;  // 로그인을 실행하기 위한 역할
 
-    //private static final AntPathRequestMatcher DEFAULT_ANT_PATH_REQUEST_MATCHER = new AntPathRequestMatcher("/loginForm", "POST");
+    private AuthenticationManager authenticationManager;  // 로그인을 실행하기 위한 역할
 
+    @Autowired
+    private CustomAuthenticationProvider customAuthenticationProvider;
     // /login 요청을 하면 로그인 시도를 위해서 실행되는 함수
 
-    private AuthenticationProvider authenticationProvider;
 
     public JWTAuthenticationFilter(AuthenticationManager authenticationManager){
+
+        this.authenticationManager=authenticationManager;
         super.setAuthenticationManager(authenticationManager);
     }
 
@@ -149,9 +151,9 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
             // DB에 있는 username과 password가 일치한다.
             System.out.println("authenticationToken : "+authenticationToken);
 
-
-            //Authentication authentication=authenticationManager.authenticate(authenticationToken);
-            Authentication authentication = getAuthenticationManager().authenticate(authenticationToken);
+            //CustomAuthenticationProvider customAuthenticationProvider=new CustomAuthenticationProvider();
+            Authentication authentication=customAuthenticationProvider.authenticate(authenticationToken);
+            //Authentication authentication = getAuthenticationManager().authenticate(authenticationToken);
             System.out.println("authentication : "+authentication);
 
             System.out.println("authenticate : "+authentication.getPrincipal());

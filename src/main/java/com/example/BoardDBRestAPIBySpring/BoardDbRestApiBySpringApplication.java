@@ -15,16 +15,12 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 public class BoardDbRestApiBySpringApplication {
 
 	@Bean   // @Bean의 역할은 해당 메서드의 return 되는 Object를 IoC로 등록해줌
-	public BCryptPasswordEncoder encodePwd(){
+	public static BCryptPasswordEncoder encodePwd(){
 		return new BCryptPasswordEncoder();
 	}
 
 	public static void main(String[] args) {
 		SpringApplication.run(BoardDbRestApiBySpringApplication.class, args);
 	}
-
-
-
-
 
 }

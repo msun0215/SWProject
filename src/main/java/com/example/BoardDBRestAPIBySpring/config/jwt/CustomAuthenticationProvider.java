@@ -1,9 +1,12 @@
-/*
+
 package com.example.BoardDBRestAPIBySpring.config.jwt;
 
 
 import com.example.BoardDBRestAPIBySpring.config.auth.PrincipalDetails;
 import com.example.BoardDBRestAPIBySpring.config.auth.PrincipalDetailsService;
+import com.example.BoardDBRestAPIBySpring.domain.Member;
+import com.example.BoardDBRestAPIBySpring.repository.MemberRepository;
+import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationProvider;
@@ -11,23 +14,27 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 
 @Component
-@RequiredArgsConstructor
-public class AuthenticationProviderImpl implements AuthenticationProvider {
+//@RequiredArgsConstructor
+//@AllArgsConstructor
+public class CustomAuthenticationProvider implements AuthenticationProvider {
 
     @Autowired
     private PrincipalDetailsService principalDetailsService;
 
     @Autowired
-    private final BCryptPasswordEncoder encodePWD;
+    private BCryptPasswordEncoder encodePWD;
+
+    @Autowired
+    private MemberRepository memberRepository;
 
     // 인증 구현
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException{
+        //Class<? extends Authentication> toTest=authentication.getClass();
         System.out.println("Provider 접근!");
         // 전달 받은 UsernamePasswordAuthenticationToken
         UsernamePasswordAuthenticationToken token = (UsernamePasswordAuthenticationToken) authentication;
@@ -37,6 +44,7 @@ public class AuthenticationProviderImpl implements AuthenticationProvider {
         String memberPW = token.getCredentials().toString();
         System.out.println("Provider에서의 memberID : "+memberID);
         System.out.println("Provider에서의 memberPW : "+memberPW);
+
 
         // 해당 회원에 대해 DB 조회
         PrincipalDetails principalDetails= (PrincipalDetails)  principalDetailsService.loadUserByUsername(memberID);
@@ -56,4 +64,3 @@ public class AuthenticationProviderImpl implements AuthenticationProvider {
         return authentication.equals(UsernamePasswordAuthenticationToken.class);
     }
 }
-*/
