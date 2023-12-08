@@ -3,21 +3,20 @@ package com.example.BoardDBRestAPIBySpring.config.jwt;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.example.BoardDBRestAPIBySpring.config.auth.PrincipalDetails;
+import com.example.BoardDBRestAPIBySpring.controller.handler.CustomLoginSuccessHandler;
 import com.example.BoardDBRestAPIBySpring.domain.Member;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.stereotype.Service;
 
@@ -39,6 +38,7 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 
     private AuthenticationManager authenticationManager;  // 로그인을 실행하기 위한 역할
 
+    private ObjectMapper objectMapper=new ObjectMapper();
     //@Autowired
     private final CustomAuthenticationProvider customAuthenticationProvider;
     // /login 요청을 하면 로그인 시도를 위해서 실행되는 함수
@@ -47,6 +47,7 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     public JWTAuthenticationFilter(AuthenticationManager authenticationManager, CustomAuthenticationProvider customAuthenticationProvider){
         this.customAuthenticationProvider=customAuthenticationProvider;
         this.authenticationManager=authenticationManager;
+
         super.setAuthenticationManager(authenticationManager);
     }
 
@@ -209,7 +210,9 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         System.out.println("Authentication이 실행됨 : 인증이 완료되었다는 뜻임");
         PrincipalDetails principalDetails=(PrincipalDetails)authResult.getPrincipal();
 
-        // RSA방식이 아닌, Hash암호방식
+
+
+        //RSA방식이 아닌, Hash암호방식
         String jwtToken = JWT.create()
                 .withSubject(principalDetails.getUsername())    // token 별명 느낌?
                         .withExpiresAt(new Date(System.currentTimeMillis()+JWTProperties.EXPIRATION_TIME))  // Token 만료 시간 -> 현재시간 + 만료시간
@@ -218,6 +221,8 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
                                                 .sign(Algorithm.HMAC512(JWTProperties.SECRET));  // HMAC512는 SECRET KEY를 필요로 함
         //String jwtToken =TokenUtils.generateJwtToken(principalDetails.getMember());
         response.addHeader(JWTProperties.HEADER_STRING, JWTProperties.TOKEN_PREFIX+jwtToken);
+        response.setHeader(JWTProperties.HEADER_STRING, JWTProperties.TOKEN_PREFIX+jwtToken);
+        response.setHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
         System.out.println("response : "+response);
         System.out.println("JWTAuthenticationFilter에서의 response.getHeader('Authorization')) : "+response.getHeader(JWTProperties.HEADER_STRING));
 
@@ -228,9 +233,8 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         //response.getWriter().close();
 
         // Client를 /엔드포인트로 리다이렉트
+        response.getOutputStream().write(objectMapper.writeValueAsBytes(principalDetails));
         response.sendRedirect("/login/successLogin");
-
-
     }
 
     private static Map<String, String> splitFormData(String formData){

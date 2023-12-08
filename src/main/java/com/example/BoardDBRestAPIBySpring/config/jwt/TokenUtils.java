@@ -1,43 +1,65 @@
 package com.example.BoardDBRestAPIBySpring.config.jwt;
 
+import com.auth0.jwt.JWT;
+import com.auth0.jwt.algorithms.Algorithm;
 import com.example.BoardDBRestAPIBySpring.domain.Member;
 import com.example.BoardDBRestAPIBySpring.domain.Role;
 import io.jsonwebtoken.*;
 import jakarta.xml.bind.DatatypeConverter;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.stereotype.Component;
 
 import javax.crypto.spec.SecretKeySpec;
 import java.security.Key;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Log4j2
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
+//@NoArgsConstructor(access = AccessLevel.PRIVATE)
+@RequiredArgsConstructor
+@Component
 public class TokenUtils {
 
     private static final String secretKey = JWTProperties.SECRET;
 
-    public static String generateJwtToken(Member member){
-        Date now=new Date();
-        JwtBuilder builder = Jwts.builder()
-                .setSubject(member.getMemberID())
-                .setHeader(createHeader())
-                .setIssuedAt(now)
-                .setClaims(createClaims(member))
-                .setExpiration(createExpireDateForOneYear())
-                .signWith(SignatureAlgorithm.HS256, createSigningKey());
-        String accessToken = builder.compact();
+    public String generateJwtToken(Authentication authentication){
+
+        UserDetails userDetails=(UserDetails) authentication.getPrincipal();
+        String memberID=userDetails.getUsername();
+        List<String> roles = userDetails.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .collect(Collectors.toList());
+        String accessToken= JWT.create().withSubject("ACCESSTOKEN")
+                .withIssuedAt(new Date())
+                .withExpiresAt(new Date(System.currentTimeMillis()+JWTProperties.EXPIRATION_TIME))
+                .withClaim("memberID", memberID)
+                .withClaim("roles", roles)
+                .sign(Algorithm.HMAC256(secretKey));
+
+        return JWTProperties.TOKEN_PREFIX+accessToken;
+
+
+//        Date now=new Date();
+//        JwtBuilder builder = Jwts.builder()
+//                .setSubject("ACCESSTOKEN")
+//                .setHeader(createHeader())
+//                .setIssuedAt(now)
+//                .setClaims(createClaims(member))
+//                .setExpiration(createExpireDateForOneYear())
+//                .signWith(SignatureAlgorithm.HS256, createSigningKey());
+//        String accessToken = builder.compact();
 
 //        String refreshToken=Jwts.builder()
 //                .setSubject(member.getMemberID())
 //                .setHeader(createHeader())
 //                .setIssuedAt(now)
 //                .setExpiration(new Date(now.getTime()+))
-        return accessToken;
     }
 
 

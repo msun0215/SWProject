@@ -7,11 +7,16 @@
     <body>
         <h1>Success To Login</h1><hr/>
         <button onclick="logout()">로그아웃</button>
-
+        <button onclick="user()">user</button>
         <script>
             function logout(){
                 alert("로그아웃 되었습니다.");
                 window.location.href='/';
+            }
+
+            function user(){
+                alert("user 페이지로 이동합니다.")
+                window.location.href='/user'
             }
         </script>
     </body>
