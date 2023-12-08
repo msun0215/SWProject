@@ -49,6 +49,7 @@ public class LoginController {
 
         return ResponseEntity.ok(memberResponseDTO);
     }
+
     @GetMapping("login/successLogin")
     public ModelAndView successLogin(){
         ModelAndView mv=new ModelAndView();

@@ -23,7 +23,7 @@ import org.springframework.security.web.authentication.www.BasicAuthenticationFi
 
 @Log4j2
 public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
-    private MemberRepository memberRepository;
+    private final MemberRepository memberRepository;
 
     public JWTAuthorizationFilter(AuthenticationManager authenticationManager, MemberRepository memberRepository){
         super(authenticationManager);

@@ -22,6 +22,5 @@ public class CorsConfig {
         source.registerCorsConfiguration("/**", config);    // /**로 들어오는 url에 대해서는 config대로 정의함
         System.out.println("Cors Filter 적용 완료");
         return new CorsFilter(source);
-
     }
 }
