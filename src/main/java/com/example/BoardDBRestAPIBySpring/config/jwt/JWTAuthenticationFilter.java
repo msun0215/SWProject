@@ -205,9 +205,9 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     // request 요청한 user에게 JWT Token을 response 하면 된다.
     @Override
     protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authResult) throws IOException, ServletException {
-
-        PrincipalDetails principalDetails=(PrincipalDetails)authResult.getPrincipal();
+        System.out.println("=========================================");
         System.out.println("Authentication이 실행됨 : 인증이 완료되었다는 뜻임");
+        PrincipalDetails principalDetails=(PrincipalDetails)authResult.getPrincipal();
 
         // RSA방식이 아닌, Hash암호방식
         String jwtToken = JWT.create()
@@ -216,9 +216,10 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
                                 .withClaim("id", principalDetails.getMember().getMemberID())    // 비공개 Claim -> 넣고싶은거 아무거나 넣으면 됨
                                         .withClaim("username", principalDetails.getMember().getMemberName())    // 비공개 Claim
                                                 .sign(Algorithm.HMAC512(JWTProperties.SECRET));  // HMAC512는 SECRET KEY를 필요로 함
+        //String jwtToken =TokenUtils.generateJwtToken(principalDetails.getMember());
         response.addHeader(JWTProperties.HEADER_STRING, JWTProperties.TOKEN_PREFIX+jwtToken);
         System.out.println("response : "+response);
-        System.out.println("JWTAuthenticationFilter에서의 response.getHeader() : "+response.getHeader(JWTProperties.HEADER_STRING));
+        System.out.println("JWTAuthenticationFilter에서의 response.getHeader('Authorization')) : "+response.getHeader(JWTProperties.HEADER_STRING));
 
         //response.addHeader("X-Redirect", "/successLogin");
         // Client에게 JWT Token을 응답

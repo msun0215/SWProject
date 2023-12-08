@@ -26,6 +26,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.web.filter.CorsFilter;
 
 @Log4j2
 @Configuration
@@ -48,6 +49,7 @@ public class WebConfig {
 	private final AuthenticationConfiguration authenticationConfiguration;
 
 	private final CorsConfig corsConfig;
+	private final CorsFilter corsFilter;
 
 	@Autowired
 	private final MemberRepository memberRepository;
@@ -98,7 +100,7 @@ public class WebConfig {
 
 //					.requestMatchers(new AntPathRequestMatcher("/login/**")).authenticated()
 //					.requestMatchers(new AntPathRequestMatcher("/login/**")).hasAnyRole("USER","MANAGER","ADMIN")
-//					.requestMatchers("/user/**").hasAnyRole("USER","MANAGER","ADMIN")
+					.requestMatchers(new AntPathRequestMatcher("/user/**")).hasAnyRole("USER","MANAGER","ADMIN")
 //					.requestMatchers("/manager/**").hasAnyRole("MANAGER","ADMIN")
 //					.requestMatchers("/admin/**").hasAnyRole("ADMIN")
 					// hasAnyRole() 메소드는 자동으로 앞에 ROLE_을 추가해서 체크해준다
@@ -134,7 +136,8 @@ public class WebConfig {
 		public void configure(HttpSecurity http) throws Exception {
 			AuthenticationManager authenticationManager=http.getSharedObject(AuthenticationManager.class);	// null값으로 받아들임?
 			System.out.println("authenticationManager : "+authenticationManager);
-			http.addFilter(corsConfig.corsFilter())
+			//http.addFilter(corsConfig.corsFilter())
+			http.addFilter(corsFilter)
 					.addFilter(new JWTAuthenticationFilter(authenticationManager, mycustomAuthenticationProvider()))  // AuthenticationManager를 Parameter로 넘겨줘야 함(로그인을 진행하는 데이터이기 때문)
 					.addFilter(new JWTAuthorizationFilter(authenticationManager,memberRepository));
 

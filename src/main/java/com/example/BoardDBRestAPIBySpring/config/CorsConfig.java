@@ -1,11 +1,14 @@
 package com.example.BoardDBRestAPIBySpring.config;
 
+import com.example.BoardDBRestAPIBySpring.config.jwt.JWTProperties;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
+
+import java.util.Arrays;
 
 @Log4j2
 @Configuration
@@ -18,6 +21,7 @@ public class CorsConfig {
         config.addAllowedOrigin("*");   // 모든 ip에 응답을 허용함
         config.addAllowedHeader("*");   // 모든 header에 응답을 허용함
         config.addAllowedMethod("*");   // 모든 post, get, put, delete, patch 등의 Method 요청을 허용함
+        config.addExposedHeader(JWTProperties.HEADER_STRING);
         //source.registerCorsConfiguration("/api/**", config);    // /api/**로 들어오는 url에 대해서는 config대로 정의함
         source.registerCorsConfiguration("/**", config);    // /**로 들어오는 url에 대해서는 config대로 정의함
         System.out.println("Cors Filter 적용 완료");

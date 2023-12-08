@@ -14,13 +14,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.token.Token;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
+import java.util.Map;
+
 @Slf4j
+@Log4j2
 @RestController
 public class LoginController {
     @Autowired
@@ -117,6 +121,15 @@ public ResponseEntity<Void> logout(HttpServletRequest servletRequest) {
         modelAndView.setViewName("joinForm");
         return modelAndView;
     }
+
+//    @PostMapping("/login")
+//    public Token login(@RequestBody Map<String, String> member){
+//        log.info("memberID = {}", member.get("memberID"));
+//        Member member1=memberRepository.findByMemberID(member.get("memberID"))
+//                //.orElseThrow(()->new IllegalArgumentException("가입되지 않은 Email입니다."));
+//
+//    }
+
 
 
 /*

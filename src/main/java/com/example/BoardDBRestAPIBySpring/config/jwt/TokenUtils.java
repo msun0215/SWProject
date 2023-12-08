@@ -22,15 +22,24 @@ public class TokenUtils {
     private static final String secretKey = JWTProperties.SECRET;
 
     public static String generateJwtToken(Member member){
+        Date now=new Date();
         JwtBuilder builder = Jwts.builder()
                 .setSubject(member.getMemberID())
                 .setHeader(createHeader())
+                .setIssuedAt(now)
                 .setClaims(createClaims(member))
                 .setExpiration(createExpireDateForOneYear())
                 .signWith(SignatureAlgorithm.HS256, createSigningKey());
+        String accessToken = builder.compact();
 
-        return builder.compact();
+//        String refreshToken=Jwts.builder()
+//                .setSubject(member.getMemberID())
+//                .setHeader(createHeader())
+//                .setIssuedAt(now)
+//                .setExpiration(new Date(now.getTime()+))
+        return accessToken;
     }
+
 
     public static boolean isValidToken(String token){
         try{

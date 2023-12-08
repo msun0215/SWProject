@@ -19,5 +19,6 @@ public class CustomLoginSuccessHandler extends SavedRequestAwareAuthenticationSu
         final Member member = ((PrincipalDetails) authentication.getPrincipal()).getMember();
         final String token=TokenUtils.generateJwtToken(member);
         response.addHeader(JWTProperties.HEADER_STRING, JWTProperties.TOKEN_PREFIX+token);
+        response.sendRedirect("/login/successLogin");
     }
 }
