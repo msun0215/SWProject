@@ -1,20 +1,19 @@
 package com.example.BoardDBRestAPIBySpring.controller;
 
 import com.example.BoardDBRestAPIBySpring.config.auth.PrincipalDetails;
-import com.example.BoardDBRestAPIBySpring.domain.Member;
-import com.example.BoardDBRestAPIBySpring.domain.MemberResponseDTO;
-import com.example.BoardDBRestAPIBySpring.domain.Message;
-import com.example.BoardDBRestAPIBySpring.domain.Role;
+import com.example.BoardDBRestAPIBySpring.domain.*;
 import com.example.BoardDBRestAPIBySpring.repository.MemberRepository;
 import com.example.BoardDBRestAPIBySpring.repository.RoleRepository;
+import com.example.BoardDBRestAPIBySpring.service.MemberService;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.token.Token;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -26,6 +25,7 @@ import java.util.Map;
 @Slf4j
 @Log4j2
 @RestController
+@RequiredArgsConstructor
 public class LoginController {
     @Autowired
     private BCryptPasswordEncoder bCryptPasswordEncoder;    // 암호화
@@ -35,6 +35,8 @@ public class LoginController {
 
     @Autowired
     private RoleRepository roleRepository;
+
+    private final MemberService memberService;
 
 //    Role role1=roleRepository.save(new Role(1,"ROLE_ADMIN"));
 //    Role role2=roleRepository.save(new Role(2,"ROLE_MANAGER"));
@@ -47,6 +49,14 @@ public class LoginController {
         ModelAndView modelAndView=new ModelAndView();
         modelAndView.setViewName("index");
         return modelAndView;
+    }
+
+
+    @PostMapping("/login")
+    public Token login(@RequestBody LoginRequest request){
+        String memberID = request.getMemberID();
+        String memberPW = request.getMemberPW();
+        return memberService.login(memberID, memberPW);
     }
 
 

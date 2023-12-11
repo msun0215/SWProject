@@ -1,9 +1,6 @@
 package com.example.BoardDBRestAPIBySpring.config;
 
-import com.example.BoardDBRestAPIBySpring.config.jwt.CustomAuthenticationProvider;
-import com.example.BoardDBRestAPIBySpring.config.jwt.JWTAuthenticationFilter;
-import com.example.BoardDBRestAPIBySpring.config.jwt.JWTAuthorizationFilter;
-import com.example.BoardDBRestAPIBySpring.config.jwt.TokenUtils;
+import com.example.BoardDBRestAPIBySpring.config.jwt.*;
 import com.example.BoardDBRestAPIBySpring.controller.handler.CustomAuthFailureHandler;
 import com.example.BoardDBRestAPIBySpring.controller.handler.CustomLoginSuccessHandler;
 import com.example.BoardDBRestAPIBySpring.repository.MemberRepository;
@@ -15,6 +12,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -22,13 +20,16 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.filter.CorsFilter;
+import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
 @Log4j2
 @Configuration
 @EnableWebSecurity
 //@EnableGlobalMethodSecurity(securedEnabled = true, prePostEnabled = true)
 @RequiredArgsConstructor
+//@CrossOrigin(origins = "http://localhost:8080", exposedHeaders = JWTProperties.HEADER_STRING)
 public class WebConfig {
 
 	// cors 설정 참조
@@ -100,9 +101,8 @@ public class WebConfig {
 					// hasAnyRole() 메소드는 자동으로 앞에 ROLE_을 추가해서 체크해준다
 					//.requestMatchers(new AntPathRequestMatcher("/**")).authenticated()
 					.anyRequest().permitAll();  // 이외의 요청은 모두 허용함
-		})
+		});
 		//		.logout(logout->logout.logoutSuccessUrl("/"))
-		;
 
 		http.logout()
 				.logoutUrl("/logout")	// 로그인과 마찬가지로 POST 요청이 와야 함

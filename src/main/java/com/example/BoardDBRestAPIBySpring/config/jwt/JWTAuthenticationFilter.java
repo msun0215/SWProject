@@ -19,6 +19,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import java.io.*;
 import java.net.URLDecoder;
@@ -31,6 +32,7 @@ import java.util.*;
      but, formLogin().disable() 설정을 하면서 이 Filter가 동작을 하지 않음
      따라서 이 Filter를 SecurityConfig에 다시 등록을 해주어야 한다.
 */
+
 @Log4j2
 @Service
 //@RequiredArgsConstructor
@@ -235,6 +237,7 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         // Client를 /엔드포인트로 리다이렉트
         response.getOutputStream().write(objectMapper.writeValueAsBytes(principalDetails));
         response.sendRedirect("/login/successLogin");
+
     }
 
     private static Map<String, String> splitFormData(String formData){
@@ -263,6 +266,13 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         }
     }
 
+    private String resolveToken(HttpServletRequest request){
+        String bearerToken=request.getHeader(JWTProperties.HEADER_STRING);
+        if(StringUtils.hasText(bearerToken)&&bearerToken.startsWith(JWTProperties.TOKEN_PREFIX))
+            return bearerToken.substring(7);
+
+        return null;
+    }
     /*
     <Spring Security>
     username, password 로그인 정상

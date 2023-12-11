@@ -3,6 +3,7 @@ package com.example.BoardDBRestAPIBySpring.controller.handler;
 import com.example.BoardDBRestAPIBySpring.config.auth.PrincipalDetails;
 import com.example.BoardDBRestAPIBySpring.config.jwt.JWTProperties;
 import com.example.BoardDBRestAPIBySpring.config.jwt.TokenUtils;
+import com.example.BoardDBRestAPIBySpring.domain.Token;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -36,8 +37,10 @@ public class CustomLoginSuccessHandler implements  AuthenticationSuccessHandler{
 
         PrincipalDetails principalDetails=(PrincipalDetails)authentication.getPrincipal();
 
-        String accessToken= tokenUtils.generateJwtToken(authentication);
-        response.setHeader(JWTProperties.HEADER_STRING, accessToken);
+//        Token token=tokenUtils.createToken(authentication).;
+        String token=tokenUtils.createToken(authentication).getAccessToken();
+
+        response.setHeader(JWTProperties.HEADER_STRING, token);
         response.setHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
         response.setStatus(HttpStatus.OK.value());
         response.sendRedirect("/login/successLogin");

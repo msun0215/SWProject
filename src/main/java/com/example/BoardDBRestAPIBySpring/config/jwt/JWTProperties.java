@@ -7,4 +7,5 @@ public interface JWTProperties {
     int REFRESH_TOKEN_EXPIRATION_TIME = EXPIRATION_TIME*5;  // Refresh Token 만료
     String TOKEN_PREFIX = "Bearer ";
     String HEADER_STRING = "Authorization";
+    String REFRESH_HEADER = "refreshToken";
 }

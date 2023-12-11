@@ -6,10 +6,13 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.method.P;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
@@ -23,6 +26,7 @@ import org.springframework.stereotype.Service;
 public class PrincipalDetailsService implements UserDetailsService {
 
     private final MemberRepository memberRepository;
+    private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
     // Security Session = Authentication = UserDetails
     // Security Session(내부 Authentication(내부 UserDetails))
@@ -44,4 +48,6 @@ public class PrincipalDetailsService implements UserDetailsService {
             return null;
         }
     }
+
+
 }

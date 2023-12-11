@@ -46,7 +46,7 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
         System.out.println("Provider에서의 memberPW : "+memberPW);
 
 
-        PrincipalDetailsService principalDetailsService=new PrincipalDetailsService(memberRepository);
+        PrincipalDetailsService principalDetailsService=new PrincipalDetailsService(memberRepository, encodePWD);
 
         // 해당 회원에 대해 DB 조회
         //PrincipalDetails principalDetails= (PrincipalDetails)  principalDetailsService.loadUserByUsername(memberID);

@@ -38,3 +38,6 @@ spring:
     properties:
       hibernate:
         format_sql: true
+
+jwt:
+  secret: MySWProjectUsingJWTwithSpringBootAndSpringSecurity
