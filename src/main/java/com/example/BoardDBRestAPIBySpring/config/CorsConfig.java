@@ -18,6 +18,7 @@ public class CorsConfig {
         config.addAllowedOriginPattern("*");   // 모든 ip에 응답을 허용함
         config.addAllowedHeader("*");   // 모든 header에 응답을 허용함
         config.addAllowedMethod("*");   // 모든 post, get, put, delete, patch 등의 Method 요청을 허용함
+        config.addExposedHeader("Authorization"); // 로그인 응답 헤더 중 Authorization 값을 받기 위한 설정
         //source.registerCorsConfiguration("/api/**", config);    // /api/**로 들어오는 url에 대해서는 config대로 정의함
         source.registerCorsConfiguration("/**", config);    // /**로 들어오는 url에 대해서는 config대로 정의함
         System.out.println("Cors Filter 적용 완료");
