@@ -39,5 +39,12 @@ spring:
       hibernate:
         format_sql: true
 
+  data:
+    redis:
+      host: localhost #배포서버일 경우 loalhost가 아닌 ec2 주소 사용
+      port: 6379
+
 jwt:
-  secret: MySWProjectUsingJWTwithSpringBootAndSpringSecurity
+  secret: TXlTV1Byb2plY3RVc2luZ0pXVHdpdGhTcHJpbmdCb290QW5kU3ByaW5nU2VjdXJpdHk= # 임의의 문자열을 Base64로 인코딩한 값
+  refresh-token-validity-in-seconds : 604800  # 7일
+  access-token-validity-in-second : 10800   # 3시간

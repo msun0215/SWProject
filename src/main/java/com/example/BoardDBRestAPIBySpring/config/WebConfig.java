@@ -3,6 +3,8 @@ package com.example.BoardDBRestAPIBySpring.config;
 import com.example.BoardDBRestAPIBySpring.config.jwt.*;
 import com.example.BoardDBRestAPIBySpring.controller.handler.CustomAuthFailureHandler;
 import com.example.BoardDBRestAPIBySpring.controller.handler.CustomLoginSuccessHandler;
+import com.example.BoardDBRestAPIBySpring.controller.handler.JwtAccessDeniedHandler;
+import com.example.BoardDBRestAPIBySpring.controller.handler.JwtAuthenticationEntryPoint;
 import com.example.BoardDBRestAPIBySpring.repository.MemberRepository;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
@@ -103,6 +105,8 @@ public class WebConfig {
 					.anyRequest().permitAll();  // 이외의 요청은 모두 허용함
 		});
 		//		.logout(logout->logout.logoutSuccessUrl("/"))
+		http.exceptionHandling().accessDeniedHandler(new JwtAccessDeniedHandler());
+		http.exceptionHandling().authenticationEntryPoint(new JwtAuthenticationEntryPoint());
 
 		http.logout()
 				.logoutUrl("/logout")	// 로그인과 마찬가지로 POST 요청이 와야 함

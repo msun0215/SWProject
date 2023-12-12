@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -12,7 +13,7 @@ import java.util.List;
 
 @Data   // GETTER & SETTER
 @Entity
-@NoArgsConstructor
+@RequiredArgsConstructor
 public class Role {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY) // MYSQL에서 AutoIncrement

@@ -35,62 +35,63 @@ import java.util.stream.Collectors;
 @Component
 public class TokenUtils {
 
+    private final String secretKey=JWTProperties.SECRET;
     private final Key key;
     public TokenUtils(@Value("${jwt.secret}") String secretKey){
         byte[] keyBytes= Decoders.BASE64.decode(secretKey);
         this.key= Keys.hmacShaKeyFor(keyBytes);
     }
 
-//    public String generateJwtToken(Authentication authentication){
-//
-//        UserDetails userDetails=(UserDetails) authentication.getPrincipal();
-//        String memberID=userDetails.getUsername();
-//        List<String> roles = userDetails.getAuthorities().stream()
-//                .map(GrantedAuthority::getAuthority)
-//                .collect(Collectors.toList());
-//        String accessToken= JWT.create().withSubject("ACCESSTOKEN")
-//                .withIssuedAt(new Date())
-//                .withExpiresAt(new Date(System.currentTimeMillis()+JWTProperties.EXPIRATION_TIME))
-//                .withClaim("memberID", memberID)
-//                .withClaim("roles", roles)
-//                .sign(Algorithm.HMAC256(secretKey));
-//
-//        return JWTProperties.TOKEN_PREFIX+accessToken;
-//
-//
-////        Date now=new Date();
-////        JwtBuilder builder = Jwts.builder()
-////                .setSubject("ACCESSTOKEN")
-////                .setHeader(createHeader())
-////                .setIssuedAt(now)
-////                .setClaims(createClaims(member))
-////                .setExpiration(createExpireDateForOneYear())
-////                .signWith(SignatureAlgorithm.HS256, createSigningKey());
-////        String accessToken = builder.compact();
-//
-////        String refreshToken=Jwts.builder()
-////                .setSubject(member.getMemberID())
-////                .setHeader(createHeader())
-////                .setIssuedAt(now)
-////                .setExpiration(new Date(now.getTime()+))
-//    }
-//
-//    public String generateRefreshToken(Authentication authentication) {
-//
-//        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-//        String memberID = userDetails.getUsername();
-//        List<String> roles = userDetails.getAuthorities().stream()
-//                .map(GrantedAuthority::getAuthority)
-//                .collect(Collectors.toList());
-//        String refreshToken = JWT.create().withSubject("REFRESHTOKEN")
-//                .withIssuedAt(new Date())
-//                .withExpiresAt(new Date(System.currentTimeMillis() + JWTProperties.REFRESH_TOKEN_EXPIRATION_TIME))
-//                .withClaim("memberID", memberID)
-//                .withClaim("roles", roles)
-//                .sign(Algorithm.HMAC256(secretKey));
-//
-//        return JWTProperties.TOKEN_PREFIX + refreshToken;
-//    }
+    public String generateJwtToken(Authentication authentication){
+
+        UserDetails userDetails=(UserDetails) authentication.getPrincipal();
+        String memberID=userDetails.getUsername();
+        List<String> roles = userDetails.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .collect(Collectors.toList());
+        String accessToken= JWT.create().withSubject("ACCESSTOKEN")
+                .withIssuedAt(new Date())
+                .withExpiresAt(new Date(System.currentTimeMillis()+JWTProperties.EXPIRATION_TIME))
+                .withClaim("memberID", memberID)
+                .withClaim("roles", roles)
+                .sign(Algorithm.HMAC256(secretKey));
+
+        return JWTProperties.TOKEN_PREFIX+accessToken;
+
+
+//        Date now=new Date();
+//        JwtBuilder builder = Jwts.builder()
+//                .setSubject("ACCESSTOKEN")
+//                .setHeader(createHeader())
+//                .setIssuedAt(now)
+//                .setClaims(createClaims(member))
+//                .setExpiration(createExpireDateForOneYear())
+//                .signWith(SignatureAlgorithm.HS256, createSigningKey());
+//        String accessToken = builder.compact();
+
+//        String refreshToken=Jwts.builder()
+//                .setSubject(member.getMemberID())
+//                .setHeader(createHeader())
+//                .setIssuedAt(now)
+//                .setExpiration(new Date(now.getTime()+))
+    }
+
+    public String generateRefreshToken(Authentication authentication) {
+
+        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+        String memberID = userDetails.getUsername();
+        List<String> roles = userDetails.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .collect(Collectors.toList());
+        String refreshToken = JWT.create().withSubject("REFRESHTOKEN")
+                .withIssuedAt(new Date())
+                .withExpiresAt(new Date(System.currentTimeMillis() + JWTProperties.REFRESH_TOKEN_EXPIRATION_TIME))
+                .withClaim("memberID", memberID)
+                .withClaim("roles", roles)
+                .sign(Algorithm.HMAC256(secretKey));
+
+        return JWTProperties.TOKEN_PREFIX + refreshToken;
+    }
 
     public Token createToken(Authentication authentication){
         UserDetails userDetails=(UserDetails) authentication.getPrincipal();
@@ -118,6 +119,10 @@ public class TokenUtils {
                 .setExpiration(new Date(now.getTime()+JWTProperties.REFRESH_TOKEN_EXPIRATION_TIME))
                 .signWith(SignatureAlgorithm.HS256,key)   // 사용할 알고리즘과 secretKey
                 .compact();
+
+        System.out.println("TokenUtils에서의 accessToken : "+accessToken);
+        System.out.println("TokenUtils에서의 refreshToken : "+refreshToken);
+
 
         return Token.builder().grantType(JWTProperties.TOKEN_PREFIX).accessToken(accessToken).refreshToken(refreshToken).key(memberID).build();
     }

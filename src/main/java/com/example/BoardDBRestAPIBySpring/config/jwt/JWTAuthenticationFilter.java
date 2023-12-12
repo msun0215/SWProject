@@ -6,11 +6,13 @@ import com.example.BoardDBRestAPIBySpring.config.auth.PrincipalDetails;
 import com.example.BoardDBRestAPIBySpring.controller.handler.CustomLoginSuccessHandler;
 import com.example.BoardDBRestAPIBySpring.domain.Member;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.jsonwebtoken.IncorrectClaimException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.log4j.Log4j2;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -18,6 +20,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -34,7 +37,7 @@ import java.util.*;
      따라서 이 Filter를 SecurityConfig에 다시 등록을 해주어야 한다.
 */
 
-@Log4j2
+@Slf4j
 @Service
 //@RequiredArgsConstructor
 public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
@@ -166,7 +169,8 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
             System.out.println("principalDetails : "+principalDetails);
             System.out.println("getUserName() : "+principalDetails.getUsername());
             SecurityContextHolder.getContext().setAuthentication(authentication);
-            setDetails(request,authenticationToken);
+//            setDetails(request,authenticationToken);
+            log.debug("Save authentication in SecurityContextHolder");
 
             return authentication;
 
@@ -190,6 +194,22 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 //            }
 
 
+        } catch (IncorrectClaimException e) {   // 잘못된 토큰인 경우
+            SecurityContextHolder.clearContext();
+            log.debug("Invalid JWT Token");
+            try {
+                response.sendError(403);
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
+            }
+        }catch(UsernameNotFoundException e){
+            SecurityContextHolder.clearContext();
+            log.debug("Can't find user");
+            try {
+                response.sendError(403);
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
