@@ -8,22 +8,20 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import lombok.RequiredArgsConstructor;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.stereotype.Service;
-
-import java.io.*;
-import java.net.URLDecoder;
-import java.util.*;
 
 /*
      Spring Security의 UsernamePasswordAuthenticationFilter 사용
@@ -37,10 +35,9 @@ import java.util.*;
 //@RequiredArgsConstructor
 public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
-    private AuthenticationManager authenticationManager;  // 로그인을 실행하기 위한 역할
-
     //@Autowired
     private final CustomAuthenticationProvider customAuthenticationProvider;
+    private AuthenticationManager authenticationManager;  // 로그인을 실행하기 위한 역할
     // /login 요청을 하면 로그인 시도를 위해서 실행되는 함수
 
 
@@ -50,6 +47,31 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         super.setAuthenticationManager(authenticationManager);
     }
 
+    private static Map<String, String> splitFormData(String formData){
+        Map<String, String> dataMap = new HashMap<>();
+        String[] keyValuePairs = formData.split("&"); // "&"를 기준으로 memberID=~ 와 memberPW=~를 나눔
+
+        for(String pair : keyValuePairs){
+            String[] entry = pair.split("=");   // memberID=~를 =기준으로 나눠서 memberID와 ~를 가짐
+            String key = entry[0];
+            String value = entry.length>1?entry[1]:"";
+
+            // URL Decoding
+            value = urlDecode(value);
+            dataMap.put(key, value);
+        }
+        return dataMap;
+    }
+
+    // URL Decoding Method
+    private static String urlDecode(String value){
+        try{
+            return URLDecoder.decode(value, "UTF-8");
+        }catch (UnsupportedEncodingException e){
+            e.printStackTrace();
+            return value;
+        }
+    }
 
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {
@@ -227,35 +249,9 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         //response.getWriter().close();
 
         // Client를 /엔드포인트로 리다이렉트
-        response.sendRedirect("/login/successLogin");
+//        response.sendRedirect("/login/successLogin");
 
 
-    }
-
-    private static Map<String, String> splitFormData(String formData){
-        Map<String, String> dataMap = new HashMap<>();
-        String[] keyValuePairs = formData.split("&"); // "&"를 기준으로 memberID=~ 와 memberPW=~를 나눔
-
-        for(String pair : keyValuePairs){
-            String[] entry = pair.split("=");   // memberID=~를 =기준으로 나눠서 memberID와 ~를 가짐
-            String key = entry[0];
-            String value = entry.length>1?entry[1]:"";
-
-            // URL Decoding
-            value = urlDecode(value);
-            dataMap.put(key, value);
-        }
-        return dataMap;
-    }
-
-    // URL Decoding Method
-    private static String urlDecode(String value){
-        try{
-            return URLDecoder.decode(value, "UTF-8");
-        }catch (UnsupportedEncodingException e){
-            e.printStackTrace();
-            return value;
-        }
     }
 
     /*
