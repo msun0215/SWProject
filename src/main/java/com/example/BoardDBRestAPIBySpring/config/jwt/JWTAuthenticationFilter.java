@@ -4,6 +4,7 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.example.BoardDBRestAPIBySpring.config.auth.PrincipalDetails;
 import com.example.BoardDBRestAPIBySpring.domain.Member;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -16,12 +17,16 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 /*
      Spring Security의 UsernamePasswordAuthenticationFilter 사용
@@ -30,6 +35,7 @@ import org.springframework.stereotype.Service;
      but, formLogin().disable() 설정을 하면서 이 Filter가 동작을 하지 않음
      따라서 이 Filter를 SecurityConfig에 다시 등록을 해주어야 한다.
 */
+
 @Log4j2
 @Service
 //@RequiredArgsConstructor
@@ -38,12 +44,14 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     //@Autowired
     private final CustomAuthenticationProvider customAuthenticationProvider;
     private AuthenticationManager authenticationManager;  // 로그인을 실행하기 위한 역할
+    private ObjectMapper objectMapper=new ObjectMapper();
     // /login 요청을 하면 로그인 시도를 위해서 실행되는 함수
 
 
     public JWTAuthenticationFilter(AuthenticationManager authenticationManager, CustomAuthenticationProvider customAuthenticationProvider){
         this.customAuthenticationProvider=customAuthenticationProvider;
         this.authenticationManager=authenticationManager;
+
         super.setAuthenticationManager(authenticationManager);
     }
 
@@ -183,6 +191,7 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
             PrincipalDetails principalDetails = (PrincipalDetails) authentication.getPrincipal();
             System.out.println("principalDetails : "+principalDetails);
             System.out.println("getUserName() : "+principalDetails.getUsername());
+            SecurityContextHolder.getContext().setAuthentication(authentication);
             setDetails(request,authenticationToken);
 
             return authentication;
@@ -227,20 +236,25 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     // request 요청한 user에게 JWT Token을 response 하면 된다.
     @Override
     protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authResult) throws IOException, ServletException {
-
-        PrincipalDetails principalDetails=(PrincipalDetails)authResult.getPrincipal();
+        System.out.println("=========================================");
         System.out.println("Authentication이 실행됨 : 인증이 완료되었다는 뜻임");
+        PrincipalDetails principalDetails=(PrincipalDetails)authResult.getPrincipal();
 
-        // RSA방식이 아닌, Hash암호방식
+
+
+        //RSA방식이 아닌, Hash암호방식
         String jwtToken = JWT.create()
                 .withSubject(principalDetails.getUsername())    // token 별명 느낌?
                         .withExpiresAt(new Date(System.currentTimeMillis()+JWTProperties.EXPIRATION_TIME))  // Token 만료 시간 -> 현재시간 + 만료시간
                                 .withClaim("id", principalDetails.getMember().getMemberID())    // 비공개 Claim -> 넣고싶은거 아무거나 넣으면 됨
                                         .withClaim("username", principalDetails.getMember().getMemberName())    // 비공개 Claim
                                                 .sign(Algorithm.HMAC512(JWTProperties.SECRET));  // HMAC512는 SECRET KEY를 필요로 함
+        //String jwtToken =TokenUtils.generateJwtToken(principalDetails.getMember());
         response.addHeader(JWTProperties.HEADER_STRING, JWTProperties.TOKEN_PREFIX+jwtToken);
+        response.setHeader(JWTProperties.HEADER_STRING, JWTProperties.TOKEN_PREFIX+jwtToken);
+        response.setHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
         System.out.println("response : "+response);
-        System.out.println("JWTAuthenticationFilter에서의 response.getHeader() : "+response.getHeader(JWTProperties.HEADER_STRING));
+        System.out.println("JWTAuthenticationFilter에서의 response.getHeader('Authorization')) : "+response.getHeader(JWTProperties.HEADER_STRING));
 
         //response.addHeader("X-Redirect", "/successLogin");
         // Client에게 JWT Token을 응답
@@ -249,11 +263,18 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         //response.getWriter().close();
 
         // Client를 /엔드포인트로 리다이렉트
+        response.getOutputStream().write(objectMapper.writeValueAsBytes(principalDetails));
 //        response.sendRedirect("/login/successLogin");
-
 
     }
 
+    private String resolveToken(HttpServletRequest request){
+        String bearerToken=request.getHeader(JWTProperties.HEADER_STRING);
+        if(StringUtils.hasText(bearerToken)&&bearerToken.startsWith(JWTProperties.TOKEN_PREFIX))
+            return bearerToken.substring(7);
+
+        return null;
+    }
     /*
     <Spring Security>
     username, password 로그인 정상

@@ -12,11 +12,14 @@ public class JwtTokenIntercepter implements HandlerInterceptor {
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         final String header=request.getHeader(JWTProperties.HEADER_STRING);
 
-        if(header!=null){
-            final String token=TokenUtils.getTokenFromHeader(header);
-            if(TokenUtils.isValidToken(token))  return true;
+        System.out.println("Interceptor에서 JWTToken 호출 : "+header);
 
+        if(header!=null&&TokenUtils.isValidToken(header)){
+            return true;
         }
+        response.setStatus(401);
+        response.setHeader(JWTProperties.HEADER_STRING, header);
+        response.setHeader("msg", "Check the Token");
         response.sendRedirect("/error/unauthorized");
         return false;
     }

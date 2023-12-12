@@ -1,13 +1,9 @@
 package com.example.BoardDBRestAPIBySpring;
 
-import com.example.BoardDBRestAPIBySpring.config.jwt.JWTAuthenticationFilter;
-import com.example.BoardDBRestAPIBySpring.controller.handler.CustomLoginSuccessHandler;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 @Log4j2

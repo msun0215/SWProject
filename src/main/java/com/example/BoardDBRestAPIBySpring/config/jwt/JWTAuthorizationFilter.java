@@ -28,7 +28,8 @@ public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
 
     public JWTAuthorizationFilter(AuthenticationManager authenticationManager, MemberRepository memberRepository){
         super(authenticationManager);
-        System.out.println("인증이나 권한이 필요한 주소가 요청됨");
+        System.out.println("JWTAuthorizationFilter : 인증이나 권한이 필요한 주소가 요청됨");
+        System.out.println("=========================================");
         this.memberRepository=memberRepository;
     }
 
@@ -37,6 +38,9 @@ public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws IOException, ServletException {
         //String header=request.getHeader("Authorization");
+        System.out.println("=========================================");
+        System.out.println("JWTAuthorizationFilter 시작");
+        System.out.println("=========================================");
         System.out.println("request : "+request);
         System.out.println("Authorization : "+request.getHeader(JWTProperties.HEADER_STRING));
         String header=request.getHeader(JWTProperties.HEADER_STRING);
@@ -50,6 +54,7 @@ public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
 
 
         // header가 있는지(유효한지) 확인
+        // 토큰이 잘못될 경우 다음 filter로 흘려 보낸다.
         if(header==null||!header.startsWith(JWTProperties.TOKEN_PREFIX)){
             System.out.println("Not Allowed User");
             chain.doFilter(request,response);
@@ -75,7 +80,7 @@ public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
 
             // JWT Token 서명을 통해서 서명이 정상적이면 Authentication 객체를 만들어준다.
             Authentication authentication = new UsernamePasswordAuthenticationToken(principalDetails, null, principalDetails.getAuthorities());
-            System.out.println("authentication"+authentication);
+            System.out.println("JWTAuthorization에서의 authentication : "+authentication);
             // 강제로 Security의 Session에 접근하여서 Authentication 객체를 저장시킨다.
             SecurityContextHolder.getContext().setAuthentication(authentication);
             System.out.println("Successfully Saved Authentication" + authentication);

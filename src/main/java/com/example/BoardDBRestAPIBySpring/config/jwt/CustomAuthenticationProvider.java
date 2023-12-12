@@ -34,6 +34,7 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException{
         //Class<? extends Authentication> toTest=authentication.getClass();
+        System.out.println("=========================================");
         System.out.println("Provider 접근!");
         // 전달 받은 UsernamePasswordAuthenticationToken
         UsernamePasswordAuthenticationToken token = (UsernamePasswordAuthenticationToken) authentication;
@@ -45,7 +46,7 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
         System.out.println("Provider에서의 memberPW : "+memberPW);
 
 
-        PrincipalDetailsService principalDetailsService=new PrincipalDetailsService(memberRepository);
+        PrincipalDetailsService principalDetailsService=new PrincipalDetailsService(memberRepository, encodePWD);
 
         // 해당 회원에 대해 DB 조회
         //PrincipalDetails principalDetails= (PrincipalDetails)  principalDetailsService.loadUserByUsername(memberID);
@@ -54,10 +55,12 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
         System.out.println("CustomAuthenticationProvider에서 받은 principalDetails의 memberPW : "+principalDetails.getPassword());
         // 비밀번호 확인
         if(!encodePWD.matches(memberPW, principalDetails.getPassword())){
+            System.out.println("=========================================");
             System.out.println("Doesn't Match");
             throw new BadCredentialsException(principalDetails.getUsername() + "Invalid password");
         }else{
             // 인증 성공 시 UsernamePasswordAuthenticationToken 반환
+            System.out.println("=========================================");
             System.out.println("Token 반환 성공! ");
             System.out.println("new : "+new UsernamePasswordAuthenticationToken(principalDetails,"",principalDetails.getAuthorities()));
             return new UsernamePasswordAuthenticationToken(principalDetails,principalDetails.getPassword(),principalDetails.getAuthorities());
