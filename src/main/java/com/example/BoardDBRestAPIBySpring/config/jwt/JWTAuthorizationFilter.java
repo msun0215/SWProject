@@ -1,9 +1,10 @@
 package com.example.BoardDBRestAPIBySpring.config.jwt;
 
+import com.auth0.jwt.JWT;
+import com.auth0.jwt.algorithms.Algorithm;
 import com.example.BoardDBRestAPIBySpring.config.auth.PrincipalDetails;
 import com.example.BoardDBRestAPIBySpring.domain.Member;
 import com.example.BoardDBRestAPIBySpring.repository.MemberRepository;
-import io.jsonwebtoken.Jwts;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -61,8 +62,7 @@ public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
 
         boolean validToken = TokenUtils.isValidToken(token);
         System.out.println("validToken = " + validToken);
-        String memberID = Jwts.parser().setSigningKey(JWTProperties.SECRET).parseClaimsJws(token).getBody()
-                .get("memberID", String.class);
+        String memberID = JWT.require(Algorithm.HMAC512(JWTProperties.SECRET)).build().verify(token).getClaim("id").asString();  // verify()를 통해서 서명
 
         System.out.println("token : "+token);
         System.out.println("memberID : "+memberID);
