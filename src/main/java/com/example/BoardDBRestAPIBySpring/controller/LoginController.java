@@ -1,11 +1,15 @@
 package com.example.BoardDBRestAPIBySpring.controller;
 
+import com.auth0.jwt.JWT;
+import com.auth0.jwt.algorithms.Algorithm;
+import com.example.BoardDBRestAPIBySpring.config.jwt.JWTProperties;
 import com.example.BoardDBRestAPIBySpring.domain.Member;
 import com.example.BoardDBRestAPIBySpring.domain.MemberResponseDTO;
 import com.example.BoardDBRestAPIBySpring.domain.Message;
 import com.example.BoardDBRestAPIBySpring.domain.Role;
 import com.example.BoardDBRestAPIBySpring.repository.MemberRepository;
 import com.example.BoardDBRestAPIBySpring.repository.RoleRepository;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -57,6 +61,20 @@ public class LoginController {
         return mv;
     }
 
+    @GetMapping("/token")
+    public ValidateTokenDto validateToken(HttpServletRequest request) {
+        String authorizationHeader = request.getHeader(JWTProperties.HEADER_STRING);
+        String token = authorizationHeader.replace(JWTProperties.TOKEN_PREFIX, "");
+        try {
+            String username = JWT.require(Algorithm.HMAC512(JWTProperties.SECRET)).build().verify(token)
+                    .getClaim("username").asString();
+            return new ValidateTokenDto(true, username);
+        } catch (Exception e) {
+            log.error("error = {}", e.getMessage());
+            return new ValidateTokenDto(false, "");
+        }
+    }
+
     @PostMapping("/join")
     public ModelAndView join(@ModelAttribute Member reqmember){
         // @RequestParam String memberID, @RequestParam String memberPW, @RequestParam String memberName, @RequestParam String memberNickname
@@ -81,6 +99,13 @@ public class LoginController {
 
         return modelAndView;   // member 저장이 완료되면 loginForm으로 되돌아가기
     }
+
+    @GetMapping("/loginForm")
+    public ModelAndView loginForm(){
+        ModelAndView modelAndView=new ModelAndView();
+        modelAndView.setViewName("loginForm");
+        return modelAndView;
+    }
 /*
     @GetMapping("/login")
     public String login(@RequestParam(value = "error", required = false) String error, @RequestParam(value="exception", required = false) String exception, Model model){
@@ -100,18 +125,14 @@ public ResponseEntity<Void> logout(HttpServletRequest servletRequest) {
 
      */
 
-    @GetMapping("/loginForm")
-    public ModelAndView loginForm(){
-        ModelAndView modelAndView=new ModelAndView();
-        modelAndView.setViewName("loginForm");
-        return modelAndView;
-    }
-
     @GetMapping("/joinForm")
     public ModelAndView joinForm(){
         ModelAndView modelAndView=new ModelAndView();
         modelAndView.setViewName("joinForm");
         return modelAndView;
+    }
+
+    public record ValidateTokenDto(boolean validate, String username) {
     }
 
 
