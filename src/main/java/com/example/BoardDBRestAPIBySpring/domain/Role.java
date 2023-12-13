@@ -9,11 +9,11 @@ import java.util.Arrays;
 import java.util.List;
 import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 
 @Data   // GETTER & SETTER
 @Entity
-@NoArgsConstructor
+@RequiredArgsConstructor
 public class Role {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY) // MYSQL에서 AutoIncrement

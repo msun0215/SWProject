@@ -1,8 +1,13 @@
 package com.example.BoardDBRestAPIBySpring.config;
 
-import com.example.BoardDBRestAPIBySpring.config.jwt.*;
+import com.example.BoardDBRestAPIBySpring.config.jwt.CustomAuthenticationProvider;
+import com.example.BoardDBRestAPIBySpring.config.jwt.JWTAuthenticationFilter;
+import com.example.BoardDBRestAPIBySpring.config.jwt.JWTAuthorizationFilter;
+import com.example.BoardDBRestAPIBySpring.config.jwt.TokenUtils;
 import com.example.BoardDBRestAPIBySpring.controller.handler.CustomAuthFailureHandler;
 import com.example.BoardDBRestAPIBySpring.controller.handler.CustomLoginSuccessHandler;
+import com.example.BoardDBRestAPIBySpring.controller.handler.JwtAccessDeniedHandler;
+import com.example.BoardDBRestAPIBySpring.controller.handler.JwtAuthenticationEntryPoint;
 import com.example.BoardDBRestAPIBySpring.repository.MemberRepository;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
@@ -12,7 +17,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
-import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -20,9 +24,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.filter.CorsFilter;
-import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
 @Log4j2
 @Configuration
@@ -103,6 +105,8 @@ public class WebConfig {
 					.anyRequest().permitAll();  // 이외의 요청은 모두 허용함
 		});
 		//		.logout(logout->logout.logoutSuccessUrl("/"))
+		http.exceptionHandling().accessDeniedHandler(new JwtAccessDeniedHandler());
+		http.exceptionHandling().authenticationEntryPoint(new JwtAuthenticationEntryPoint());
 
 		http.logout()
 				.logoutUrl("/logout")	// 로그인과 마찬가지로 POST 요청이 와야 함
