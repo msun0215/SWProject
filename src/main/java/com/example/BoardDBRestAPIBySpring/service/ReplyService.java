@@ -36,14 +36,14 @@ public class ReplyService {
     }
 
     @Transactional
-    public void createReply(final long boardId, final Member member, final ReplyCreateRequest request) {
+    public Reply createReply(final long boardId, final Member member, final ReplyCreateRequest request) {
         Board board = postRepository.findById(boardId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 게시글입니다."));
         Reply reply = request.toEntity();
         reply.setBoard(board);
         reply.setMember(member);
 
-        replyRepository.save(reply);
+        return replyRepository.save(reply);
     }
 
     @Transactional

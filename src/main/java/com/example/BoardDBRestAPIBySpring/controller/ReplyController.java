@@ -2,13 +2,14 @@ package com.example.BoardDBRestAPIBySpring.controller;
 
 import com.example.BoardDBRestAPIBySpring.config.auth.PrincipalDetails;
 import com.example.BoardDBRestAPIBySpring.domain.Member;
+import com.example.BoardDBRestAPIBySpring.domain.Reply;
 import com.example.BoardDBRestAPIBySpring.dto.ReplyDeletetDto;
 import com.example.BoardDBRestAPIBySpring.request.ReplyCreateRequest;
 import com.example.BoardDBRestAPIBySpring.request.ReplyEditDto;
 import com.example.BoardDBRestAPIBySpring.request.ReplyEditRequest;
 import com.example.BoardDBRestAPIBySpring.response.RepliesResponse;
+import com.example.BoardDBRestAPIBySpring.response.ReplyResponse;
 import com.example.BoardDBRestAPIBySpring.service.ReplyService;
-import java.net.URI;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
@@ -40,14 +41,16 @@ public class ReplyController {
     }
 
     @PostMapping
-    public ResponseEntity<Void> createReply(@AuthenticationPrincipal final PrincipalDetails principalDetails,
+    public ResponseEntity<ReplyResponse> createReply(@AuthenticationPrincipal final PrincipalDetails principalDetails,
                                             @PathVariable final long boardId,
                                             @RequestBody final ReplyCreateRequest request) {
 
         Member member = principalDetails.getMember();
-        replyService.createReply(boardId, member, request);
+        Reply reply = replyService.createReply(boardId, member, request);
 
-        return ResponseEntity.created(URI.create(String.format("/boards/%s/replies", boardId))).build();
+        ReplyResponse replyResponse = ReplyResponse.of(reply);
+
+        return ResponseEntity.status(201).body(replyResponse);
     }
 
     @PutMapping("/{id}")
