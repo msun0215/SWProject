@@ -1,42 +1,43 @@
 package com.example.BoardDBRestAPIBySpring.controller;
 
-import com.example.BoardDBRestAPIBySpring.config.auth.PrincipalDetails;
-import com.example.BoardDBRestAPIBySpring.domain.*;
+import com.auth0.jwt.JWT;
+import com.auth0.jwt.algorithms.Algorithm;
+import com.example.BoardDBRestAPIBySpring.config.jwt.JWTProperties;
+import com.example.BoardDBRestAPIBySpring.domain.LoginRequest;
+import com.example.BoardDBRestAPIBySpring.domain.Member;
+import com.example.BoardDBRestAPIBySpring.domain.MemberResponseDTO;
+import com.example.BoardDBRestAPIBySpring.domain.Message;
+import com.example.BoardDBRestAPIBySpring.domain.Role;
+import com.example.BoardDBRestAPIBySpring.domain.Token;
 import com.example.BoardDBRestAPIBySpring.repository.MemberRepository;
 import com.example.BoardDBRestAPIBySpring.repository.RoleRepository;
 import com.example.BoardDBRestAPIBySpring.service.MemberService;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.ModelAndView;
-
-import java.util.Map;
 
 @Slf4j
 @Log4j2
 @RestController
 @RequiredArgsConstructor
 public class LoginController {
+    private final MemberService memberService;
     @Autowired
     private BCryptPasswordEncoder bCryptPasswordEncoder;    // 암호화
-
     @Autowired
     private MemberRepository memberRepository;
-
     @Autowired
     private RoleRepository roleRepository;
-
-    private final MemberService memberService;
 
 //    Role role1=roleRepository.save(new Role(1,"ROLE_ADMIN"));
 //    Role role2=roleRepository.save(new Role(2,"ROLE_MANAGER"));
@@ -99,6 +100,28 @@ public class LoginController {
 
         return modelAndView;   // member 저장이 완료되면 loginForm으로 되돌아가기
     }
+
+    @GetMapping("/token")
+    public ValidateTokenDto validateToken(HttpServletRequest request) {
+        String authorizationHeader = request.getHeader(JWTProperties.HEADER_STRING);
+        String token = authorizationHeader.replace(JWTProperties.TOKEN_PREFIX, "");
+        try {
+            String username = JWT.require(Algorithm.HMAC512(JWTProperties.SECRET)).build().verify(token)
+                    .getClaim("username").asString();
+            return new ValidateTokenDto(true, username);
+        } catch (Exception e) {
+            log.error("error = {}", e.getMessage());
+            return new ValidateTokenDto(false, "");
+        }
+    }
+
+    @GetMapping("/loginForm")
+    public ModelAndView loginForm(){
+        ModelAndView modelAndView=new ModelAndView();
+        modelAndView.setViewName("loginForm");
+        return modelAndView;
+    }
+
 /*
     @GetMapping("/login")
     public String login(@RequestParam(value = "error", required = false) String error, @RequestParam(value="exception", required = false) String exception, Model model){
@@ -118,18 +141,14 @@ public ResponseEntity<Void> logout(HttpServletRequest servletRequest) {
 
      */
 
-    @GetMapping("/loginForm")
-    public ModelAndView loginForm(){
-        ModelAndView modelAndView=new ModelAndView();
-        modelAndView.setViewName("loginForm");
-        return modelAndView;
-    }
-
     @GetMapping("/joinForm")
     public ModelAndView joinForm(){
         ModelAndView modelAndView=new ModelAndView();
         modelAndView.setViewName("joinForm");
         return modelAndView;
+    }
+
+    public record ValidateTokenDto(boolean validate, String username) {
     }
 
 //    @PostMapping("/login")
