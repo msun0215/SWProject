@@ -1,5 +1,6 @@
 package com.example.BoardDBRestAPIBySpring.service;
 
+import com.example.BoardDBRestAPIBySpring.config.jwt.JWTProperties;
 import com.example.BoardDBRestAPIBySpring.config.jwt.JWTTokenProvider;
 import com.example.BoardDBRestAPIBySpring.domain.AuthDTO;
 import lombok.RequiredArgsConstructor;
@@ -7,10 +8,20 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Date;
+import java.util.stream.Collectors;
+
+
+/*
+ * 요청 -> AT 검사 -> AT 유효 -> 요청 실행
+ * 요청 -> AT 검사 -> AT 기간만 만료 -> AT, RT로 재발급 요청 -> RT 유효 -> 재발급
+ * 요청 -> AT 검사 -> AT 기간만 만료 -> AT, RT로 재발급 요청 -> RT 유효X -> 재로그인
+ */
 @Slf4j
 @Service
 @Transactional(readOnly = true)
@@ -22,6 +33,9 @@ public class AuthService {
     private final RedisService redisService;
 
     private final String SERVER="Server";
+    // RefreshToken을 생성한 후 Redis에 {key:RT({발급자}):{memberID}, value:{RT}} 형식으로 저장
+    // Oauth2.0 OPEN API 적용 시 사용함
+
 
     // 로그인 : 인증 정보 저장 및 Bearer 토큰 발급
     @Transactional
@@ -50,7 +64,7 @@ public class AuthService {
         Authentication authentication= jwtTokenProvider.getAuthentication(requestAccessToken);
         String principal = getPrincipal(requestAccessToken);
 
-        String refreshTokenInRedis = redisService.getValues("RT("+SERVER+")"+principla);
+        String refreshTokenInRedis = redisService.getValues("RT("+SERVER+")"+principal);
         if(refreshTokenInRedis==null)       // Redis에 저장되어있는 RefreshToken이 없을 경우
             return null;                    // 재로그인 요청
 
@@ -70,8 +84,62 @@ public class AuthService {
         return tokenDto;
     }
 
-    https://surf-kookaburra-9e3.notion.site/090e456609b0493793f0d0d94e8f91fa
     // Token 발급
     @Transactional
-    public
+    public AuthDTO.TokenDto generateToken(String provider, String memberID, String authorities){
+        // RefreshToken이 이미 있는 경우
+        if(redisService.getValues("RT("+provider+"):"+memberID)!=null)
+            redisService.deleteValues("RT("+provider+"):"+memberID);    // 삭제
+
+        // AccessToken, RefreshToken 생성 및 Redis에 RefreshToken 저장
+        AuthDTO.TokenDto tokenDto=jwtTokenProvider.createToken(memberID, authorities);
+        saveRefreshToken(provider, memberID, tokenDto.getRefreshToken());
+        return tokenDto;
+    }
+
+
+    // RfreshToken을 Redis에 저장
+    @Transactional
+    public void saveRefreshToken(String provider, String principal, String refreshToken){
+        redisService.setValuesWithTimeout("RT("+provider+"):"+principal,  //key
+                refreshToken,    // value
+                jwtTokenProvider.getTokenExpirationTime(refreshToken)); // timeout(milliseconds)
+    }
+
+    // 권한 이름 가져오기
+    public String getAuthorities(Authentication authentication){
+        return authentication.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .collect(Collectors.joining(","));
+    }
+
+    // AccessToken으로부터 principal 추출
+    public String getPrincipal(String requestAccessToken){
+        return jwtTokenProvider.getAuthentication(requestAccessToken).getName();
+    }
+
+    // "Bearer {AT}"에서 "{AT}" 추출
+    public String resolveToken(String requestAccessTokenInHeader){
+        if(requestAccessTokenInHeader!=null&&requestAccessTokenInHeader.startsWith(JWTProperties.TOKEN_PREFIX))
+            return requestAccessTokenInHeader.substring(7);
+
+        return null;
+    }
+
+
+    // logout
+    @Transactional
+    public void logout(String requestAccessTokenInHeader){
+        String requestAccessToken=resolveToken(requestAccessTokenInHeader);
+        String principal=getPrincipal(requestAccessToken);
+
+        // Redis에 저장되어 있는 RefreshToken 삭제
+        String refreshTokenInRedis=redisService.getValues("RT("+SERVER+"):"+principal);
+        if(refreshTokenInRedis!=null)
+            redisService.deleteValues("RT("+SERVER+"):"+principal);
+
+        // Redis에 logout 처리한 AccessToken 저장
+        long expiration=jwtTokenProvider.getTokenExpirationTime(requestAccessToken)-new Date().getTime();
+        redisService.setValuesWithTimeout(requestAccessToken,"logout",expiration);
+    }
 }

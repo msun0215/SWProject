@@ -1,6 +1,6 @@
 package com.example.BoardDBRestAPIBySpring.domain;
 
-import jakarta.persistence.Id;
+import org.springframework.data.annotation.Id;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.springframework.data.redis.core.RedisHash;

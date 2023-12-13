@@ -10,6 +10,7 @@ import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -17,10 +18,12 @@ import org.springframework.security.config.annotation.authentication.configurati
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.filter.CorsFilter;
@@ -28,8 +31,8 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
 @Log4j2
 @Configuration
-@EnableWebSecurity
-//@EnableGlobalMethodSecurity(securedEnabled = true, prePostEnabled = true)
+@EnableWebSecurity	// Spring Security 설정
+@EnableGlobalMethodSecurity(securedEnabled = true)	// @Secured 어노테이션으로 권한 설정
 @RequiredArgsConstructor
 //@CrossOrigin(origins = "http://localhost:8080", exposedHeaders = JWTProperties.HEADER_STRING)
 public class WebConfig {
@@ -42,13 +45,14 @@ public class WebConfig {
 	//}
 	private final CustomAuthFailureHandler customAuthFailureHandler;
 	private final AuthenticationFailureHandler customFailureHandler;
-//	private final JWTAuthenticationFilter jwtAuthenticationFilter;
+
 	private final TokenUtils tokenUtils;
 	@Autowired
 	private final AuthenticationConfiguration authenticationConfiguration;
 
 	private final CorsConfig corsConfig;
 	private final CorsFilter corsFilter;
+	private final JWTTokenProvider jwtTokenProvider;
 
 	@Autowired
 	private final MemberRepository memberRepository;
@@ -60,19 +64,21 @@ public class WebConfig {
 
 	@Bean
 	public CustomLoginSuccessHandler myCustomLoginSuccessHandler(TokenUtils tokenUtils){return new CustomLoginSuccessHandler(tokenUtils);}
-	//private static AuthenticationConfiguration authenticationConfiguration;
+
 
 
 	@Bean
-	public AuthenticationManager authenticationManagerBean() throws Exception{
+	public AuthenticationManager authenticationManagerBean(AuthenticationConfiguration authenticationConfiguration) throws Exception{
 		return authenticationConfiguration.getAuthenticationManager();
 	}
 
+
+
+	// ACL(Access Control List, 접근 제어 목록)의 예외 URL 설정
 	@Bean
-	public JWTAuthenticationFilter JwtAuthenticationFilter() throws  Exception{
-		JWTAuthenticationFilter jwtAuthenticationFilter=new JWTAuthenticationFilter(authenticationManagerBean(), mycustomAuthenticationProvider());
-		jwtAuthenticationFilter.afterPropertiesSet();
-		return jwtAuthenticationFilter;
+	public WebSecurityCustomizer webSecurityCustomizer(){
+		return (web)->web.ignoring()
+				.requestMatchers(PathRequest.toStaticResources().atCommonLocations());
 	}
 
 	@Bean
@@ -81,7 +87,8 @@ public class WebConfig {
 				.sessionManagement(s->s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))		// 세션에 저장을 하지 않는다
 				.formLogin(f->f.disable())
 				.httpBasic(h->h.disable())
-				.apply(new MyCustomDs1());
+				.addFilterBefore(new CustomAuthenticationFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class);
+				//.apply(new MyCustomDs1());
 						//.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 		//.authorizeHttpRequests(authorize->{
 
@@ -105,8 +112,12 @@ public class WebConfig {
 					.anyRequest().permitAll();  // 이외의 요청은 모두 허용함
 		});
 		//		.logout(logout->logout.logoutSuccessUrl("/"))
+
+		// 예외 처리
 		http.exceptionHandling().accessDeniedHandler(new JwtAccessDeniedHandler());
 		http.exceptionHandling().authenticationEntryPoint(new JwtAuthenticationEntryPoint());
+
+		http.headers().frameOptions().sameOrigin();
 
 		http.logout()
 				.logoutUrl("/logout")	// 로그인과 마찬가지로 POST 요청이 와야 함
@@ -140,7 +151,7 @@ public class WebConfig {
 			//http.addFilter(corsConfig.corsFilter())
 			http.addFilter(corsFilter)
 					//.addFilter(new JWTAuthenticationFilter(authenticationManager, mycustomAuthenticationProvider()))  // AuthenticationManager를 Parameter로 넘겨줘야 함(로그인을 진행하는 데이터이기 때문)
-					.addFilter(jwtAuthenticationFilter)
+					//.addFilter(jwtAuthenticationFilter)
 					.addFilter(jwtAuthorizationFilter);
 
 			System.out.println("authenticationManager3 : " + authenticationManager);    // log

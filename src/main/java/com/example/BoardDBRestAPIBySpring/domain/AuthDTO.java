@@ -14,10 +14,11 @@ public class AuthDTO {
 
         @Builder
         public LoginDto(String memberID, String memberPW){
-            this. memberID=memberID;
+            this.memberID=memberID;
             this.memberPW=memberPW;
         }
     }
+
 
 
     @Getter

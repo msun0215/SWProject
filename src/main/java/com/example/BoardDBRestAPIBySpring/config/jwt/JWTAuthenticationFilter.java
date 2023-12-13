@@ -257,7 +257,7 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         //response.getWriter().close();
 
         // Client를 /엔드포인트로 리다이렉트
-        response.getOutputStream().write(objectMapper.writeValueAsBytes(principalDetails));
+        //response.getOutputStream().write(objectMapper.writeValueAsBytes(principalDetails));
         response.sendRedirect("/login/successLogin");
 
     }

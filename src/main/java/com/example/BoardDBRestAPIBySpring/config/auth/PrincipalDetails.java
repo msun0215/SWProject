@@ -29,7 +29,7 @@ import java.util.Map;
 @ToString
 public class PrincipalDetails implements UserDetails {
 
-    private Member member;  // Composition
+    private final Member member;  // Composition
     private Map<String, Object> attributes;
 
     // 일반 로그인 객체
@@ -64,17 +64,7 @@ public class PrincipalDetails implements UserDetails {
     @Override
     public Collection <? extends GrantedAuthority> getAuthorities(){
         Collection<GrantedAuthority> authorities=new ArrayList<GrantedAuthority>();
-        authorities.add(new GrantedAuthority() {
-            @Override
-            public String getAuthority() {
-                System.out.println("getRoleName().toString() : "+member.getRoles().getRoleName().toString());
-                return member.getRoles().getRoleName().toString();
-            }
-        });
-
-//        member.getRoles().getRoleList().forEach(r->{
-//            authorities.add(()->r);
-//        });
+        authorities.add(()->member.getRoles().getKey());        // key : ROLE_권한
         return authorities;
     }
 

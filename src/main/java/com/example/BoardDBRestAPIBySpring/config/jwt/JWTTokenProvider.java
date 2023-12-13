@@ -42,13 +42,14 @@ public class JWTTokenProvider implements InitializingBean {
             PrincipalDetailsService principalDetailsService,
             RedisService redisService,
             @Value("${jwt.secret}") String secretKey,
-            @Value("${jwt.access-token-validity-in-seconds") Long accessTokenValidityInMilliseconds,
-            @Value("${wjt.refresh-token-validity-in-seconds") Long refreshTokenValidityInMiliseconds){
+            @Value("${jwt.access-token-validity-in-seconds}") Long accessTokenValidityInMilliseconds,
+            @Value("${jwt.refresh-token-validity-in-seconds}") Long refreshTokenValidityInMiliseconds){
         this.principalDetailsService=principalDetailsService;
         this.redisService=redisService;
         this.secretKey=secretKey;
-        this.accessTokenValidityInMilliseconds=accessTokenValidityInMilliseconds;
-        this.refreshTokenValidityInMiliseconds=refreshTokenValidityInMiliseconds;
+        // seconds->milliseconds
+        this.accessTokenValidityInMilliseconds=accessTokenValidityInMilliseconds*1000;
+        this.refreshTokenValidityInMiliseconds=refreshTokenValidityInMiliseconds*1000;
     }
 
     // Secret Key 설정

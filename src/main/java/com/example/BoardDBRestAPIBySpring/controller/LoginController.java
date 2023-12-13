@@ -3,15 +3,17 @@ package com.example.BoardDBRestAPIBySpring.controller;
 import com.example.BoardDBRestAPIBySpring.config.auth.PrincipalDetails;
 import com.example.BoardDBRestAPIBySpring.domain.*;
 import com.example.BoardDBRestAPIBySpring.repository.MemberRepository;
-import com.example.BoardDBRestAPIBySpring.repository.RoleRepository;
+//import com.example.BoardDBRestAPIBySpring.repository.RoleRepository;
+import com.example.BoardDBRestAPIBySpring.service.AuthService;
 import com.example.BoardDBRestAPIBySpring.service.MemberService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -23,9 +25,9 @@ import org.springframework.web.servlet.ModelAndView;
 import java.util.Map;
 
 @Slf4j
-@Log4j2
 @RestController
 @RequiredArgsConstructor
+@RequestMapping
 public class LoginController {
     @Autowired
     private BCryptPasswordEncoder bCryptPasswordEncoder;    // 암호화
@@ -34,9 +36,11 @@ public class LoginController {
     private MemberRepository memberRepository;
 
     @Autowired
-    private RoleRepository roleRepository;
+    //private RoleRepository roleRepository;
 
     private final MemberService memberService;
+    private final AuthService authService;
+    private final long COOKIE_EXPIRATION=7776000;       // 90일
 
 //    Role role1=roleRepository.save(new Role(1,"ROLE_ADMIN"));
 //    Role role2=roleRepository.save(new Role(2,"ROLE_MANAGER"));
@@ -51,12 +55,68 @@ public class LoginController {
         return modelAndView;
     }
 
-
+    // 로그인->Token 발급
     @PostMapping("/login")
-    public Token login(@RequestBody LoginRequest request){
-        String memberID = request.getMemberID();
-        String memberPW = request.getMemberPW();
-        return memberService.login(memberID, memberPW);
+    public ResponseEntity<?> login(@RequestBody @Valid AuthDTO.LoginDto loginDto){
+        String memberID = loginDto.getMemberID();
+        String memberPW = loginDto.getMemberPW();
+
+        // Member 등록 및 RefreshToken 저장
+        AuthDTO.TokenDto tokenDto=authService.login(loginDto);
+
+        // RefreshToken 저장
+        HttpCookie httpCookie= ResponseCookie.from("refresh-token", tokenDto.getRefreshToken())
+                .maxAge(COOKIE_EXPIRATION)
+                .httpOnly(true)
+                .secure(true)
+                .build();
+
+        return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, httpCookie.toString())
+                .header(HttpHeaders.AUTHORIZATION, "Bearer "+tokenDto.getAccessToken()) // AccessToken 저장
+                .build();
+    }
+
+    @PostMapping("/validate")
+    public ResponseEntity<?> validate(@RequestHeader("Authorization") String requestAccessToken){
+        if(!authService.validate(requestAccessToken))
+            return ResponseEntity.status(HttpStatus.OK).build();    // 재발급 필요 없음
+        else
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();   // 재발급 필요
+    }
+
+
+    // 토큰 재발급
+    @PostMapping("/reissue")
+    public ResponseEntity<?> reissue(@CookieValue(name="refresh-token") String requestRefreshToken,
+                                    @RequestHeader("Authorization") String requestAccessToken) {
+        AuthDTO.TokenDto reissuedTokenDto = authService.reissue(requestAccessToken, requestRefreshToken);
+
+        if (reissuedTokenDto != null) {     // 토큰 재발급 성공
+            ResponseCookie responseCookie = ResponseCookie.from("refresh-token", reissuedTokenDto.getRefreshToken())
+                    .maxAge(COOKIE_EXPIRATION).httpOnly(true).secure(true).build();
+
+            return ResponseEntity.status(HttpStatus.OK)
+                    .header(HttpHeaders.SET_COOKIE, responseCookie.toString())  // AccessToken 저장
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer " + reissuedTokenDto.getAccessToken()).build();
+        } else {     // Refresh Token 탈취 가능성
+            // Cookie 삭제 후 재로그인 유도
+            ResponseCookie responseCookie = ResponseCookie.from("refresh-token", "")
+                    .maxAge(0).path("/").build();
+
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .header(HttpHeaders.SET_COOKIE, responseCookie.toString()).build();
+        }
+    }
+
+
+    @PostMapping("/logout")
+    public ResponseEntity<?> logout(@RequestHeader("Authorization") String requestAccessToken){
+        authService.logout(requestAccessToken);
+        ResponseCookie responseCookie=ResponseCookie.from("refresh-token","")
+                .maxAge(0).path("/").build();
+
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .header(HttpHeaders.SET_COOKIE, responseCookie.toString()).build();
     }
 
 
@@ -68,9 +128,10 @@ public class LoginController {
         return ResponseEntity.ok(memberResponseDTO);
     }
 
+
     @GetMapping("login/successLogin")
-    public ModelAndView successLogin(){
-        ModelAndView mv=new ModelAndView();
+    public ModelAndView successLogin(ModelAndView mv, @RequestHeader("Authorization") String requestAccessToken){
+
         mv.setViewName("successLogin");
         return mv;
     }
@@ -89,8 +150,8 @@ public class LoginController {
         member.setMemberPW(bCryptPasswordEncoder.encode(reqmember.getMemberPW())); // 비밀번호 암호화
         member.setMemberName(reqmember.getMemberName());
         member.setMemberNickname(reqmember.getMemberNickname());
-        Role roleWithId3 = roleRepository.findByRoleID(3L);     // 기본적으로 회원가입 할 경우 ROLE_USER로 등록
-        member.setRoles(roleWithId3);
+        //Role roleWithId3 = roleRepository.findByRoleID(3L);     // 기본적으로 회원가입 할 경우 ROLE_USER로 등록
+        member.setRoles(Role.USER);
         memberRepository.save(member);
 
         modelAndView.addObject("data",

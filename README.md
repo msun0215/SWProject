@@ -15,3 +15,9 @@ AuthorizationFilter에서 받아내는데,
 왜 AuthorizationFilter에서 response.getHeader()의 값이 null인가?
 ![img_2.png](img_2.png)
 =>Chain걸기
+
+
+==============================================\
+[12/13]
+ RefreshToken까지 구현을 했으나, 다음 페이지에서 받는 Authorization을 못받안매\
+ unauthorization 403 request 무한루프
