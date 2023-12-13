@@ -38,9 +38,9 @@ public class CustomLoginSuccessHandler implements  AuthenticationSuccessHandler{
         PrincipalDetails principalDetails=(PrincipalDetails)authentication.getPrincipal();
 
 //        Token token=tokenUtils.createToken(authentication).;
-        String token=tokenUtils.createToken(authentication).getAccessToken();
+        String accessToken=tokenUtils.generateJwtToken(authentication);
 
-        response.setHeader(JWTProperties.HEADER_STRING, token);
+        response.setHeader(JWTProperties.HEADER_STRING, accessToken);
         response.setHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
         response.setStatus(HttpStatus.OK.value());
         response.sendRedirect("/login/successLogin");
