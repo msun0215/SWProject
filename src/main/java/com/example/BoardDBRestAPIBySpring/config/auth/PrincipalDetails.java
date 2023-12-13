@@ -61,6 +61,7 @@ public class PrincipalDetails implements UserDetails {
 //    }
 
     // 권한 목록
+    //https://velog.io/@u-nij
     @Override
     public Collection <? extends GrantedAuthority> getAuthorities(){
         Collection<GrantedAuthority> authorities=new ArrayList<GrantedAuthority>();

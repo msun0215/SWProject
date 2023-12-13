@@ -14,6 +14,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 
+//https://velog.io/@u-nij
 @Slf4j
 @RequiredArgsConstructor
 public class CustomAuthenticationFilter extends OncePerRequestFilter {
@@ -30,7 +31,7 @@ public class CustomAuthenticationFilter extends OncePerRequestFilter {
                 Authentication authentication = jwtTokenProvider.getAuthentication(accessToken);
                 SecurityContextHolder.getContext().setAuthentication(authentication);
                 log.debug("Save authentication in SecurityContextHolder");
-                ;
+
             }
         } catch (IncorrectClaimException e) { // 잘못된 토큰일 경우
             SecurityContextHolder.clearContext();
@@ -38,7 +39,7 @@ public class CustomAuthenticationFilter extends OncePerRequestFilter {
             response.sendError(403);
         } catch (UsernameNotFoundException e) {   // 회원을 찾을 수 없는 경우
             SecurityContextHolder.clearContext();
-            log.debug("Can't fint Member");
+            log.debug("Can't find Member");
             response.sendError(403);
         }
 

@@ -20,4 +20,5 @@ AuthorizationFilter에서 받아내는데,
 ==============================================\
 [12/13]
  RefreshToken까지 구현을 했으나, 다음 페이지에서 받는 Authorization을 못받안매\
- unauthorization 403 request 무한루프
+ AuthenticationFilter를 JWTAuthenticationFilter에서 CustomAuthenticationFilter로 바꿔서 적용시킴\
+ /error/unauthorized로 무한루프=>redirection 횟수가 너무 많다

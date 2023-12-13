@@ -88,19 +88,18 @@ public class WebConfig {
 				.formLogin(f->f.disable())
 				.httpBasic(h->h.disable())
 				.addFilterBefore(new CustomAuthenticationFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class);
-				//.apply(new MyCustomDs1());
+				//.apply(new MyCustomDs1());	// CustomFilter
 						//.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
-		//.authorizeHttpRequests(authorize->{
 
-		//});   // custom Filter
+		//.authorizeHttpRequests(authorize->{
 		//.addFilter(new JWTAuthenticationFilter(authenticationManager))
 		//.addFilter(new JWTAuthorizationFilter(authenticationManager, userRepository))
 		http.authorizeRequests(authorize-> {     // 권한 부여
 			// authorizeRequests가 deprecated됨에 따라 authorizeHttpRequests 사용 권장
 			authorize
-//                            .requestMatchers("/user/**").hasAnyRole("hasRole('ROLE_USER') or hasRole('ROLE_MANAGER') or hasRole('ROLE_ADMIN')")
-//                            .requestMatchers("/manager/**").hasAnyRole("hasRole('ROLE_MANAGER') or hasRole('ROLE_ADMIN')")
-//                            .requestMatchers("/admin/**").hasAnyRole("hasRole('ROLE_ADMIN')")
+//                  .requestMatchers("/user/**").hasAnyRole("hasRole('ROLE_USER') or hasRole('ROLE_MANAGER') or hasRole('ROLE_ADMIN')")
+//                  .requestMatchers("/manager/**").hasAnyRole("hasRole('ROLE_MANAGER') or hasRole('ROLE_ADMIN')")
+//                  .requestMatchers("/admin/**").hasAnyRole("hasRole('ROLE_ADMIN')")
 
 //					.requestMatchers(new AntPathRequestMatcher("/login/**")).authenticated()
 //					.requestMatchers(new AntPathRequestMatcher("/login/**")).hasAnyRole("USER","MANAGER","ADMIN")
@@ -140,6 +139,7 @@ public class WebConfig {
 		return http.build();
 	}
 
+	/*
 	public class MyCustomDs1 extends AbstractHttpConfigurer<MyCustomDs1, HttpSecurity> { // custom Filter
 		@Override
 		public void configure(HttpSecurity http) throws Exception {
@@ -148,7 +148,7 @@ public class WebConfig {
 			JWTAuthenticationFilter jwtAuthenticationFilter=new JWTAuthenticationFilter(authenticationManager,mycustomAuthenticationProvider());
 			jwtAuthenticationFilter.setAuthenticationSuccessHandler(new CustomLoginSuccessHandler(tokenUtils));
 			JWTAuthorizationFilter jwtAuthorizationFilter=new JWTAuthorizationFilter(authenticationManager, memberRepository);
-			//http.addFilter(corsConfig.corsFilter())
+			http.addFilter(corsConfig.corsFilter())
 			http.addFilter(corsFilter)
 					//.addFilter(new JWTAuthenticationFilter(authenticationManager, mycustomAuthenticationProvider()))  // AuthenticationManager를 Parameter로 넘겨줘야 함(로그인을 진행하는 데이터이기 때문)
 					//.addFilter(jwtAuthenticationFilter)
@@ -158,6 +158,8 @@ public class WebConfig {
 		}
 
 	}
+	
+	 */
 
 /*
 	@Bean

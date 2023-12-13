@@ -19,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.security.Key;
 import java.util.Date;
 
+//https://velog.io/@u-nij
 @Slf4j
 @Component
 @Transactional(readOnly = true)
