@@ -51,9 +51,10 @@ public class PostService {
 	public void editBoard(final Long boardId, final Member member, final PostEditRequest request) {
 		Board board = postRepository.findById(boardId)
 				.orElseThrow(() -> new IllegalArgumentException("존재하지 않는 게시글입니다."));
-		if (!board.isSameMember(member)) {
-			throw new IllegalStateException("게시글 작성자가 아닙니다.");
+		if (member.hasNotUpdatePermissionFor(board)) {
+			throw new IllegalArgumentException("게시글 수정 권한이 없습니다.");
 		}
+
 		board.edit(request);
 	}
 
@@ -61,9 +62,10 @@ public class PostService {
 	public void deleteBoard(final Long boardId, final Member member) {
 		Board board = postRepository.findById(boardId)
 				.orElseThrow(() -> new IllegalArgumentException("존재하지 않는 게시글입니다."));
-		if (!board.isSameMember(member)) {
-			throw new IllegalStateException("게시글 작성자가 아닙니다.");
+		if (member.hasNotUpdatePermissionFor(board)) {
+			throw new IllegalArgumentException("게시글 삭제 권한이 없습니다.");
 		}
+
 		postRepository.delete(board);
 	}
 

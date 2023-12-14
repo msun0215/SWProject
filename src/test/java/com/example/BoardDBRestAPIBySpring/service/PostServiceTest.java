@@ -45,6 +45,7 @@ class PostServiceTest {
 
     private Member member;
     private Role role;
+    private Member admin;
 
     @BeforeEach
     void init() {
@@ -62,6 +63,17 @@ class PostServiceTest {
         member.setRoles(role);
 
         memberRepository.save(member);
+
+        admin = new Member();
+        admin.setMemberID("admin@admin.com");
+        admin.setMemberPW(bCryptPasswordEncoder.encode(memberPW));
+        admin.setMemberName("admin");
+        admin.setMemberNickname("adminK");
+        var adminRole = new Role();
+        adminRole.setRoleName("ADMIN");
+        roleRepository.save(adminRole);
+        admin.setRoles(adminRole);
+        memberRepository.save(admin);
     }
 
 	@Test
@@ -222,6 +234,40 @@ class PostServiceTest {
     }
 
     @Test
+    @DisplayName("어드민 게시글 수정 테스트")
+    @Transactional(readOnly = true)
+    void editBoardByAdminTest() {
+        // given
+        var boards = LongStream.rangeClosed(1, 20)
+                .mapToObj(index -> {
+                    Board board = Board.from("제목입니다." + index, "내용입니다." + index);
+                    board.setMember(member);
+                    return board;
+                })
+                .toList();
+        postRepository.saveAll(boards);
+
+        var request = PostEditRequest.builder()
+                .title("수정된 제목입니다.")
+                .content("수정된 내용입니다.")
+                .build();
+
+        var boardId = 1L;
+
+        // when
+        postService.editBoard(boardId, admin, request);
+
+        // then
+        var actual = postRepository.findById(boardId).get();
+        assertAll(() -> {
+            assertEquals(boardId, actual.getId());
+            assertEquals(request.getTitle(), actual.getTitle());
+            assertEquals(request.getContent(), actual.getContent());
+            assertEquals(member, actual.getMember());
+        });
+    }
+
+    @Test
     @DisplayName("게시글 삭제 테스트")
     void deleteBoardTest() {
         // given
@@ -273,7 +319,25 @@ class PostServiceTest {
         var boardId = 1L;
 
         // expected
-        assertThrows(IllegalStateException.class, () -> postService.deleteBoard(boardId, otherMember));
+        assertThrows(IllegalArgumentException.class, () -> postService.deleteBoard(boardId, otherMember));
+    }
+
+    @Test
+    @DisplayName("어드민 게시글 삭제 테스트")
+    void deleteBoardByAdminTest() {
+        // given
+        var board = Board.from("제목입니다.", "내용입니다.");
+        board.setMember(member);
+        postRepository.save(board);
+
+        var boardId = 1L;
+
+        // when
+        postService.deleteBoard(boardId, admin);
+
+        // then
+        var actual = postRepository.findById(boardId).isEmpty();
+        assertTrue(actual);
     }
 
     @Test

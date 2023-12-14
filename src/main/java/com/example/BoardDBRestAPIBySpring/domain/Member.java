@@ -61,4 +61,7 @@ public class Member {
 	public boolean hasNotUpdatePermissionFor(final Reply reply) {
 		return !(isAdmin() || reply.isSameMember(this));
 	}
+	public boolean hasNotUpdatePermissionFor(final Board board) {
+		return !(isAdmin() || board.isSameMember(this));
+	}
 }
