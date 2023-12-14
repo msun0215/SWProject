@@ -106,12 +106,14 @@ public class LoginController {
         String authorizationHeader = request.getHeader(JWTProperties.HEADER_STRING);
         String token = authorizationHeader.replace(JWTProperties.TOKEN_PREFIX, "");
         try {
-            String username = JWT.require(Algorithm.HMAC512(JWTProperties.SECRET)).build().verify(token)
-                    .getClaim("username").asString();
-            return new ValidateTokenDto(true, username);
+            String memberID = JWT.require(Algorithm.HMAC512(JWTProperties.SECRET)).build().verify(token)
+                    .getClaim("id").asString();
+            String role = JWT.require(Algorithm.HMAC512(JWTProperties.SECRET)).build().verify(token)
+                    .getClaim("role").asString();
+            return new ValidateTokenDto(true, memberID, role);
         } catch (Exception e) {
             log.error("error = {}", e.getMessage());
-            return new ValidateTokenDto(false, "");
+            return new ValidateTokenDto(false, "", "");
         }
     }
 
@@ -148,7 +150,7 @@ public ResponseEntity<Void> logout(HttpServletRequest servletRequest) {
         return modelAndView;
     }
 
-    public record ValidateTokenDto(boolean validate, String username) {
+    public record ValidateTokenDto(boolean validate, String memberID, String role) {
     }
 
 //    @PostMapping("/login")

@@ -17,7 +17,6 @@ import java.net.URLDecoder;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import lombok.extern.log4j.Log4j2;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -268,6 +267,7 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
                         .withExpiresAt(new Date(System.currentTimeMillis()+JWTProperties.EXPIRATION_TIME))  // Token 만료 시간 -> 현재시간 + 만료시간
                                 .withClaim("id", principalDetails.getMember().getMemberID())    // 비공개 Claim -> 넣고싶은거 아무거나 넣으면 됨
                                         .withClaim("username", principalDetails.getMember().getMemberName())    // 비공개 Claim
+                                        .withClaim("role", principalDetails.getMember().getRoleName())    // 비공개 Claim
                                                 .sign(Algorithm.HMAC512(JWTProperties.SECRET));  // HMAC512는 SECRET KEY를 필요로 함
         //String jwtToken =TokenUtils.generateJwtToken(principalDetails.getMember());
         response.addHeader(JWTProperties.HEADER_STRING, JWTProperties.TOKEN_PREFIX+jwtToken);
