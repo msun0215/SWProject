@@ -50,6 +50,7 @@ class ReplyServiceTest {
     private Member member;
     private Board board;
     private Role role;
+    private Member admin;
 
     @BeforeEach
     void init() {
@@ -71,6 +72,17 @@ class ReplyServiceTest {
         board = Board.from("제목입니다.", "내용입니다.");
         board.setMember(member);
         postRepository.save(board);
+
+        admin = new Member();
+        admin.setMemberID("admin@admin.com");
+        admin.setMemberPW(bCryptPasswordEncoder.encode(memberPW));
+        admin.setMemberName("admin");
+        admin.setMemberNickname("adminK");
+        var adminRole = new Role();
+        adminRole.setRoleName("ADMIN");
+        roleRepository.save(adminRole);
+        admin.setRoles(adminRole);
+        memberRepository.save(admin);
     }
 
     @Test
@@ -259,6 +271,41 @@ class ReplyServiceTest {
     }
 
     @Test
+    @DisplayName("어드민 댓글 수정 테스트")
+    @Transactional(readOnly = true)
+    void editBoardByAdminTest() {
+        // given
+        var reply = Reply.of("내용입니다.");
+        reply.setBoard(board);
+        reply.setMember(member);
+        replyRepository.save(reply);
+
+        var replyId = reply.getId();
+
+        var request = ReplyEditRequest.builder()
+                .content("수정된 내용입니다.")
+                .build();
+
+        var dto = ReplyEditDto.builder()
+                .replyId(reply.getId())
+                .boardId(board.getId())
+                .member(admin)
+                .request(request)
+                .build();
+
+        // when
+        replyService.editReply(dto);
+
+        // then
+        var actual = replyRepository.findById(replyId).get();
+        assertAll(() -> {
+            assertEquals(request.getContent(), actual.getContent());
+            assertEquals(board, actual.getBoard());
+            assertEquals(member, actual.getMember());
+        });
+    }
+
+    @Test
     @DisplayName("댓글 삭제 테스트")
     @Transactional(readOnly = true)
     void deleteReplyTest() {
@@ -350,5 +397,30 @@ class ReplyServiceTest {
 
         // expected
         assertThrows(IllegalArgumentException.class, () -> replyService.deleteReply(dto));
+    }
+
+    @Test
+    @DisplayName("어드민 댓글 삭제 테스트")
+    void deleteReplyByAdminTest() {
+        // given
+        var reply = Reply.of("내용입니다.");
+        reply.setBoard(board);
+        reply.setMember(member);
+        replyRepository.save(reply);
+
+        var replyId = reply.getId();
+
+        var dto = ReplyDeletetDto.builder()
+                .replyId(replyId)
+                .boardId(board.getId())
+                .member(admin)
+                .build();
+
+        // when
+        replyService.deleteReply(dto);
+
+        // then
+        var actual = replyRepository.findById(replyId).isEmpty();
+        assertTrue(actual);
     }
 }

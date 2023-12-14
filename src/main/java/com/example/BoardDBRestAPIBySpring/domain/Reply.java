@@ -59,8 +59,8 @@ public class Reply {
         return this.board.getId() != boardId;
     }
 
-    public boolean isNotSameMember(final Member member) {
-        return !this.member.isSame(member);
+    public boolean isSameMember(final Member member) {
+        return this.member.isSame(member);
     }
 
     public void edit(final ReplyEditDto dto) {

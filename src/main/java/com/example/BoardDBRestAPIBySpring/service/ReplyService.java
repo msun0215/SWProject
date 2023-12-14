@@ -53,8 +53,10 @@ public class ReplyService {
         if (reply.isNotSameBoardId(dto.getBoardId())) {
             throw new IllegalArgumentException("게시글의 댓글이 아닙니다.");
         }
-        if (reply.isNotSameMember(dto.getMember())) {
-            throw new IllegalArgumentException("댓글 작성자가 아닙니다.");
+
+        Member member = dto.getMember();
+        if (member.hasNotUpdatePermissionFor(reply)) {
+            throw new IllegalArgumentException("댓글 수정 권한이 없습니다.");
         }
 
         reply.edit(dto);
@@ -67,8 +69,10 @@ public class ReplyService {
         if (reply.isNotSameBoardId(dto.getBoardId())) {
             throw new IllegalArgumentException("게시글의 댓글이 아닙니다.");
         }
-        if (reply.isNotSameMember(dto.getMember())) {
-            throw new IllegalArgumentException("댓글 작성자가 아닙니다.");
+
+        Member member = dto.getMember();
+        if (member.hasNotUpdatePermissionFor(reply)) {
+            throw new IllegalArgumentException("댓글 삭제 권한이 없습니다.");
         }
 
         replyRepository.delete(reply);

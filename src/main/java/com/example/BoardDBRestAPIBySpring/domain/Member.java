@@ -53,4 +53,12 @@ public class Member {
 	public boolean isSameRole(final String roleName) {
 		return roles.isSame(roleName);
 	}
+
+	private boolean isAdmin() {
+		return roles.isSame("ADMIN");
+	}
+
+	public boolean hasNotUpdatePermissionFor(final Reply reply) {
+		return !(isAdmin() || reply.isSameMember(this));
+	}
 }
