@@ -1,6 +1,7 @@
-package com.example.BoardDBRestAPIBySpring.request;
+package com.example.BoardDBRestAPIBySpring.dto;
 
 import com.example.BoardDBRestAPIBySpring.domain.Member;
+import com.example.BoardDBRestAPIBySpring.request.ReplyEditRequest;
 import lombok.Builder;
 import lombok.Getter;
 

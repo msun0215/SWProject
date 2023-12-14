@@ -2,7 +2,7 @@ package com.example.BoardDBRestAPIBySpring.domain;
 
 import static jakarta.persistence.FetchType.LAZY;
 
-import com.example.BoardDBRestAPIBySpring.request.ReplyEditDto;
+import com.example.BoardDBRestAPIBySpring.dto.ReplyEditDto;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
