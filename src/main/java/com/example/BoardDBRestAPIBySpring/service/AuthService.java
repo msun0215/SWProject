@@ -36,7 +36,6 @@ public class AuthService {
     // RefreshToken을 생성한 후 Redis에 {key:RT({발급자}):{memberID}, value:{RT}} 형식으로 저장
     // Oauth2.0 OPEN API 적용 시 사용함
 
-
     // 로그인 : 인증 정보 저장 및 Bearer 토큰 발급
     @Transactional
     public AuthDTO.TokenDto login(AuthDTO.LoginDto loginDto){
@@ -108,9 +107,13 @@ public class AuthService {
 
     // 권한 이름 가져오기
     public String getAuthorities(Authentication authentication){
-        return authentication.getAuthorities().stream()
-                .map(GrantedAuthority::getAuthority)
-                .collect(Collectors.joining(","));
+        String getAuth=authentication.getAuthorities().stream()
+                        .map(GrantedAuthority::getAuthority)
+                                .collect(Collectors.joining(","));
+
+        System.out.println("getAuthorities : "+getAuth);
+        return getAuth;
+
     }
 
     // AccessToken으로부터 principal 추출

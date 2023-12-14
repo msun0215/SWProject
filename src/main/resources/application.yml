@@ -45,6 +45,6 @@ spring:
       port: 6379
 
 jwt:
-  secret: TXlTV1Byb2plY3RVc2luZ0pXVHdpdGhTcHJpbmdCb290QW5kU3ByaW5nU2VjdXJpdHk= # 임의의 문자열을 Base64로 인코딩한 값
+  secret: TXlTV1Byb2plY3RVc2luZ0pXVHdpdGhTcHJpbmdCb290QW5kU3ByaW5nU2VjdXJpdHk=TXlTV1Byb2plY3RVc2luZ0pXVHdpdGhTcHJpbmdCb290QW5kU3ByaW5nU2VjdXJpdHk= # 임의의 문자열을 Base64로 인코딩한 값
   refresh-token-validity-in-seconds : 604800  # 7일
   access-token-validity-in-seconds : 10800   # 3시간

@@ -3,7 +3,7 @@ package com.example.BoardDBRestAPIBySpring.controller;
 import com.example.BoardDBRestAPIBySpring.config.auth.PrincipalDetails;
 import com.example.BoardDBRestAPIBySpring.domain.*;
 import com.example.BoardDBRestAPIBySpring.repository.MemberRepository;
-//import com.example.BoardDBRestAPIBySpring.repository.RoleRepository;
+import com.example.BoardDBRestAPIBySpring.repository.RoleRepository;
 import com.example.BoardDBRestAPIBySpring.service.AuthService;
 import com.example.BoardDBRestAPIBySpring.service.MemberService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -24,6 +24,7 @@ import org.springframework.web.servlet.ModelAndView;
 
 import java.util.Map;
 
+// https://velog.io/@u-nij/
 @Slf4j
 @RestController
 @RequiredArgsConstructor
@@ -36,7 +37,7 @@ public class LoginController {
     private MemberRepository memberRepository;
 
     @Autowired
-    //private RoleRepository roleRepository;
+    private RoleRepository roleRepository;
 
     private final MemberService memberService;
     private final AuthService authService;
@@ -56,8 +57,8 @@ public class LoginController {
     }
 
     // 로그인->Token 발급
-    @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody @Valid AuthDTO.LoginDto loginDto){
+    @PostMapping(value = "/login", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> loginByJson(@RequestBody @Valid AuthDTO.LoginDto loginDto){
         String memberID = loginDto.getMemberID();
         String memberPW = loginDto.getMemberPW();
 
@@ -73,6 +74,29 @@ public class LoginController {
 
         return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, httpCookie.toString())
                 .header(HttpHeaders.AUTHORIZATION, "Bearer "+tokenDto.getAccessToken()) // AccessToken 저장
+                .build();
+    }
+
+
+    @PostMapping(value = "/login", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+    public ResponseEntity<?> loginByWWW(@Valid AuthDTO.LoginDto loginDto){
+        String memberID = loginDto.getMemberID();
+        String memberPW = loginDto.getMemberPW();
+
+        // Member 등록 및 RefreshToken 저장
+        AuthDTO.TokenDto tokenDto=authService.login(loginDto);
+
+        // RefreshToken 저장
+        HttpCookie httpCookie= ResponseCookie.from("refresh-token", tokenDto.getRefreshToken())
+                .maxAge(COOKIE_EXPIRATION)
+                .httpOnly(true)
+                .secure(true)
+                .build();
+
+
+        return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, httpCookie.toString())
+                .header(HttpHeaders.AUTHORIZATION, "Bearer "+tokenDto.getAccessToken()) // AccessToken 저장
+                .header(HttpHeaders.LOCATION,"/login/successLogin")
                 .build();
     }
 
@@ -150,8 +174,8 @@ public class LoginController {
         member.setMemberPW(bCryptPasswordEncoder.encode(reqmember.getMemberPW())); // 비밀번호 암호화
         member.setMemberName(reqmember.getMemberName());
         member.setMemberNickname(reqmember.getMemberNickname());
-        //Role roleWithId3 = roleRepository.findByRoleID(3L);     // 기본적으로 회원가입 할 경우 ROLE_USER로 등록
-        member.setRoles(Role.USER);
+        Role roleWithId3 = roleRepository.findByRoleID(3L);     // 기본적으로 회원가입 할 경우 ROLE_USER로 등록
+        member.setRoles(roleWithId3);
         memberRepository.save(member);
 
         modelAndView.addObject("data",

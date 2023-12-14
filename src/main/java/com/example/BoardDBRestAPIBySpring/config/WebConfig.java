@@ -118,6 +118,7 @@ public class WebConfig {
 
 		http.headers().frameOptions().sameOrigin();
 
+
 		http.logout()
 				.logoutUrl("/logout")	// 로그인과 마찬가지로 POST 요청이 와야 함
 				.addLogoutHandler(((request, response, authentication) -> {

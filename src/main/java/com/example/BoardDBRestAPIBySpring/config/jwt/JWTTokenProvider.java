@@ -55,12 +55,14 @@ public class JWTTokenProvider implements InitializingBean {
 
     // Secret Key 설정
     public void afterPropertiesSet() throws Exception{
+        System.out.println("Setting Secret Key");
         byte[] secretKeyBytes= Decoders.BASE64.decode(secretKey);
         signingKey= Keys.hmacShaKeyFor(secretKeyBytes);
     }
 
     @Transactional
     public AuthDTO.TokenDto createToken(String memberID, String authorities){
+        System.out.println("createToken");
         Long now=System.currentTimeMillis();
 
         String accessToken= Jwts.builder()
@@ -83,11 +85,16 @@ public class JWTTokenProvider implements InitializingBean {
                 .signWith(signingKey, SignatureAlgorithm.HS512)
                 .compact();
 
+        System.out.println("accessToken : "+accessToken);
+        System.out.println("refreshToken : "+refreshToken);
+
+        System.out.println(new AuthDTO.TokenDto(accessToken,refreshToken));
         return new AuthDTO.TokenDto(accessToken,refreshToken);
     }
 
     // Token으로부터 정보 추출(Token 검증)
     public Claims getClaims(String token){
+        System.out.println("getClaims with : "+token);
         try{
             return Jwts.parserBuilder().setSigningKey(signingKey)
                     .build().parseClaimsJws(token).getBody();
@@ -97,17 +104,20 @@ public class JWTTokenProvider implements InitializingBean {
     }
 
     public Authentication getAuthentication(String token){
+        System.out.println("getAuthentication with : "+token);
         String memberID=getClaims(token).get(MEMBERID_KEY).toString();
         PrincipalDetails principalDetails= (PrincipalDetails) principalDetailsService.loadUserByUsername(memberID);
         return new UsernamePasswordAuthenticationToken(principalDetails,"",principalDetails.getAuthorities());
     }
 
     public long getTokenExpirationTime(String token){
+        System.out.println("getTokenExpirationTime : "+getClaims(token).getExpiration().getTime());
         return getClaims(token).getExpiration().getTime();
     }
 
     // Token 검증
     public boolean validateRefreshToken(String refreshToken){
+        System.out.println("validateRefreshToken : "+refreshToken);
         try{
             if(redisService.getValues(refreshToken).equals("delete"))   return false;  //회원 탈퇴?
 
@@ -132,6 +142,7 @@ public class JWTTokenProvider implements InitializingBean {
 
     // Filter에서 사용
     public boolean validateAccessToken(String accessToken){
+        System.out.println("validateAccessToken : "+accessToken);
         try{
             if(redisService.getValues(accessToken)!=null    // NPE 방지
             &&redisService.getValues(accessToken).equals("logout")) // 로그아웃일 경우
