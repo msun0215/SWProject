@@ -20,7 +20,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Board {
+public class Board implements Ownable {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -59,9 +59,10 @@ public class Board {
 		this.member = member;
 	}
 
-	public boolean isSameMember(final Member member) {
+	@Override
+	public boolean isOwner(final Member member) {
 		return this.member.isSame(member);
-    }
+	}
 
 	public void edit(final PostEditRequest request) {
 		this.title = request.getTitle();

@@ -58,10 +58,7 @@ public class Member {
 		return roles.isSame("ADMIN");
 	}
 
-	public boolean hasNotUpdatePermissionFor(final Reply reply) {
-		return !(isAdmin() || reply.isSameMember(this));
-	}
-	public boolean hasNotUpdatePermissionFor(final Board board) {
-		return !(isAdmin() || board.isSameMember(this));
+	public boolean hasNotUpdatePermissionFor(final Ownable ownable) {
+		return !(isAdmin() || ownable.isOwner(this));
 	}
 }

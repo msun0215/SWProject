@@ -18,7 +18,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Reply {
+public class Reply implements Ownable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -59,7 +59,8 @@ public class Reply {
         return this.board.getId() != boardId;
     }
 
-    public boolean isSameMember(final Member member) {
+    @Override
+    public boolean isOwner(final Member member) {
         return this.member.isSame(member);
     }
 
