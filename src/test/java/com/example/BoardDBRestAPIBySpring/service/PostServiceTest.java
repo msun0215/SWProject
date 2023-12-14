@@ -10,6 +10,7 @@ import com.example.BoardDBRestAPIBySpring.domain.Board;
 import com.example.BoardDBRestAPIBySpring.domain.Member;
 import com.example.BoardDBRestAPIBySpring.domain.Role;
 import com.example.BoardDBRestAPIBySpring.domain.RoleName;
+import com.example.BoardDBRestAPIBySpring.dto.PostEditDto;
 import com.example.BoardDBRestAPIBySpring.repository.MemberRepository;
 import com.example.BoardDBRestAPIBySpring.repository.PostRepository;
 import com.example.BoardDBRestAPIBySpring.repository.RoleRepository;
@@ -173,8 +174,14 @@ class PostServiceTest {
 
         var boardId = 1L;
 
+        var dto = PostEditDto.builder()
+                .boardId(boardId)
+                .member(member)
+                .request(request)
+                .build();
+
         // when
-        postService.editBoard(boardId, member, request);
+        postService.editBoard(dto);
 
         // then
         var actual = postRepository.findById(boardId).get();
@@ -201,8 +208,14 @@ class PostServiceTest {
 
         var boardId = 2L;
 
+        var dto = PostEditDto.builder()
+                .boardId(boardId)
+                .member(member)
+                .request(request)
+                .build();
+
         // expected
-        assertThrows(IllegalArgumentException.class, () -> postService.editBoard(boardId, member, request));
+        assertThrows(IllegalArgumentException.class, () -> postService.editBoard(dto));
     }
 
     @Test
@@ -229,8 +242,14 @@ class PostServiceTest {
 
         var boardId = 1L;
 
+        var dto = PostEditDto.builder()
+                .boardId(boardId)
+                .member(otherMember)
+                .request(request)
+                .build();
+
         // expected
-        assertThrows(IllegalStateException.class, () -> postService.editBoard(boardId, otherMember, request));
+        assertThrows(IllegalArgumentException.class, () -> postService.editBoard(dto));
     }
 
     @Test
@@ -254,8 +273,14 @@ class PostServiceTest {
 
         var boardId = 1L;
 
+        var dto = PostEditDto.builder()
+                .boardId(boardId)
+                .member(admin)
+                .request(request)
+                .build();
+
         // when
-        postService.editBoard(boardId, admin, request);
+        postService.editBoard(dto);
 
         // then
         var actual = postRepository.findById(boardId).get();

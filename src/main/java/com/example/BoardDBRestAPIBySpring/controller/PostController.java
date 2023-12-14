@@ -2,6 +2,7 @@ package com.example.BoardDBRestAPIBySpring.controller;
 
 import com.example.BoardDBRestAPIBySpring.config.auth.PrincipalDetails;
 import com.example.BoardDBRestAPIBySpring.domain.Member;
+import com.example.BoardDBRestAPIBySpring.dto.PostEditDto;
 import com.example.BoardDBRestAPIBySpring.request.PostCreateRequest;
 import com.example.BoardDBRestAPIBySpring.request.PostEditRequest;
 import com.example.BoardDBRestAPIBySpring.request.PostRoleChangeRequest;
@@ -56,7 +57,12 @@ public class PostController {
 	public ResponseEntity<Void> editBoard(@AuthenticationPrincipal PrincipalDetails principalDetails,
 										  @PathVariable Long id, @RequestBody PostEditRequest request) {
 		Member member = principalDetails.getMember();
-		postService.editBoard(id, member, request);
+		PostEditDto dto = PostEditDto.builder()
+				.boardId(id)
+				.member(member)
+				.request(request)
+				.build();
+		postService.editBoard(dto);
 
 		return ResponseEntity.ok().build();
 	}

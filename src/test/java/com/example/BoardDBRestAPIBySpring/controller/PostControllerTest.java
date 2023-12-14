@@ -16,9 +16,10 @@ import static org.springframework.restdocs.request.RequestDocumentation.queryPar
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.auth0.jwt.JWT;
+import com.auth0.jwt.algorithms.Algorithm;
 import com.example.BoardDBRestAPIBySpring.config.AbstractRestDocsTest;
 import com.example.BoardDBRestAPIBySpring.config.jwt.JWTProperties;
-import com.example.BoardDBRestAPIBySpring.config.jwt.TokenUtils;
 import com.example.BoardDBRestAPIBySpring.domain.Board;
 import com.example.BoardDBRestAPIBySpring.domain.Member;
 import com.example.BoardDBRestAPIBySpring.domain.Role;
@@ -30,6 +31,7 @@ import com.example.BoardDBRestAPIBySpring.request.PostCreateRequest;
 import com.example.BoardDBRestAPIBySpring.request.PostEditRequest;
 import com.example.BoardDBRestAPIBySpring.request.PostRoleChangeRequest;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.Date;
 import java.util.stream.LongStream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -151,7 +153,7 @@ class PostControllerTest extends AbstractRestDocsTest {
                 .content("내용입니다.")
                 .build();
 
-        var jwtToken = TokenUtils.generateJwtToken(member);
+        var jwtToken = generateJwtToken(member);
         var authorizationHeader = JWTProperties.TOKEN_PREFIX.concat(jwtToken);
 
         var json = objectMapper.writeValueAsString(postCreateRequest);
@@ -195,7 +197,7 @@ class PostControllerTest extends AbstractRestDocsTest {
                 .build();
         var json = objectMapper.writeValueAsString(postEditRequest);
 
-        var jwtToken = TokenUtils.generateJwtToken(member);
+        var jwtToken = generateJwtToken(member);
         var authorizationHeader = JWTProperties.TOKEN_PREFIX.concat(jwtToken);
 
         // expected
@@ -234,7 +236,7 @@ class PostControllerTest extends AbstractRestDocsTest {
                 .toList();
         postRepository.saveAll(boards);
 
-        var jwtToken = TokenUtils.generateJwtToken(member);
+        var jwtToken = generateJwtToken(member);
         var authorizationHeader = JWTProperties.TOKEN_PREFIX.concat(jwtToken);
 
         // expected
@@ -261,7 +263,7 @@ class PostControllerTest extends AbstractRestDocsTest {
                 .changeRole(RoleName.MANAGER.toString())
                 .build();
 
-        var jwtToken = TokenUtils.generateJwtToken(member);
+        var jwtToken = generateJwtToken(member);
         var authorizationHeader = JWTProperties.TOKEN_PREFIX.concat(jwtToken);
 
         var json = objectMapper.writeValueAsString(postCreateRequest);
@@ -281,5 +283,15 @@ class PostControllerTest extends AbstractRestDocsTest {
                                 fieldWithPath("changeRole").description("바꿀 권한")
                         )
                 ));
+    }
+
+    private String generateJwtToken(final Member member) {
+        return JWT.create()
+                .withSubject(member.getMemberName())    // token 별명 느낌?
+                .withExpiresAt(new Date(System.currentTimeMillis()+JWTProperties.EXPIRATION_TIME))  // Token 만료 시간 -> 현재시간 + 만료시간
+                .withClaim("id", member.getMemberID())    // 비공개 Claim -> 넣고싶은거 아무거나 넣으면 됨
+                .withClaim("username", member.getMemberName())    // 비공개 Claim
+                .withClaim("role", member.getRoleName())    // 비공개 Claim
+                .sign(Algorithm.HMAC512(JWTProperties.SECRET));  // HMAC512는 SECRET KEY를 필요로 함
     }
 }
