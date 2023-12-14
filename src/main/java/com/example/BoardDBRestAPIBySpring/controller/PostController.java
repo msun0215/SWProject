@@ -2,6 +2,7 @@ package com.example.BoardDBRestAPIBySpring.controller;
 
 import com.example.BoardDBRestAPIBySpring.config.auth.PrincipalDetails;
 import com.example.BoardDBRestAPIBySpring.domain.Member;
+import com.example.BoardDBRestAPIBySpring.dto.PostDeleteDto;
 import com.example.BoardDBRestAPIBySpring.dto.PostEditDto;
 import com.example.BoardDBRestAPIBySpring.request.PostCreateRequest;
 import com.example.BoardDBRestAPIBySpring.request.PostEditRequest;
@@ -71,7 +72,11 @@ public class PostController {
 	public ResponseEntity<Void> deleteBoard(@AuthenticationPrincipal PrincipalDetails principalDetails,
 											@PathVariable Long id) {
 		Member member = principalDetails.getMember();
-		postService.deleteBoard(id, member);
+		PostDeleteDto dto = PostDeleteDto.builder()
+				.boardId(id)
+				.member(member)
+				.build();
+		postService.deleteBoard(dto);
 
 		return ResponseEntity.ok().build();
 	}

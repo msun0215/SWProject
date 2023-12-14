@@ -3,6 +3,7 @@ package com.example.BoardDBRestAPIBySpring.service;
 import com.example.BoardDBRestAPIBySpring.domain.Board;
 import com.example.BoardDBRestAPIBySpring.domain.Member;
 import com.example.BoardDBRestAPIBySpring.domain.RoleName;
+import com.example.BoardDBRestAPIBySpring.dto.PostDeleteDto;
 import com.example.BoardDBRestAPIBySpring.dto.PostEditDto;
 import com.example.BoardDBRestAPIBySpring.repository.PostRepository;
 import com.example.BoardDBRestAPIBySpring.request.PostCreateRequest;
@@ -59,9 +60,10 @@ public class PostService {
 	}
 
 	@Transactional
-	public void deleteBoard(final Long boardId, final Member member) {
-		Board board = postRepository.findById(boardId)
+	public void deleteBoard(final PostDeleteDto dto) {
+		Board board = postRepository.findById(dto.getBoardId())
 				.orElseThrow(() -> new IllegalArgumentException("존재하지 않는 게시글입니다."));
+		Member member = dto.getMember();
 		if (member.hasNotUpdatePermissionFor(board)) {
 			throw new IllegalArgumentException("게시글 삭제 권한이 없습니다.");
 		}

@@ -10,6 +10,7 @@ import com.example.BoardDBRestAPIBySpring.domain.Board;
 import com.example.BoardDBRestAPIBySpring.domain.Member;
 import com.example.BoardDBRestAPIBySpring.domain.Role;
 import com.example.BoardDBRestAPIBySpring.domain.RoleName;
+import com.example.BoardDBRestAPIBySpring.dto.PostDeleteDto;
 import com.example.BoardDBRestAPIBySpring.dto.PostEditDto;
 import com.example.BoardDBRestAPIBySpring.repository.MemberRepository;
 import com.example.BoardDBRestAPIBySpring.repository.PostRepository;
@@ -302,8 +303,13 @@ class PostServiceTest {
 
         var boardId = 1L;
 
+        var dto = PostDeleteDto.builder()
+                .boardId(boardId)
+                .member(member)
+                .build();
+
         // when
-        postService.deleteBoard(boardId, member);
+        postService.deleteBoard(dto);
 
         // then
         var actual = postRepository.findById(boardId).isEmpty();
@@ -320,8 +326,13 @@ class PostServiceTest {
 
         var boardId = 2L;
 
+        var dto = PostDeleteDto.builder()
+                .boardId(boardId)
+                .member(member)
+                .build();
+
         // expected
-        assertThrows(IllegalArgumentException.class, () -> postService.deleteBoard(boardId, member));
+        assertThrows(IllegalArgumentException.class, () -> postService.deleteBoard(dto));
     }
 
     @Test
@@ -343,8 +354,13 @@ class PostServiceTest {
 
         var boardId = 1L;
 
+        var dto = PostDeleteDto.builder()
+                .boardId(boardId)
+                .member(otherMember)
+                .build();
+
         // expected
-        assertThrows(IllegalArgumentException.class, () -> postService.deleteBoard(boardId, otherMember));
+        assertThrows(IllegalArgumentException.class, () -> postService.deleteBoard(dto));
     }
 
     @Test
@@ -357,8 +373,13 @@ class PostServiceTest {
 
         var boardId = 1L;
 
+        var dto = PostDeleteDto.builder()
+                .boardId(boardId)
+                .member(admin)
+                .build();
+
         // when
-        postService.deleteBoard(boardId, admin);
+        postService.deleteBoard(dto);
 
         // then
         var actual = postRepository.findById(boardId).isEmpty();
