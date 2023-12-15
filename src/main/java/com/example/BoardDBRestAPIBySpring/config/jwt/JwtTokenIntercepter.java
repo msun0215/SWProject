@@ -18,13 +18,15 @@ public class JwtTokenIntercepter implements HandlerInterceptor {
 
         System.out.println("Interceptor에서 JWTToken 호출 : "+header);
 
-        if(header!=null&&TokenUtils.isValidToken(header)){
-            return true;
-        }
-        response.setStatus(401);
-        response.setHeader(JWTProperties.HEADER_STRING, header);
-        response.setHeader("msg", "Check the Token");
-        response.sendRedirect("/error/unauthorized");
-        return false;
+        return true;
+
+//        if(header!=null&&TokenUtils.isValidToken(header)){
+//            return true;
+//        }
+//        response.setStatus(401);
+//        response.setHeader(JWTProperties.HEADER_STRING, header);
+//        response.setHeader("msg", "Check the Token");
+//        response.sendRedirect("/error/unauthorized");
+//        return false;
     }
 }
