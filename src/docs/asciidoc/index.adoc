@@ -9,8 +9,11 @@
 
 == 로그인
 
-operation::login-controller-test/login[snippets="http-request,form-parameters,http-response,response-headers"]
+=== Form으로 로그인
+operation::login-controller-test/login-by-www[snippets="http-request,form-parameters,http-response,response-headers"]
 
+=== Json으로 로그인
+operation::login-controller-test/login-by-json[snippets="http-request,request-fields,http-response,response-headers"]
 
 == 회원가입
 
