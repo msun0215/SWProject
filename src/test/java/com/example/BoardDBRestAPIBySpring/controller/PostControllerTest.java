@@ -16,8 +16,6 @@ import static org.springframework.restdocs.request.RequestDocumentation.queryPar
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.auth0.jwt.JWT;
-import com.auth0.jwt.algorithms.Algorithm;
 import com.example.BoardDBRestAPIBySpring.config.AbstractRestDocsTest;
 import com.example.BoardDBRestAPIBySpring.config.jwt.JWTProperties;
 import com.example.BoardDBRestAPIBySpring.domain.Board;
@@ -31,6 +29,10 @@ import com.example.BoardDBRestAPIBySpring.request.PostCreateRequest;
 import com.example.BoardDBRestAPIBySpring.request.PostEditRequest;
 import com.example.BoardDBRestAPIBySpring.request.PostRoleChangeRequest;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.io.Decoders;
+import io.jsonwebtoken.security.Keys;
 import java.util.Date;
 import java.util.stream.LongStream;
 import org.junit.jupiter.api.BeforeEach;
@@ -286,12 +288,24 @@ class PostControllerTest extends AbstractRestDocsTest {
     }
 
     private String generateJwtToken(final Member member) {
-        return JWT.create()
-                .withSubject(member.getMemberName())    // token 별명 느낌?
-                .withExpiresAt(new Date(System.currentTimeMillis()+JWTProperties.EXPIRATION_TIME))  // Token 만료 시간 -> 현재시간 + 만료시간
-                .withClaim("id", member.getMemberID())    // 비공개 Claim -> 넣고싶은거 아무거나 넣으면 됨
-                .withClaim("username", member.getMemberName())    // 비공개 Claim
-                .withClaim("role", member.getRoleName())    // 비공개 Claim
-                .sign(Algorithm.HMAC512(JWTProperties.SECRET));  // HMAC512는 SECRET KEY를 필요로 함
+        String AUTHROITIES_KEY="role";
+        String MEMBERID_KEY="memberID";
+        String url="http://localhost:8080";
+
+        long now = System.currentTimeMillis();
+
+        String secretKey = "TXlTV1Byb2plY3RVc2luZ0pXVHdpdGhTcHJpbmdCb290QW5kU3ByaW5nU2VjdXJpdHk=TXlTV1Byb2plY3RVc2luZ0pXVHdpdGhTcHJpbmdCb290QW5kU3ByaW5nU2VjdXJpdHk";
+        byte[] secretKeyBytes= Decoders.BASE64.decode(secretKey);
+
+        return Jwts.builder()
+                .setHeaderParam("typ", "JWT")
+                .setHeaderParam("alg", "HS512")
+                .setExpiration(new Date(now + 604800))
+                .setSubject("access-token")
+                .claim(url, true)
+                .claim(MEMBERID_KEY, member.getMemberID())
+                .claim(AUTHROITIES_KEY, "ROLE_USER")
+                .signWith(Keys.hmacShaKeyFor(secretKeyBytes), SignatureAlgorithm.HS512)
+                .compact();
     }
 }
