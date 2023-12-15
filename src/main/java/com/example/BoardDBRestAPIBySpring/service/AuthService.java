@@ -3,6 +3,8 @@ package com.example.BoardDBRestAPIBySpring.service;
 import com.example.BoardDBRestAPIBySpring.config.jwt.JWTProperties;
 import com.example.BoardDBRestAPIBySpring.config.jwt.JWTTokenProvider;
 import com.example.BoardDBRestAPIBySpring.domain.AuthDTO;
+import java.util.Date;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -12,9 +14,6 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.Date;
-import java.util.stream.Collectors;
 
 
 /*
@@ -119,6 +118,11 @@ public class AuthService {
     // AccessToken으로부터 principal 추출
     public String getPrincipal(String requestAccessToken){
         return jwtTokenProvider.getAuthentication(requestAccessToken).getName();
+    }
+
+    public Authentication getAuthentication(String requestAccessToken){
+        String token = resolveToken(requestAccessToken);
+        return jwtTokenProvider.getAuthentication(token);
     }
 
     // "Bearer {AT}"에서 "{AT}" 추출

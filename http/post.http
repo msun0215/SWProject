@@ -2,52 +2,7 @@
 GET http://localhost:8080/boards
 
 
-### get all boards by paging
-GET http://localhost:8080/boards/paging?page=0&size=5
-
-
-### get post counts
-GET http://localhost:8080/boards/counts
-
-
-# intelli http에서 multipart/form_data를 보내는 방법
-# https://m.blog.naver.com/PostView.naver?blogId=rinjyu&logNo=222156997603&categoryNo=34&proxyReferer=
-
-### create post
-POST http://localhost:8080/boards
-Content-Type: multipart/form-data; boundary=createPostBoundary
-
---createPostBoundary
-Content-Disposition: form-data; name="mem_id"
-
-유저아이디입니다.
-
---createPostBoundary
-Content-Disposition: form-data; name="title"
-
-제목입니다.
-
---createPostBoundary
-Content-Disposition: form-data; name="text"
-
-내용입니다.
-
---createPostBoundary
-Content-Disposition: form-data; name="files"; filename="createPostTestFile1.txt"
-
-< ./createPostTestFile1.txt
-
---createPostBoundary
-Content-Disposition: form-data; name="files"; filename="createPostTestFile2.txt"
-
-< ./createPostTestFile2.txt
-
---createPostBoundary
-Content-Disposition: form-data; name="files"; filename="img.png"
-
-< ./
-
-### test
+### login
 POST http://localhost:8080/login
 Content-Type: application/json
 
@@ -56,20 +11,30 @@ Content-Type: application/json
   "memberPW": "b"
 }
 
+> {%
+    client.test("Validate", function () {
+        client.assert(response.status === 200, "Response status is not 200");
+        client.assert(response.headers.valueOf("Authorization").length > 0);
+    });
 
-### test
-GET http://localhost:8080/joinForm
-Authorization: Bearer eyJyZWdEYXRlIjoxNzAxNjU5NTg3MDYyLCJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJtZW1iZXJOYW1lIjoiYiIsImV4cCI6MTcwNDI1MTU4NywibWVtYmVySUQiOiJiQGIuY29tIn0.b95p5hWUG7Ct-SkDlGIyAsLbjXTOMab0aLPOE2B6eVQ
+    client.log(response.headers.valueOf("Authorization"));
+    client.global.set("access_token", response.headers.valueOf("Authorization"));
+ %}
+
+
+### user list
+GET http://localhost:8080/user/list
+Authorization: {{access_token}}
 
 
 ### 게시글 조회
 GET http://localhost:8080/boards
-Authorization: Bearer eyJyZWdEYXRlIjoxNzAxNjU5NTg3MDYyLCJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJtZW1iZXJOYW1lIjoiYiIsImV4cCI6MTcwNDI1MTU4NywibWVtYmVySUQiOiJiQGIuY29tIn0.b95p5hWUG7Ct-SkDlGIyAsLbjXTOMab0aLPOE2B6eVQ
+Authorization: {{access_token}}
 
 
 ### 게시글 생성
 POST http://localhost:8080/boards
-Authorization: Bearer eyJyZWdEYXRlIjoxNzAxNjU5NTg3MDYyLCJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJtZW1iZXJOYW1lIjoiYiIsImV4cCI6MTcwNDI1MTU4NywibWVtYmVySUQiOiJiQGIuY29tIn0.b95p5hWUG7Ct-SkDlGIyAsLbjXTOMab0aLPOE2B6eVQ
+Authorization: {{access_token}}
 Content-Type: application/json
 
 {
@@ -80,7 +45,7 @@ Content-Type: application/json
 
 ### 게시글 수정
 PUT http://localhost:8080/boards/15
-Authorization: Bearer eyJyZWdEYXRlIjoxNzAxODIyMjQ5MTA5LCJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJtZW1iZXJOYW1lIjoiYiIsImV4cCI6MTcwNDQxNDI0OSwibWVtYmVySUQiOiJiQGIuY29tIn0.2SNUIPSbtJNuPMBXUrZBcU3uIFopvRn8T0bPsN5qtjI
+Authorization: {{access_token}}
 Content-Type: application/json
 
 {
@@ -91,12 +56,12 @@ Content-Type: application/json
 
 ### 게시글 삭제
 DELETE http://localhost:8080/boards/15
-Authorization: Bearer eyJyZWdEYXRlIjoxNzAxODIyMjQ5MTA5LCJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJtZW1iZXJOYW1lIjoiYiIsImV4cCI6MTcwNDQxNDI0OSwibWVtYmVySUQiOiJiQGIuY29tIn0.2SNUIPSbtJNuPMBXUrZBcU3uIFopvRn8T0bPsN5qtjI
+Authorization: {{access_token}}
 
 
 ### 댓글 생성
 POST http://localhost:8080/boards/14/replies
-Authorization: Bearer eyJyZWdEYXRlIjoxNzAxNjU5NTg3MDYyLCJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJtZW1iZXJOYW1lIjoiYiIsImV4cCI6MTcwNDI1MTU4NywibWVtYmVySUQiOiJiQGIuY29tIn0.b95p5hWUG7Ct-SkDlGIyAsLbjXTOMab0aLPOE2B6eVQ
+Authorization: {{access_token}}
 Content-Type: application/json
 
 {

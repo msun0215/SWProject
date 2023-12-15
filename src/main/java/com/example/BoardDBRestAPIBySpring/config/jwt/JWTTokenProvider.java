@@ -4,10 +4,17 @@ import com.example.BoardDBRestAPIBySpring.config.auth.PrincipalDetails;
 import com.example.BoardDBRestAPIBySpring.config.auth.PrincipalDetailsService;
 import com.example.BoardDBRestAPIBySpring.domain.AuthDTO;
 import com.example.BoardDBRestAPIBySpring.service.RedisService;
-import io.jsonwebtoken.*;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.MalformedJwtException;
+import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.UnsupportedJwtException;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.security.SignatureException;
+import java.security.Key;
+import java.util.Date;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Value;
@@ -16,25 +23,19 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.security.Key;
-import java.util.Date;
-
 //https://velog.io/@u-nij
 @Slf4j
 @Component
 @Transactional(readOnly = true)
 public class JWTTokenProvider implements InitializingBean {
 
-    private final PrincipalDetailsService principalDetailsService;
-    private final RedisService redisService;
-
     private static final String AUTHROITIES_KEY="role";
     private static final String MEMBERID_KEY="memberID";
     private static final String url="http://localhost:8080";
-
-    private final String secretKey;
     private static Key signingKey;
-
+    private final PrincipalDetailsService principalDetailsService;
+    private final RedisService redisService;
+    private final String secretKey;
     private final Long accessTokenValidityInMilliseconds;
     private final Long refreshTokenValidityInMiliseconds;
 
@@ -164,7 +165,7 @@ public class JWTTokenProvider implements InitializingBean {
         }catch(ExpiredJwtException e){
             return true;
         }catch(Exception e){
-            return false;
+            return true;
         }
     }
 }

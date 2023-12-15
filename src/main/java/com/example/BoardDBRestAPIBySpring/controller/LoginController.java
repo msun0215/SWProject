@@ -1,28 +1,38 @@
 package com.example.BoardDBRestAPIBySpring.controller;
 
-import com.example.BoardDBRestAPIBySpring.config.auth.PrincipalDetails;
-import com.example.BoardDBRestAPIBySpring.domain.*;
+import com.example.BoardDBRestAPIBySpring.domain.AuthDTO;
+import com.example.BoardDBRestAPIBySpring.domain.Member;
+import com.example.BoardDBRestAPIBySpring.domain.MemberResponseDTO;
+import com.example.BoardDBRestAPIBySpring.domain.Message;
+import com.example.BoardDBRestAPIBySpring.domain.Role;
 import com.example.BoardDBRestAPIBySpring.repository.MemberRepository;
 import com.example.BoardDBRestAPIBySpring.repository.RoleRepository;
 import com.example.BoardDBRestAPIBySpring.service.AuthService;
 import com.example.BoardDBRestAPIBySpring.service.MemberService;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
+import java.util.Collection;
+import lombok.Builder;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.log4j.Log4j2;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.*;
-import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.http.HttpCookie;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseCookie;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.CookieValue;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.ModelAndView;
-
-import java.util.Map;
 
 // https://velog.io/@u-nij/
 @Slf4j
@@ -30,18 +40,15 @@ import java.util.Map;
 @RequiredArgsConstructor
 @RequestMapping
 public class LoginController {
-    @Autowired
-    private BCryptPasswordEncoder bCryptPasswordEncoder;    // 암호화
-
-    @Autowired
-    private MemberRepository memberRepository;
-
-    @Autowired
-    private RoleRepository roleRepository;
-
     private final MemberService memberService;
     private final AuthService authService;
     private final long COOKIE_EXPIRATION=7776000;       // 90일
+    @Autowired
+    private BCryptPasswordEncoder bCryptPasswordEncoder;    // 암호화
+    @Autowired
+    private MemberRepository memberRepository;
+    @Autowired
+    private RoleRepository roleRepository;
 
 //    Role role1=roleRepository.save(new Role(1,"ROLE_ADMIN"));
 //    Role role2=roleRepository.save(new Role(2,"ROLE_MANAGER"));
@@ -108,6 +115,28 @@ public class LoginController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();   // 재발급 필요
     }
 
+    // todo 권한 변경 게시글을 따로 볼 수 있게 Category 객체를 만들까?
+
+    @GetMapping("/token")
+    public ResponseEntity<TokenResponse> token(@RequestHeader("Authorization") String requestAccessToken) {
+        if (authService.validate(requestAccessToken)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        Authentication authentication = authService.getAuthentication(requestAccessToken);
+        String memberID = authentication.getName();
+        Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
+        GrantedAuthority grantedAuthority = authorities.stream().toList().get(0);
+        String authority = grantedAuthority.getAuthority();
+        String role = authority.replace("ROLE_", "");
+
+        TokenResponse tokenResponse = TokenResponse.builder()
+                .memberID(memberID)
+                .role(role)
+                .build();
+
+        return ResponseEntity.status(HttpStatus.OK).body(tokenResponse);
+    }
 
     // 토큰 재발급
     @PostMapping("/reissue")
@@ -132,7 +161,6 @@ public class LoginController {
         }
     }
 
-
     @PostMapping("/logout")
     public ResponseEntity<?> logout(@RequestHeader("Authorization") String requestAccessToken){
         authService.logout(requestAccessToken);
@@ -143,7 +171,6 @@ public class LoginController {
                 .header(HttpHeaders.SET_COOKIE, responseCookie.toString()).build();
     }
 
-
     @GetMapping("/user/list")
     public ResponseEntity<MemberResponseDTO> findAll(){
         final MemberResponseDTO memberResponseDTO=MemberResponseDTO.builder()
@@ -151,7 +178,6 @@ public class LoginController {
 
         return ResponseEntity.ok(memberResponseDTO);
     }
-
 
     @GetMapping("login/successLogin")
     public ModelAndView successLogin(ModelAndView mv, @RequestHeader("Authorization") String requestAccessToken){
@@ -184,6 +210,13 @@ public class LoginController {
 
         return modelAndView;   // member 저장이 완료되면 loginForm으로 되돌아가기
     }
+
+    @GetMapping("/loginForm")
+    public ModelAndView loginForm(){
+        ModelAndView modelAndView=new ModelAndView();
+        modelAndView.setViewName("loginForm");
+        return modelAndView;
+    }
 /*
     @GetMapping("/login")
     public String login(@RequestParam(value = "error", required = false) String error, @RequestParam(value="exception", required = false) String exception, Model model){
@@ -203,18 +236,17 @@ public ResponseEntity<Void> logout(HttpServletRequest servletRequest) {
 
      */
 
-    @GetMapping("/loginForm")
-    public ModelAndView loginForm(){
-        ModelAndView modelAndView=new ModelAndView();
-        modelAndView.setViewName("loginForm");
-        return modelAndView;
-    }
-
     @GetMapping("/joinForm")
     public ModelAndView joinForm(){
         ModelAndView modelAndView=new ModelAndView();
         modelAndView.setViewName("joinForm");
         return modelAndView;
+    }
+
+    public record TokenResponse(String memberID, String role) {
+        @Builder
+        public TokenResponse {
+        }
     }
 
 //    @PostMapping("/login")
