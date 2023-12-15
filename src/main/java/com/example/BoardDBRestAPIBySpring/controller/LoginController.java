@@ -1,43 +1,47 @@
 package com.example.BoardDBRestAPIBySpring.controller;
 
-import com.auth0.jwt.JWT;
-import com.auth0.jwt.algorithms.Algorithm;
-import com.example.BoardDBRestAPIBySpring.config.jwt.JWTProperties;
-import com.example.BoardDBRestAPIBySpring.domain.LoginRequest;
-import com.example.BoardDBRestAPIBySpring.domain.Member;
-import com.example.BoardDBRestAPIBySpring.domain.MemberResponseDTO;
-import com.example.BoardDBRestAPIBySpring.domain.Message;
-import com.example.BoardDBRestAPIBySpring.domain.Role;
-import com.example.BoardDBRestAPIBySpring.domain.Token;
+import com.example.BoardDBRestAPIBySpring.config.auth.PrincipalDetails;
+import com.example.BoardDBRestAPIBySpring.domain.*;
 import com.example.BoardDBRestAPIBySpring.repository.MemberRepository;
 import com.example.BoardDBRestAPIBySpring.repository.RoleRepository;
+import com.example.BoardDBRestAPIBySpring.service.AuthService;
 import com.example.BoardDBRestAPIBySpring.service.MemberService;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
+import java.util.Map;
+
+// https://velog.io/@u-nij/
 @Slf4j
-@Log4j2
 @RestController
 @RequiredArgsConstructor
+@RequestMapping
 public class LoginController {
-    private final MemberService memberService;
     @Autowired
     private BCryptPasswordEncoder bCryptPasswordEncoder;    // 암호화
+
     @Autowired
     private MemberRepository memberRepository;
+
     @Autowired
     private RoleRepository roleRepository;
+
+    private final MemberService memberService;
+    private final AuthService authService;
+    private final long COOKIE_EXPIRATION=7776000;       // 90일
 
 //    Role role1=roleRepository.save(new Role(1,"ROLE_ADMIN"));
 //    Role role2=roleRepository.save(new Role(2,"ROLE_MANAGER"));
@@ -52,12 +56,91 @@ public class LoginController {
         return modelAndView;
     }
 
+    // 로그인->Token 발급
+    @PostMapping(value = "/login", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> loginByJson(@RequestBody @Valid AuthDTO.LoginDto loginDto){
+        String memberID = loginDto.getMemberID();
+        String memberPW = loginDto.getMemberPW();
 
-    @PostMapping("/login")
-    public Token login(@RequestBody LoginRequest request){
-        String memberID = request.getMemberID();
-        String memberPW = request.getMemberPW();
-        return memberService.login(memberID, memberPW);
+        // Member 등록 및 RefreshToken 저장
+        AuthDTO.TokenDto tokenDto=authService.login(loginDto);
+
+        // RefreshToken 저장
+        HttpCookie httpCookie= ResponseCookie.from("refresh-token", tokenDto.getRefreshToken())
+                .maxAge(COOKIE_EXPIRATION)
+                .httpOnly(true)
+                .secure(true)
+                .build();
+
+        return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, httpCookie.toString())
+                .header(HttpHeaders.AUTHORIZATION, "Bearer "+tokenDto.getAccessToken()) // AccessToken 저장
+                .build();
+    }
+
+
+    @PostMapping(value = "/login", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+    public ResponseEntity<?> loginByWWW(@Valid AuthDTO.LoginDto loginDto){
+        String memberID = loginDto.getMemberID();
+        String memberPW = loginDto.getMemberPW();
+
+        // Member 등록 및 RefreshToken 저장
+        AuthDTO.TokenDto tokenDto=authService.login(loginDto);
+
+        // RefreshToken 저장
+        HttpCookie httpCookie= ResponseCookie.from("refresh-token", tokenDto.getRefreshToken())
+                .maxAge(COOKIE_EXPIRATION)
+                .httpOnly(true)
+                .secure(true)
+                .build();
+
+
+        return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, httpCookie.toString())
+                .header(HttpHeaders.AUTHORIZATION, "Bearer "+tokenDto.getAccessToken()) // AccessToken 저장
+                .header(HttpHeaders.LOCATION,"/login/successLogin")
+                .build();
+    }
+
+    @PostMapping("/validate")
+    public ResponseEntity<?> validate(@RequestHeader("Authorization") String requestAccessToken){
+        if(!authService.validate(requestAccessToken))
+            return ResponseEntity.status(HttpStatus.OK).build();    // 재발급 필요 없음
+        else
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();   // 재발급 필요
+    }
+
+
+    // 토큰 재발급
+    @PostMapping("/reissue")
+    public ResponseEntity<?> reissue(@CookieValue(name="refresh-token") String requestRefreshToken,
+                                    @RequestHeader("Authorization") String requestAccessToken) {
+        AuthDTO.TokenDto reissuedTokenDto = authService.reissue(requestAccessToken, requestRefreshToken);
+
+        if (reissuedTokenDto != null) {     // 토큰 재발급 성공
+            ResponseCookie responseCookie = ResponseCookie.from("refresh-token", reissuedTokenDto.getRefreshToken())
+                    .maxAge(COOKIE_EXPIRATION).httpOnly(true).secure(true).build();
+
+            return ResponseEntity.status(HttpStatus.OK)
+                    .header(HttpHeaders.SET_COOKIE, responseCookie.toString())  // AccessToken 저장
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer " + reissuedTokenDto.getAccessToken()).build();
+        } else {     // Refresh Token 탈취 가능성
+            // Cookie 삭제 후 재로그인 유도
+            ResponseCookie responseCookie = ResponseCookie.from("refresh-token", "")
+                    .maxAge(0).path("/").build();
+
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .header(HttpHeaders.SET_COOKIE, responseCookie.toString()).build();
+        }
+    }
+
+
+    @PostMapping("/logout")
+    public ResponseEntity<?> logout(@RequestHeader("Authorization") String requestAccessToken){
+        authService.logout(requestAccessToken);
+        ResponseCookie responseCookie=ResponseCookie.from("refresh-token","")
+                .maxAge(0).path("/").build();
+
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .header(HttpHeaders.SET_COOKIE, responseCookie.toString()).build();
     }
 
 
@@ -69,9 +152,10 @@ public class LoginController {
         return ResponseEntity.ok(memberResponseDTO);
     }
 
+
     @GetMapping("login/successLogin")
-    public ModelAndView successLogin(){
-        ModelAndView mv=new ModelAndView();
+    public ModelAndView successLogin(ModelAndView mv, @RequestHeader("Authorization") String requestAccessToken){
+
         mv.setViewName("successLogin");
         return mv;
     }
@@ -100,30 +184,6 @@ public class LoginController {
 
         return modelAndView;   // member 저장이 완료되면 loginForm으로 되돌아가기
     }
-
-    @GetMapping("/token")
-    public ValidateTokenDto validateToken(HttpServletRequest request) {
-        String authorizationHeader = request.getHeader(JWTProperties.HEADER_STRING);
-        String token = authorizationHeader.replace(JWTProperties.TOKEN_PREFIX, "");
-        try {
-            String memberID = JWT.require(Algorithm.HMAC512(JWTProperties.SECRET)).build().verify(token)
-                    .getClaim("id").asString();
-            String role = JWT.require(Algorithm.HMAC512(JWTProperties.SECRET)).build().verify(token)
-                    .getClaim("role").asString();
-            return new ValidateTokenDto(true, memberID, role);
-        } catch (Exception e) {
-            log.error("error = {}", e.getMessage());
-            return new ValidateTokenDto(false, "", "");
-        }
-    }
-
-    @GetMapping("/loginForm")
-    public ModelAndView loginForm(){
-        ModelAndView modelAndView=new ModelAndView();
-        modelAndView.setViewName("loginForm");
-        return modelAndView;
-    }
-
 /*
     @GetMapping("/login")
     public String login(@RequestParam(value = "error", required = false) String error, @RequestParam(value="exception", required = false) String exception, Model model){
@@ -143,14 +203,18 @@ public ResponseEntity<Void> logout(HttpServletRequest servletRequest) {
 
      */
 
+    @GetMapping("/loginForm")
+    public ModelAndView loginForm(){
+        ModelAndView modelAndView=new ModelAndView();
+        modelAndView.setViewName("loginForm");
+        return modelAndView;
+    }
+
     @GetMapping("/joinForm")
     public ModelAndView joinForm(){
         ModelAndView modelAndView=new ModelAndView();
         modelAndView.setViewName("joinForm");
         return modelAndView;
-    }
-
-    public record ValidateTokenDto(boolean validate, String memberID, String role) {
     }
 
 //    @PostMapping("/login")

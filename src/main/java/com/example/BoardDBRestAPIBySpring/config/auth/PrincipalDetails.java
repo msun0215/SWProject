@@ -27,7 +27,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 @ToString
 public class PrincipalDetails implements UserDetails {
 
-    private Member member;  // Composition
+    private final Member member;  // Composition
     private Map<String, Object> attributes;
 
     // 일반 로그인 객체
@@ -44,40 +44,27 @@ public class PrincipalDetails implements UserDetails {
 //    }
 
 
-//    // 해당 User의 권한을 return하는 곳
-//    @Override
-//    public Collection<? extends GrantedAuthority> getAuthorities() {
-//        // User의 Roll을 return하는데, User.getRoll()의 타입은 String
-//        Collection<GrantedAuthority> collect=new ArrayList<>();
-//        collect.add(new GrantedAuthority() {
-//            @Override
-//            public String getAuthority() {
-//                return member.getRoles().toString();
-//            }
-//        });
-//        return collect;
-//    }
+    // 해당 User의 권한을 return하는 곳
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        // User의 Roll을 return하는데, User.getRoll()의 타입은 String
+        Collection<GrantedAuthority> collect=new ArrayList<GrantedAuthority>();
+
+        SimpleGrantedAuthority simpleGrantedAuthority = new SimpleGrantedAuthority(
+                "ROLE_".concat(member.getRoles().getRoleName()));
+        collect.add(simpleGrantedAuthority);
+
+        return collect;
+    }
 
     // 권한 목록
-    @Override
-    public Collection <? extends GrantedAuthority> getAuthorities(){
-        Collection<GrantedAuthority> authorities=new ArrayList<GrantedAuthority>();
-//        authorities.add(new GrantedAuthority() {
-//            @Override
-//            public String getAuthority() {
-//                System.out.println("getRoleName().toString() : "+member.getRoles().getRoleName().toString());
-//                return member.getRoles().getRoleName().toString();
-//            }
-//        });
-
-        SimpleGrantedAuthority simpleGrantedAuthority = new SimpleGrantedAuthority("ROLE_".concat(member.getRoles().getRoleName()));
-        authorities.add(simpleGrantedAuthority);
-
-//        member.getRoles().getRoleList().forEach(r->{
-//            authorities.add(()->r);
-//        });
-        return authorities;
-    }
+//    //https://velog.io/@u-nij
+//    @Override
+//    public Collection <? extends GrantedAuthority> getAuthorities(){
+//        Collection<GrantedAuthority> authorities=new ArrayList<GrantedAuthority>();
+//        authorities.add(()->member.getRoles().getRoleName());        // key : ROLE_권한
+//        return authorities;
+//    }
 
 
     // 비밀번호

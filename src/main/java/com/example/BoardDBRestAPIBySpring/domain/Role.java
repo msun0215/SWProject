@@ -9,11 +9,26 @@ import java.util.Arrays;
 import java.util.List;
 import lombok.Builder;
 import lombok.Data;
-import lombok.RequiredArgsConstructor;
+import lombok.NoArgsConstructor;
+
+/*
+@Getter
+@RequiredArgsConstructor
+public enum Role {
+    ADMIN("ROLE_ADMIN", "관리자"),
+    MANAGER("ROLE_MANAGER", "매니저"),
+    USER("ROLE_USER", "일반 사용자");
+
+    private final String key;
+    private final String title;
+}
+*/
+
+
 
 @Data   // GETTER & SETTER
 @Entity
-@RequiredArgsConstructor
+@NoArgsConstructor
 public class Role {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY) // MYSQL에서 AutoIncrement
@@ -42,7 +57,6 @@ public class Role {
         }
         return new ArrayList<>();
     }
-
 
     public boolean isSame(final String roleName) {
         return this.roleName.equals(roleName);

@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+//https://velog.io/@u-nij
 public class AuthDTO {
     @Getter
     @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -14,11 +15,10 @@ public class AuthDTO {
 
         @Builder
         public LoginDto(String memberID, String memberPW){
-            this. memberID=memberID;
+            this.memberID=memberID;
             this.memberPW=memberPW;
         }
     }
-
 
     @Getter
     @NoArgsConstructor(access = AccessLevel.PROTECTED)

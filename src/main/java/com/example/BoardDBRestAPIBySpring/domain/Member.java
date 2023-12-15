@@ -21,6 +21,7 @@ public class Member {
 
 	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "RoleID")
+	//@Enumerated(EnumType.STRING)
 	private Role roles;   // USER, MANAGER, ADMIN
 
 	// OAuth 제공자
