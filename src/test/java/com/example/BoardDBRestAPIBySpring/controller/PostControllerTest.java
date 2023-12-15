@@ -142,7 +142,8 @@ class PostControllerTest extends AbstractRestDocsTest {
                                 fieldWithPath("content").description("내용"),
                                 fieldWithPath("createDate").description("생성일"),
                                 fieldWithPath("modifyDate").description("수정일"),
-                                fieldWithPath("memberName").description("작성자 이름")
+                                fieldWithPath("memberName").description("작성자 이름"),
+                                fieldWithPath("memberID").description("작성자 아이디")
                         )
                 ));
     }
