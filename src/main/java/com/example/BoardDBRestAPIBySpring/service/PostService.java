@@ -52,8 +52,9 @@ public class PostService {
 	public void editBoard(final PostEditDto dto) {
 		Board board = postRepository.findById(dto.getBoardId())
 				.orElseThrow(() -> new IllegalArgumentException("존재하지 않는 게시글입니다."));
-		if (dto.getMember().hasNotUpdatePermissionFor(board)) {
-			throw new IllegalArgumentException("게시글 수정 권한이 없습니다.");
+		Member member = dto.getMember();
+		if (member.isNotOwnerFor(board)) {
+			throw new IllegalArgumentException("게시글 작성자가 아닙니다.");
 		}
 
 		board.edit(dto.getRequest());
@@ -64,7 +65,7 @@ public class PostService {
 		Board board = postRepository.findById(dto.getBoardId())
 				.orElseThrow(() -> new IllegalArgumentException("존재하지 않는 게시글입니다."));
 		Member member = dto.getMember();
-		if (member.hasNotUpdatePermissionFor(board)) {
+		if (member.hasNotDeletePermissionFor(board)) {
 			throw new IllegalArgumentException("게시글 삭제 권한이 없습니다.");
 		}
 

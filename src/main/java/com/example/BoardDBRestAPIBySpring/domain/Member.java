@@ -59,7 +59,15 @@ public class Member {
 		return roles.isSame("ADMIN");
 	}
 
-	public boolean hasNotUpdatePermissionFor(final Ownable ownable) {
-		return !(isAdmin() || ownable.isOwner(this));
+	public boolean isNotOwnerFor(final Ownable ownable) {
+		return !ownable.isOwner(this);
 	}
+
+	public boolean hasNotDeletePermissionFor(final Ownable ownable) {
+		if (isAdmin()) {
+			return false;
+		}
+
+		return !ownable.isOwner(this);
+    }
 }

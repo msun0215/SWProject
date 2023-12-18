@@ -271,41 +271,6 @@ class ReplyServiceTest {
     }
 
     @Test
-    @DisplayName("어드민 댓글 수정 테스트")
-    @Transactional(readOnly = true)
-    void editBoardByAdminTest() {
-        // given
-        var reply = Reply.of("내용입니다.");
-        reply.setBoard(board);
-        reply.setMember(member);
-        replyRepository.save(reply);
-
-        var replyId = reply.getId();
-
-        var request = ReplyEditRequest.builder()
-                .content("수정된 내용입니다.")
-                .build();
-
-        var dto = ReplyEditDto.builder()
-                .replyId(reply.getId())
-                .boardId(board.getId())
-                .member(admin)
-                .request(request)
-                .build();
-
-        // when
-        replyService.editReply(dto);
-
-        // then
-        var actual = replyRepository.findById(replyId).get();
-        assertAll(() -> {
-            assertEquals(request.getContent(), actual.getContent());
-            assertEquals(board, actual.getBoard());
-            assertEquals(member, actual.getMember());
-        });
-    }
-
-    @Test
     @DisplayName("댓글 삭제 테스트")
     @Transactional(readOnly = true)
     void deleteReplyTest() {

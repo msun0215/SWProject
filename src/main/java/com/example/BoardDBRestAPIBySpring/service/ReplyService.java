@@ -55,8 +55,8 @@ public class ReplyService {
         }
 
         Member member = dto.getMember();
-        if (member.hasNotUpdatePermissionFor(reply)) {
-            throw new IllegalArgumentException("댓글 수정 권한이 없습니다.");
+        if (member.isNotOwnerFor(reply)) {
+            throw new IllegalArgumentException("댓글 작성자가 아닙니다.");
         }
 
         reply.edit(dto);
@@ -71,7 +71,7 @@ public class ReplyService {
         }
 
         Member member = dto.getMember();
-        if (member.hasNotUpdatePermissionFor(reply)) {
+        if (member.hasNotDeletePermissionFor(reply)) {
             throw new IllegalArgumentException("댓글 삭제 권한이 없습니다.");
         }
 

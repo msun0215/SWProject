@@ -254,46 +254,6 @@ class PostServiceTest {
     }
 
     @Test
-    @DisplayName("어드민 게시글 수정 테스트")
-    @Transactional(readOnly = true)
-    void editBoardByAdminTest() {
-        // given
-        var boards = LongStream.rangeClosed(1, 20)
-                .mapToObj(index -> {
-                    Board board = Board.from("제목입니다." + index, "내용입니다." + index);
-                    board.setMember(member);
-                    return board;
-                })
-                .toList();
-        postRepository.saveAll(boards);
-
-        var request = PostEditRequest.builder()
-                .title("수정된 제목입니다.")
-                .content("수정된 내용입니다.")
-                .build();
-
-        var boardId = 1L;
-
-        var dto = PostEditDto.builder()
-                .boardId(boardId)
-                .member(admin)
-                .request(request)
-                .build();
-
-        // when
-        postService.editBoard(dto);
-
-        // then
-        var actual = postRepository.findById(boardId).get();
-        assertAll(() -> {
-            assertEquals(boardId, actual.getId());
-            assertEquals(request.getTitle(), actual.getTitle());
-            assertEquals(request.getContent(), actual.getContent());
-            assertEquals(member, actual.getMember());
-        });
-    }
-
-    @Test
     @DisplayName("게시글 삭제 테스트")
     void deleteBoardTest() {
         // given
