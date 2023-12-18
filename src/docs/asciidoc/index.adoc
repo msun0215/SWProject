@@ -34,7 +34,9 @@ operation::post-controller-test/find-board[snippets="http-request,path-parameter
 
 operation::post-controller-test/create-board[snippets="http-request,request-headers,request-fields,http-response"]
 
-== 게시글 수정
+== 게시글 수정 - 작성자 권한
+
+IMPORTANT: 작성자만 권한이 존재합니다.
 
 operation::post-controller-test/edit-board[snippets="http-request,path-parameters,request-headers,request-fields,http-response"]
 
@@ -57,7 +59,9 @@ operation::reply-controller-test/get-all-replies[snippets="http-request,path-par
 
 operation::reply-controller-test/create-reply[snippets="http-request,path-parameters,request-headers,request-fields,http-response"]
 
-== 댓글 수정
+== 댓글 수정 - 작성자 권한
+
+IMPORTANT: 작성자만 권한이 존재합니다.
 
 operation::reply-controller-test/edit-reply[snippets="http-request,path-parameters,request-headers,request-fields,http-response"]
 
