@@ -32,6 +32,8 @@ operation::post-controller-test/find-board[snippets="http-request,path-parameter
 
 == 게시글 생성
 
+IMPORTANT: "권한 변경" 문구는 제목에 포함할 수 없습니다.
+
 operation::post-controller-test/create-board[snippets="http-request,request-headers,request-fields,http-response"]
 
 == 게시글 수정 - 작성자 권한
