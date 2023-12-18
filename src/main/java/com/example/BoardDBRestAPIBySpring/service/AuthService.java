@@ -39,6 +39,10 @@ public class AuthService {
     // 로그인 : 인증 정보 저장 및 Bearer 토큰 발급
     @Transactional
     public AuthDTO.TokenDto login(AuthDTO.LoginDto loginDto){
+        System.out.println("====================================");
+        System.out.println("Access To Login");
+        System.out.println("====================================");
+
         UsernamePasswordAuthenticationToken authenticationToken=
                 new UsernamePasswordAuthenticationToken(loginDto.getMemberID(), loginDto.getMemberPW());
 
@@ -52,6 +56,10 @@ public class AuthService {
 
     // AccessToken이 만료일자만 초과한 유효한 Token인지 검사
     public boolean validate(String requestAccessTokenInHeader){
+        System.out.println("====================================");
+        System.out.println("Access To Validate AccessToken");
+        System.out.println("====================================");
+
         String requestAccessToken=resolveToken(requestAccessTokenInHeader);
         return jwtTokenProvider.validateAccessTokenOnlyExpired(requestAccessToken); // true->재발급
     }
@@ -59,6 +67,10 @@ public class AuthService {
     // Token 재발급 : validate 메서드가 true를 반환할 때만 사용함 -> AccessToken, RefreshToken 재발급
     @Transactional
     public AuthDTO.TokenDto reissue(String requestAccessTokenInHeader, String requestRefreshToken){
+        System.out.println("====================================");
+        System.out.println("Access To reissue AccessToken");
+        System.out.println("====================================");
+
         String requestAccessToken=resolveToken(requestAccessTokenInHeader);
         Authentication authentication= jwtTokenProvider.getAuthentication(requestAccessToken);
         String principal = getPrincipal(requestAccessToken);
@@ -86,12 +98,21 @@ public class AuthService {
     // Token 발급
     @Transactional
     public AuthDTO.TokenDto generateToken(String provider, String memberID, String authorities){
+        System.out.println("====================================");
+        System.out.println("Access To Generate Token");
+        System.out.println("====================================");
+
         // RefreshToken이 이미 있는 경우
-        if(redisService.getValues("RT("+provider+"):"+memberID)!=null)
-            redisService.deleteValues("RT("+provider+"):"+memberID);    // 삭제
+        if(redisService.getValues("RT("+provider+"):"+memberID)!=null) {
+            System.out.println("RefreshToken is already exists. Delete RefreshToken");
+            redisService.deleteValues("RT(" + provider + "):" + memberID);    // 삭제
+        }
 
         // AccessToken, RefreshToken 생성 및 Redis에 RefreshToken 저장
         AuthDTO.TokenDto tokenDto=jwtTokenProvider.createToken(memberID, authorities);
+        System.out.println("Get TokenDTO");
+        System.out.println("AccessToken : "+tokenDto.getAccessToken());
+        System.out.println("RefreshToken : "+tokenDto.getRefreshToken());
         saveRefreshToken(provider, memberID, tokenDto.getRefreshToken());
         return tokenDto;
     }
@@ -100,6 +121,10 @@ public class AuthService {
     // RfreshToken을 Redis에 저장
     @Transactional
     public void saveRefreshToken(String provider, String principal, String refreshToken){
+        System.out.println("====================================");
+        System.out.println("Access To SaveRefreshToken : "+refreshToken);;
+        System.out.println("====================================");
+
         redisService.setValuesWithTimeout("RT("+provider+"):"+principal,  //key
                 refreshToken,    // value
                 jwtTokenProvider.getTokenExpirationTime(refreshToken)); // timeout(milliseconds)

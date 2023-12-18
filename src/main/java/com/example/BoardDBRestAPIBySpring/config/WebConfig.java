@@ -119,16 +119,16 @@ public class WebConfig {
 		http.headers().frameOptions().sameOrigin();
 
 
-		http.logout()
-				.logoutUrl("/logout")	// 로그인과 마찬가지로 POST 요청이 와야 함
-				.addLogoutHandler(((request, response, authentication) -> {
-					HttpSession session=request.getSession();
-					if(session!=null){
-						session.invalidate();	// 세션 삭제
-					}
-				})).logoutSuccessHandler(((request, response, authentication) -> {
-					response.sendRedirect("/");
-				}));
+//		http.logout()
+//				.logoutUrl("/logout")	// 로그인과 마찬가지로 POST 요청이 와야 함
+//				.addLogoutHandler(((request, response, authentication) -> {
+//					HttpSession session=request.getSession();
+//					if(session!=null){
+//						session.invalidate();	// 세션 삭제
+//					}
+//				})).logoutSuccessHandler(((request, response, authentication) -> {
+//					response.sendRedirect("/");
+//				}));
 
         /* Spring Security 사용 시
         http.formLogin(f->f{

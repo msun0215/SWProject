@@ -36,7 +36,7 @@ public class JWTTokenProvider implements InitializingBean {
     private static Key signingKey;
 
     private final Long accessTokenValidityInMilliseconds;
-    private final Long refreshTokenValidityInMiliseconds;
+    private final Long refreshTokenValidityInMilliseconds;
 
 
     public JWTTokenProvider(
@@ -44,13 +44,13 @@ public class JWTTokenProvider implements InitializingBean {
             RedisService redisService,
             @Value("${jwt.secret}") String secretKey,
             @Value("${jwt.access-token-validity-in-seconds}") Long accessTokenValidityInMilliseconds,
-            @Value("${jwt.refresh-token-validity-in-seconds}") Long refreshTokenValidityInMiliseconds){
+            @Value("${jwt.refresh-token-validity-in-seconds}") Long refreshTokenValidityInMilliseconds){
         this.principalDetailsService=principalDetailsService;
         this.redisService=redisService;
         this.secretKey=secretKey;
         // seconds->milliseconds
         this.accessTokenValidityInMilliseconds=accessTokenValidityInMilliseconds*1000;
-        this.refreshTokenValidityInMiliseconds=refreshTokenValidityInMiliseconds*1000;
+        this.refreshTokenValidityInMilliseconds=refreshTokenValidityInMilliseconds*1000;
     }
 
     // Secret Key 설정
@@ -62,7 +62,10 @@ public class JWTTokenProvider implements InitializingBean {
 
     @Transactional
     public AuthDTO.TokenDto createToken(String memberID, String authorities){
-        System.out.println("createToken");
+        System.out.println("====================================");
+        System.out.println("Access To CreateToken");
+        System.out.println("====================================");
+
         Long now=System.currentTimeMillis();
 
         String accessToken= Jwts.builder()
@@ -80,7 +83,7 @@ public class JWTTokenProvider implements InitializingBean {
         String refreshToken= Jwts.builder()
                 .setHeaderParam("typ", "JWT")
                 .setHeaderParam("alg", "HS512")
-                .setExpiration(new Date(now+refreshTokenValidityInMiliseconds))
+                .setExpiration(new Date(now+refreshTokenValidityInMilliseconds))
                 .setSubject("refresh-token")
                 .signWith(signingKey, SignatureAlgorithm.HS512)
                 .compact();
@@ -88,7 +91,7 @@ public class JWTTokenProvider implements InitializingBean {
         System.out.println("accessToken : "+accessToken);
         System.out.println("refreshToken : "+refreshToken);
 
-        System.out.println(new AuthDTO.TokenDto(accessToken,refreshToken));
+        System.out.println("TokenDTO : "+new AuthDTO.TokenDto(accessToken,refreshToken));
         return new AuthDTO.TokenDto(accessToken,refreshToken);
     }
 
@@ -96,6 +99,8 @@ public class JWTTokenProvider implements InitializingBean {
     public Claims getClaims(String token){
         System.out.println("getClaims with : "+token);
         try{
+            System.out.println("getClaims return : "+Jwts.parserBuilder().setSigningKey(signingKey)
+                    .build().parseClaimsJws(token).getBody());
             return Jwts.parserBuilder().setSigningKey(signingKey)
                     .build().parseClaimsJws(token).getBody();
         }catch (ExpiredJwtException e) {  // Access Token

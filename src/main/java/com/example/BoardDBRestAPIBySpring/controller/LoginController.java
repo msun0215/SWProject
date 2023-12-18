@@ -21,6 +21,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.view.RedirectView;
 
 import java.util.Map;
 
@@ -78,8 +79,34 @@ public class LoginController {
     }
 
 
+//    @PostMapping(value = "/login", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+//    public ResponseEntity<?> loginByWWW(@Valid AuthDTO.LoginDto loginDto){
+//        String memberID = loginDto.getMemberID();
+//        String memberPW = loginDto.getMemberPW();
+//
+//        // Member 등록 및 RefreshToken 저장
+//        AuthDTO.TokenDto tokenDto=authService.login(loginDto);
+//
+//        // RefreshToken 저장
+//        HttpCookie httpCookie= ResponseCookie.from("refresh-token", tokenDto.getRefreshToken())
+//                .maxAge(COOKIE_EXPIRATION)
+//                .httpOnly(true)
+//                .secure(true)
+//                .build();
+//
+//        HttpHeaders headers=new HttpHeaders();
+//        headers.add(HttpHeaders.LOCATION,"/validate");
+//
+//
+//        return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, httpCookie.toString())
+//                .headers(headers)
+//                .header(HttpHeaders.AUTHORIZATION, "Bearer "+tokenDto.getAccessToken()) // AccessToken 저장
+//                .build();
+//    }
+
     @PostMapping(value = "/login", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
     public ResponseEntity<?> loginByWWW(@Valid AuthDTO.LoginDto loginDto){
+
         String memberID = loginDto.getMemberID();
         String memberPW = loginDto.getMemberPW();
 
@@ -93,14 +120,22 @@ public class LoginController {
                 .secure(true)
                 .build();
 
+        HttpHeaders headers=new HttpHeaders();
+        headers.add(HttpHeaders.LOCATION,"/validate");
+        headers.add(HttpHeaders.AUTHORIZATION, "Bearer "+tokenDto.getAccessToken());
 
         return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, httpCookie.toString())
-                .header(HttpHeaders.AUTHORIZATION, "Bearer "+tokenDto.getAccessToken()) // AccessToken 저장
-                .header(HttpHeaders.LOCATION,"/login/successLogin")
+                .headers(headers)
+//                .header(HttpHeaders.AUTHORIZATION, "Bearer "+tokenDto.getAccessToken()) // AccessToken 저장
                 .build();
+
+//        ModelAndView mv=new ModelAndView();
+//        mv.setView(new RedirectView("/validate"));   // validate 페이지로 이동
+
+//        return mv;
     }
 
-    @PostMapping("/validate")
+    @RequestMapping("/validate")
     public ResponseEntity<?> validate(@RequestHeader("Authorization") String requestAccessToken){
         if(!authService.validate(requestAccessToken))
             return ResponseEntity.status(HttpStatus.OK).build();    // 재발급 필요 없음
