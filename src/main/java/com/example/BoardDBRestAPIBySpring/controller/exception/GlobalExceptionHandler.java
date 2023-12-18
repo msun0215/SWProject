@@ -23,4 +23,22 @@ public class GlobalExceptionHandler {
 
         return ResponseEntity.status(e.getStatusCode()).body(errorResponse);
     }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    protected ResponseEntity<?> handleIllegalArgumentException(IllegalArgumentException e) {
+        final ErrorResponse errorResponse = ErrorResponse.builder()
+                .message(e.getMessage())
+                .build();
+
+        return ResponseEntity.status(500).body(errorResponse);
+    }
+
+    @ExceptionHandler(Exception.class)
+    protected ResponseEntity<?> handleAllException(Exception e) {
+        final ErrorResponse errorResponse = ErrorResponse.builder()
+                .message(e.getMessage())
+                .build();
+
+        return ResponseEntity.status(500).body(errorResponse);
+    }
 }

@@ -115,8 +115,6 @@ public class LoginController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();   // 재발급 필요
     }
 
-    // todo 권한 변경 게시글을 따로 볼 수 있게 Category 객체를 만들까?
-
     @GetMapping("/token")
     public ResponseEntity<TokenResponse> token(@RequestHeader("Authorization") String requestAccessToken) {
         if (authService.validate(requestAccessToken)) {
