@@ -10,6 +10,7 @@ import com.example.BoardDBRestAPIBySpring.request.ReplyEditRequest;
 import com.example.BoardDBRestAPIBySpring.response.RepliesResponse;
 import com.example.BoardDBRestAPIBySpring.response.ReplyResponse;
 import com.example.BoardDBRestAPIBySpring.service.ReplyService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
@@ -42,8 +43,8 @@ public class ReplyController {
 
     @PostMapping
     public ResponseEntity<ReplyResponse> createReply(@AuthenticationPrincipal final PrincipalDetails principalDetails,
-                                            @PathVariable final long boardId,
-                                            @RequestBody final ReplyCreateRequest request) {
+                                                     @PathVariable final long boardId,
+                                                     @Valid @RequestBody final ReplyCreateRequest request) {
 
         Member member = principalDetails.getMember();
         Reply reply = replyService.createReply(boardId, member, request);
@@ -56,7 +57,7 @@ public class ReplyController {
     @PutMapping("/{id}")
     public ResponseEntity<Void> editReply(@AuthenticationPrincipal PrincipalDetails principalDetails,
                                           @PathVariable final long boardId, @PathVariable final long id,
-                                          @RequestBody final ReplyEditRequest request) {
+                                          @Valid @RequestBody final ReplyEditRequest request) {
 
         Member member = principalDetails.getMember();
         ReplyEditDto dto = ReplyEditDto.builder()
