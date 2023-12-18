@@ -79,7 +79,7 @@ public class PostService {
 		RoleName currentRoleName = RoleName.findBy(member.getRoleName());
 		RoleName changeRoleName = RoleName.findBy(request.getChangeRole());
 		String title = String.format("[권한 변경] %s -> %s", currentRoleName, changeRoleName);
-		String content = String.format("%s의 현재 권한 %s을 %s로 변경하고 싶습니다.", member.getMemberName(), currentRoleName,
+		String content = String.format("%s의 현재 권한을 %s에서 %s로 변경하고 싶습니다.", member.getMemberName(), currentRoleName,
 				changeRoleName);
 		Board board = Board.from(title, content);
 		board.setMember(member);
