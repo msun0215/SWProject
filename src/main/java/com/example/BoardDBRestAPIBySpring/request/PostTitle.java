@@ -14,7 +14,7 @@ import java.lang.annotation.Target;
 @Documented
 public @interface PostTitle {
 
-    String message() default "Invalid Post Title";
+    String message() default "\"권한 변경\" 문구는 제목에 포함할 수 없습니다.";
 
     Class<?>[] groups() default { };
 
