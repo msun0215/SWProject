@@ -10,6 +10,7 @@ import com.example.BoardDBRestAPIBySpring.request.PostRoleChangeRequest;
 import com.example.BoardDBRestAPIBySpring.response.PostResponse;
 import com.example.BoardDBRestAPIBySpring.response.PostsResponse;
 import com.example.BoardDBRestAPIBySpring.service.PostService;
+import jakarta.validation.Valid;
 import java.net.URI;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -46,7 +47,7 @@ public class PostController {
 
 	@PostMapping
 	public ResponseEntity<Void> createBoard(@AuthenticationPrincipal PrincipalDetails principalDetails,
-											@RequestBody PostCreateRequest request) {
+											@Valid @RequestBody PostCreateRequest request) {
 
 		Member member = principalDetails.getMember();
 		postService.createBoard(member, request);
