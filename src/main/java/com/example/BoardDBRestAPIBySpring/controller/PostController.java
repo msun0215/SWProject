@@ -57,7 +57,8 @@ public class PostController {
 
 	@PutMapping("/{id}")
 	public ResponseEntity<Void> editBoard(@AuthenticationPrincipal PrincipalDetails principalDetails,
-										  @PathVariable Long id, @RequestBody PostEditRequest request) {
+										  @PathVariable Long id, @Valid @RequestBody PostEditRequest request) {
+
 		Member member = principalDetails.getMember();
 		PostEditDto dto = PostEditDto.builder()
 				.boardId(id)
@@ -84,7 +85,7 @@ public class PostController {
 
 	@PostMapping("/users/roles")
 	public ResponseEntity<Void> createRoleChangeBoard(@AuthenticationPrincipal PrincipalDetails principalDetails,
-													  @RequestBody PostRoleChangeRequest request) {
+													  @Valid @RequestBody PostRoleChangeRequest request) {
 
 		Member member = principalDetails.getMember();
 		postService.createRoleChangeBoard(member, request);
