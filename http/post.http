@@ -37,6 +37,13 @@ Content-Type: application/x-www-form-urlencoded
 %}
 
 
+### reissue
+POST http://localhost:8080/reissue
+Content-Type: application/json
+Authorization: {{access_token}}
+Cookie: refresh-token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJleHAiOjE3MDM1ODA3NjQsInN1YiI6InJlZnJlc2gtdG9rZW4ifQ.Il81Hy99gQ0mnmOh94myuHmp_V3BfoflYAE5QR78vIZ9GtJkpkncfPdCRTcJJTLK7DRlsR8u5iMXKpC_Yil5SA
+
+
 ### user list
 GET http://localhost:8080/user/list
 Authorization: {{access_token}}
@@ -60,7 +67,6 @@ Content-Type: application/json
 
 ### 게시글 수정
 PUT http://localhost:8080/boards/15
-Authorization: {{access_token}}
 Content-Type: application/json
 
 {

@@ -120,7 +120,7 @@ public class JWTTokenProvider implements InitializingBean {
     public boolean validateRefreshToken(String refreshToken){
         System.out.println("validateRefreshToken : "+refreshToken);
         try{
-            if(redisService.getValues(refreshToken).equals("delete"))   return false;  //회원 탈퇴?
+//            if(redisService.getValues(refreshToken).equals("delete"))   return false;  //회원 탈퇴?
 
             Jwts.parserBuilder().setSigningKey(signingKey).build().parseClaimsJws(refreshToken);
             return true;
