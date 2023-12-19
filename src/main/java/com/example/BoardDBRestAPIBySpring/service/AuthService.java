@@ -62,7 +62,7 @@ public class AuthService {
         Authentication authentication= jwtTokenProvider.getAuthentication(requestAccessToken);
         String principal = getPrincipal(requestAccessToken);
 
-        String refreshTokenInRedis = redisService.getValues("RT("+SERVER+")"+principal);
+        String refreshTokenInRedis = redisService.getValues("RT("+SERVER+"):"+principal);
         if(refreshTokenInRedis==null)       // Redis에 저장되어있는 RefreshToken이 없을 경우
             return null;                    // 재로그인 요청
 
