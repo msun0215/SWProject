@@ -2,7 +2,9 @@ package com.example.BoardDBRestAPIBySpring.service;
 
 import com.example.BoardDBRestAPIBySpring.config.jwt.JWTProperties;
 import com.example.BoardDBRestAPIBySpring.config.jwt.JWTTokenProvider;
+import com.example.BoardDBRestAPIBySpring.controller.handler.CustomAuthFailureHandler;
 import com.example.BoardDBRestAPIBySpring.domain.AuthDTO;
+import com.example.BoardDBRestAPIBySpring.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -10,6 +12,7 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,7 +34,8 @@ public class AuthService {
     private final JWTTokenProvider jwtTokenProvider;
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
     private final RedisService redisService;
-
+    private final CustomAuthFailureHandler customAuthFailureHandler;
+    private final MemberRepository memberRepository;
     private final String SERVER="Server";
     // RefreshToken을 생성한 후 Redis에 {key:RT({발급자}):{memberID}, value:{RT}} 형식으로 저장
     // Oauth2.0 OPEN API 적용 시 사용함
@@ -43,15 +47,21 @@ public class AuthService {
         System.out.println("Access To Login");
         System.out.println("====================================");
 
-        UsernamePasswordAuthenticationToken authenticationToken=
-                new UsernamePasswordAuthenticationToken(loginDto.getMemberID(), loginDto.getMemberPW());
 
-        Authentication authentication=authenticationManagerBuilder.getObject()
-                .authenticate(authenticationToken);
+        if(memberRepository.findByMemberID(loginDto.getMemberID())==null){
+            log.debug("memberID doesn't exists");
+            return null;
+        }else {
+            UsernamePasswordAuthenticationToken authenticationToken =
+                    new UsernamePasswordAuthenticationToken(loginDto.getMemberID(), loginDto.getMemberPW());
 
-        SecurityContextHolder.getContext().setAuthentication(authentication);
+            Authentication authentication = authenticationManagerBuilder.getObject()
+                    .authenticate(authenticationToken);
 
-        return generateToken(SERVER, authentication.getName(), getAuthorities(authentication));
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+
+            return generateToken(SERVER, authentication.getName(), getAuthorities(authentication));
+        }
     }
 
     // AccessToken이 만료일자만 초과한 유효한 Token인지 검사

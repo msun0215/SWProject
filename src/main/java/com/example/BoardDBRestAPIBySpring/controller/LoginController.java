@@ -6,6 +6,7 @@ import com.example.BoardDBRestAPIBySpring.repository.MemberRepository;
 import com.example.BoardDBRestAPIBySpring.repository.RoleRepository;
 import com.example.BoardDBRestAPIBySpring.service.AuthService;
 import com.example.BoardDBRestAPIBySpring.service.MemberService;
+import com.example.BoardDBRestAPIBySpring.service.ThymeleafUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -19,10 +20,13 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.view.RedirectView;
 
+import java.net.URI;
+import java.util.HashMap;
 import java.util.Map;
 
 // https://velog.io/@u-nij/
@@ -59,23 +63,40 @@ public class LoginController {
 
     // 로그인->Token 발급
     @PostMapping(value = "/login", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> loginByJson(@RequestBody @Valid AuthDTO.LoginDto loginDto){
+    public ResponseEntity<?> loginByJson(Model model, @RequestBody @Valid AuthDTO.LoginDto loginDto) {
         String memberID = loginDto.getMemberID();
         String memberPW = loginDto.getMemberPW();
 
         // Member 등록 및 RefreshToken 저장
-        AuthDTO.TokenDto tokenDto=authService.login(loginDto);
+        AuthDTO.TokenDto tokenDto = authService.login(loginDto);
 
-        // RefreshToken 저장
-        HttpCookie httpCookie= ResponseCookie.from("refresh-token", tokenDto.getRefreshToken())
-                .maxAge(COOKIE_EXPIRATION)
-                .httpOnly(true)
-                .secure(true)
-                .build();
+        if(tokenDto==null){
+            Map<String, Object> data=new HashMap<>();
+            data.put("message", "등록된 정보가 없습니다. 다시 시도해주세요!");
+            data.put("href", "loginForm");
 
-        return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, httpCookie.toString())
-                .header(HttpHeaders.AUTHORIZATION, "Bearer "+tokenDto.getAccessToken()) // AccessToken 저장
-                .build();
+            HttpHeaders headers=new HttpHeaders();
+            headers.setContentType(MediaType.TEXT_HTML);
+            model.addAttribute("data", data);
+            String htmlContent= ThymeleafUtil.processTemplate("message", model);
+            return new ResponseEntity<>(htmlContent, headers,HttpStatus.OK);
+        } else {
+            // RefreshToken 저장
+            HttpCookie httpCookie = ResponseCookie.from("refresh-token", tokenDto.getRefreshToken())
+                    .maxAge(COOKIE_EXPIRATION)
+                    .httpOnly(true)
+                    .secure(true)
+                    .build();
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.add(HttpHeaders.LOCATION, "/validate");
+            headers.add(HttpHeaders.AUTHORIZATION, "Bearer " + tokenDto.getAccessToken());
+
+            return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, httpCookie.toString())
+                    .headers(headers)
+//                .header(HttpHeaders.AUTHORIZATION, "Bearer "+tokenDto.getAccessToken()) // AccessToken 저장
+                    .build();
+        }
     }
 
 
@@ -105,30 +126,43 @@ public class LoginController {
 //    }
 
     @PostMapping(value = "/login", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-    public ResponseEntity<?> loginByWWW(@Valid AuthDTO.LoginDto loginDto){
+    public ResponseEntity<?> loginByWWW(Model model, @Valid AuthDTO.LoginDto loginDto){
 
         String memberID = loginDto.getMemberID();
         String memberPW = loginDto.getMemberPW();
 
+
         // Member 등록 및 RefreshToken 저장
         AuthDTO.TokenDto tokenDto=authService.login(loginDto);
 
-        // RefreshToken 저장
-        HttpCookie httpCookie= ResponseCookie.from("refresh-token", tokenDto.getRefreshToken())
-                .maxAge(COOKIE_EXPIRATION)
-                .httpOnly(true)
-                .secure(true)
-                .build();
+        if(tokenDto==null){
+            Map<String, Object> data=new HashMap<>();
+            data.put("message", "등록된 정보가 없습니다. 다시 시도해주세요!");
+            data.put("href", "loginForm");
 
-        HttpHeaders headers=new HttpHeaders();
-        headers.add(HttpHeaders.LOCATION,"/validate");
-        headers.add(HttpHeaders.AUTHORIZATION, "Bearer "+tokenDto.getAccessToken());
+            HttpHeaders headers=new HttpHeaders();
+            headers.setContentType(MediaType.TEXT_HTML);
+            model.addAttribute("data", data);
+            String htmlContent= ThymeleafUtil.processTemplate("message", model);
+            return new ResponseEntity<>(htmlContent, headers,HttpStatus.OK);
+        }
+        else {
+            // RefreshToken 저장
+            HttpCookie httpCookie = ResponseCookie.from("refresh-token", tokenDto.getRefreshToken())
+                    .maxAge(COOKIE_EXPIRATION)
+                    .httpOnly(true)
+                    .secure(true)
+                    .build();
 
-        return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, httpCookie.toString())
-                .headers(headers)
+            HttpHeaders headers = new HttpHeaders();
+            headers.add(HttpHeaders.LOCATION, "/validate");
+            headers.add(HttpHeaders.AUTHORIZATION, "Bearer " + tokenDto.getAccessToken());
+
+            return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, httpCookie.toString())
+                    .headers(headers)
 //                .header(HttpHeaders.AUTHORIZATION, "Bearer "+tokenDto.getAccessToken()) // AccessToken 저장
-                .build();
-
+                    .build();
+        }
 //        ModelAndView mv=new ModelAndView();
 //        mv.setView(new RedirectView("/validate"));   // validate 페이지로 이동
 
@@ -201,23 +235,30 @@ public class LoginController {
         ModelAndView modelAndView=new ModelAndView();
         Member member=new Member();
         //member.setRole("ROLE_USER");
+        if(memberRepository.findByMemberID(reqmember.getMemberID())!=null){
+            modelAndView.addObject("data",
+                    new Message("이미 존재하는 회원입니다! 다시 입력해주세요.", "joinForm"));
+            modelAndView.setViewName("message");
+            return modelAndView;
+        }
+        else {
+            // 회원가입은 잘 되나 저장한 비밀번호로 저장됨
+            // =>Security로 로그인을 할 수가 없음
+            // Password가 Encrypt 되지 않았기 때문
+            member.setMemberID(reqmember.getMemberID());
+            member.setMemberPW(bCryptPasswordEncoder.encode(reqmember.getMemberPW())); // 비밀번호 암호화
+            member.setMemberName(reqmember.getMemberName());
+            member.setMemberNickname(reqmember.getMemberNickname());
+            Role roleWithId3 = roleRepository.findByRoleID(3L);     // 기본적으로 회원가입 할 경우 ROLE_USER로 등록
+            member.setRoles(roleWithId3);
+            memberRepository.save(member);
 
-        // 회원가입은 잘 되나 저장한 비밀번호로 저장됨
-        // =>Security로 로그인을 할 수가 없음
-        // Password가 Encrypt 되지 않았기 때문
-        member.setMemberID(reqmember.getMemberID());
-        member.setMemberPW(bCryptPasswordEncoder.encode(reqmember.getMemberPW())); // 비밀번호 암호화
-        member.setMemberName(reqmember.getMemberName());
-        member.setMemberNickname(reqmember.getMemberNickname());
-        Role roleWithId3 = roleRepository.findByRoleID(3L);     // 기본적으로 회원가입 할 경우 ROLE_USER로 등록
-        member.setRoles(roleWithId3);
-        memberRepository.save(member);
+            modelAndView.addObject("data",
+                    new Message("회원가입이 완료되었습니다! 로그인을 진행해주세요", "loginForm"));
+            modelAndView.setViewName("message");
 
-        modelAndView.addObject("data",
-                new Message("회원가입이 완료되었습니다! 로그인을 진행해주세요","loginForm"));
-        modelAndView.setViewName("message");
-
-        return modelAndView;   // member 저장이 완료되면 loginForm으로 되돌아가기
+            return modelAndView;   // member 저장이 완료되면 loginForm으로 되돌아가기
+        }
     }
 /*
     @GetMapping("/login")

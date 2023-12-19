@@ -34,19 +34,22 @@ public class PrincipalDetailsService implements UserDetailsService {
     public UserDetails loadUserByUsername(String memberID) throws UsernameNotFoundException {
         // String memberID loginForm.html에서 넘어온 input name="memberID"
         System.out.println("PrincipalDetailsService의 loadUserByusername() : "  +memberID);
-        Member memberEntity = memberRepository.findByMemberID(memberID);
 
-        System.out.println("PrincipalDetailsService에서 찾은 Member Entity : "+memberEntity);
-        if(memberEntity!=null){       // memberID로 찾은 memberEntity가 존재한다면
-            System.out.println("memberEntity [["+memberEntity+"]] return 성공!");
-            PrincipalDetails principalDetails=new PrincipalDetails(memberEntity);
-            System.out.println("loadUserByUsername에서 찾은 principalDetails : "+principalDetails);
-            return principalDetails;
-        }
-        else{
-            System.out.println(memberID+"의 memberEntity를 찾을 수 없습니다.");
-            return null;
-        }
+
+            Member memberEntity = memberRepository.findByMemberID(memberID);
+
+
+            System.out.println("PrincipalDetailsService에서 찾은 Member Entity : " + memberEntity);
+            if (memberEntity != null) {       // memberID로 찾은 memberEntity가 존재한다면
+                System.out.println("memberEntity [[" + memberEntity + "]] return 성공!");
+                PrincipalDetails principalDetails = new PrincipalDetails(memberEntity);
+                System.out.println("loadUserByUsername에서 찾은 principalDetails : " + principalDetails);
+                return principalDetails;
+            } else {
+                System.out.println(memberID + "의 memberEntity를 찾을 수 없습니다.");
+                return null;
+            }
+
     }
 
 

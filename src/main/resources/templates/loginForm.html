@@ -16,17 +16,10 @@
                 <input type="password" class="form-control" name="memberPW" placeholder="비밀번호를 입력해주세요">
             </div>
 
-            <span>
-                {{#error}}
-                    <p id="valid" class="alert alert-danger">{{Exception}}</p>
-                {{/error}}
-            </span>
             <button>로그인</button>
         </form>
         <BR/><BR/><BR/>
-        <a href="/oauth2/authorization/google">Google Login</a><br/>
-        <a href="/oauth2/authorization/facebook">Facebook Login</a><br/>
-        <a href="/oauth2/authorization/naver">Naver Login</a><br/>
+
         <!-- /oauth2/authorization/~은 Spring Security의 규칙임-->
         <a href="/joinForm">아직 회원이 아니신가요?</a>
     </body>

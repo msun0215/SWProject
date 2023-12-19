@@ -2,9 +2,12 @@ package com.example.BoardDBRestAPIBySpring.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Duration;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 @Service
@@ -37,5 +40,20 @@ public class RedisService {
     @Transactional
     public void deleteValues(String key){
         redisTemplate.delete(key);
+    }
+
+//    public void setValues(String authCodePrefix, String toEmail, String authCode, Duration duration) {
+//        String key = authCodePrefix+toEmail;
+//        String Email = toEmail.substring(9).replace("%40","@");
+//        String value = authCode+duration;
+//        redisTemplate.opsForValue().set(key,value);
+//        redisTemplate.set
+//    }
+
+    @Transactional
+    public boolean checkExistsValue(String value, String key){
+        System.out.println("check key : "+key);
+        System.out.println("check value : "+value);
+        return redisTemplate.opsForValue().get(key).equals(value);
     }
 }
