@@ -15,7 +15,6 @@ import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpCookie;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -24,7 +23,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -69,19 +67,15 @@ public class LoginController {
         String memberID = loginDto.getMemberID();
         String memberPW = loginDto.getMemberPW();
 
+        if(memberRepository.findByMemberID(loginDto.getMemberID())==null){
+            throw new IllegalArgumentException("등록된 정보가 없습니다. 다시 시도해주세요!");
+        }
+
         // Member 등록 및 RefreshToken 저장
         AuthDTO.TokenDto tokenDto=authService.login(loginDto);
 
-        // RefreshToken 저장
-        HttpCookie httpCookie= ResponseCookie.from("refresh-token", tokenDto.getRefreshToken())
-                .maxAge(COOKIE_EXPIRATION)
-                .httpOnly(true)
-                .secure(true)
-                .build();
-
-        return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, httpCookie.toString())
-                .header(HttpHeaders.AUTHORIZATION, "Bearer "+tokenDto.getAccessToken()) // AccessToken 저장
-                .build();
+        return ResponseEntity.ok()
+                .body(tokenDto);
     }
 
 
@@ -90,21 +84,15 @@ public class LoginController {
         String memberID = loginDto.getMemberID();
         String memberPW = loginDto.getMemberPW();
 
+        if(memberRepository.findByMemberID(loginDto.getMemberID())==null){
+            throw new IllegalArgumentException("등록된 정보가 없습니다. 다시 시도해주세요!");
+        }
+
         // Member 등록 및 RefreshToken 저장
         AuthDTO.TokenDto tokenDto=authService.login(loginDto);
 
-        // RefreshToken 저장
-        HttpCookie httpCookie= ResponseCookie.from("refresh-token", tokenDto.getRefreshToken())
-                .maxAge(COOKIE_EXPIRATION)
-                .httpOnly(true)
-                .secure(true)
-                .build();
-
-
-        return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, httpCookie.toString())
-                .header(HttpHeaders.AUTHORIZATION, "Bearer "+tokenDto.getAccessToken()) // AccessToken 저장
-                .header(HttpHeaders.LOCATION,"/login/successLogin")
-                .build();
+        return ResponseEntity.ok()
+                .body(tokenDto);
     }
 
     @PostMapping("/validate")
@@ -138,24 +126,16 @@ public class LoginController {
 
     // 토큰 재발급
     @PostMapping("/reissue")
-    public ResponseEntity<?> reissue(@CookieValue(name="refresh-token") String requestRefreshToken,
+    public ResponseEntity<?> reissue(@RequestHeader("Refresh-Token") String requestRefreshToken,
                                     @RequestHeader("Authorization") String requestAccessToken) {
         AuthDTO.TokenDto reissuedTokenDto = authService.reissue(requestAccessToken, requestRefreshToken);
 
         if (reissuedTokenDto != null) {     // 토큰 재발급 성공
-            ResponseCookie responseCookie = ResponseCookie.from("refresh-token", reissuedTokenDto.getRefreshToken())
-                    .maxAge(COOKIE_EXPIRATION).httpOnly(true).secure(true).build();
-
-            return ResponseEntity.status(HttpStatus.OK)
-                    .header(HttpHeaders.SET_COOKIE, responseCookie.toString())  // AccessToken 저장
-                    .header(HttpHeaders.AUTHORIZATION, "Bearer " + reissuedTokenDto.getAccessToken()).build();
+            return ResponseEntity.ok()
+                    .body(reissuedTokenDto);
         } else {     // Refresh Token 탈취 가능성
             // Cookie 삭제 후 재로그인 유도
-            ResponseCookie responseCookie = ResponseCookie.from("refresh-token", "")
-                    .maxAge(0).path("/").build();
-
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .header(HttpHeaders.SET_COOKIE, responseCookie.toString()).build();
+            throw new IllegalArgumentException("다시 로그인하세요.");
         }
     }
 
@@ -191,6 +171,10 @@ public class LoginController {
         Member member=new Member();
         //member.setRole("ROLE_USER");
 
+        if(memberRepository.findByMemberID(reqmember.getMemberID())!=null){
+            throw new IllegalArgumentException("이미 존재하는 회원입니다! 다시 입력해주세요.");
+        }
+
         // 회원가입은 잘 되나 저장한 비밀번호로 저장됨
         // =>Security로 로그인을 할 수가 없음
         // Password가 Encrypt 되지 않았기 때문
@@ -203,7 +187,7 @@ public class LoginController {
         memberRepository.save(member);
 
         modelAndView.addObject("data",
-                new Message("회원가입이 완료되었습니다! 로그인을 진행해주세요","loginForm"));
+                new Message("회원가입이 완료되었습니다! 로그인을 진행해주세요", "loginForm"));
         modelAndView.setViewName("message");
 
         return modelAndView;   // member 저장이 완료되면 loginForm으로 되돌아가기
