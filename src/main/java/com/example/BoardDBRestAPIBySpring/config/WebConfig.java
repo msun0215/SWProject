@@ -1,12 +1,14 @@
 package com.example.BoardDBRestAPIBySpring.config;
 
-import com.example.BoardDBRestAPIBySpring.config.jwt.*;
+import com.example.BoardDBRestAPIBySpring.config.jwt.CustomAuthenticationFilter;
+import com.example.BoardDBRestAPIBySpring.config.jwt.CustomAuthenticationProvider;
+import com.example.BoardDBRestAPIBySpring.config.jwt.JWTTokenProvider;
+import com.example.BoardDBRestAPIBySpring.config.jwt.TokenUtils;
 import com.example.BoardDBRestAPIBySpring.controller.handler.CustomAuthFailureHandler;
 import com.example.BoardDBRestAPIBySpring.controller.handler.CustomLoginSuccessHandler;
 import com.example.BoardDBRestAPIBySpring.controller.handler.JwtAccessDeniedHandler;
 import com.example.BoardDBRestAPIBySpring.controller.handler.JwtAuthenticationEntryPoint;
 import com.example.BoardDBRestAPIBySpring.repository.MemberRepository;
-import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,15 +21,12 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
-import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.filter.CorsFilter;
-import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
 @Log4j2
 @Configuration
@@ -119,16 +118,16 @@ public class WebConfig {
 		http.headers().frameOptions().sameOrigin();
 
 
-		http.logout()
-				.logoutUrl("/logout")	// 로그인과 마찬가지로 POST 요청이 와야 함
-				.addLogoutHandler(((request, response, authentication) -> {
-					HttpSession session=request.getSession();
-					if(session!=null){
-						session.invalidate();	// 세션 삭제
-					}
-				})).logoutSuccessHandler(((request, response, authentication) -> {
-					response.sendRedirect("/");
-				}));
+//		http.logout()
+//				.logoutUrl("/logout")	// 로그인과 마찬가지로 POST 요청이 와야 함
+//				.addLogoutHandler(((request, response, authentication) -> {
+//					HttpSession session=request.getSession();
+//					if(session!=null){
+//						session.invalidate();	// 세션 삭제
+//					}
+//				})).logoutSuccessHandler(((request, response, authentication) -> {
+//					response.sendRedirect("/");
+//				}));
 
         /* Spring Security 사용 시
         http.formLogin(f->f{

@@ -2,7 +2,9 @@ package com.example.BoardDBRestAPIBySpring.service;
 
 import com.example.BoardDBRestAPIBySpring.config.jwt.JWTProperties;
 import com.example.BoardDBRestAPIBySpring.config.jwt.JWTTokenProvider;
+import com.example.BoardDBRestAPIBySpring.controller.handler.CustomAuthFailureHandler;
 import com.example.BoardDBRestAPIBySpring.domain.AuthDTO;
+import com.example.BoardDBRestAPIBySpring.repository.MemberRepository;
 import java.util.Date;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -30,7 +32,8 @@ public class AuthService {
     private final JWTTokenProvider jwtTokenProvider;
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
     private final RedisService redisService;
-
+    private final CustomAuthFailureHandler customAuthFailureHandler;
+    private final MemberRepository memberRepository;
     private final String SERVER="Server";
     // RefreshToken을 생성한 후 Redis에 {key:RT({발급자}):{memberID}, value:{RT}} 형식으로 저장
     // Oauth2.0 OPEN API 적용 시 사용함
@@ -38,19 +41,33 @@ public class AuthService {
     // 로그인 : 인증 정보 저장 및 Bearer 토큰 발급
     @Transactional
     public AuthDTO.TokenDto login(AuthDTO.LoginDto loginDto){
-        UsernamePasswordAuthenticationToken authenticationToken=
-                new UsernamePasswordAuthenticationToken(loginDto.getMemberID(), loginDto.getMemberPW());
+        System.out.println("====================================");
+        System.out.println("Access To Login");
+        System.out.println("====================================");
 
-        Authentication authentication=authenticationManagerBuilder.getObject()
-                .authenticate(authenticationToken);
 
-        SecurityContextHolder.getContext().setAuthentication(authentication);
+        if(memberRepository.findByMemberID(loginDto.getMemberID())==null){
+            log.debug("memberID doesn't exists");
+            return null;
+        }else {
+            UsernamePasswordAuthenticationToken authenticationToken =
+                    new UsernamePasswordAuthenticationToken(loginDto.getMemberID(), loginDto.getMemberPW());
 
-        return generateToken(SERVER, authentication.getName(), getAuthorities(authentication));
+            Authentication authentication = authenticationManagerBuilder.getObject()
+                    .authenticate(authenticationToken);
+
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+
+            return generateToken(SERVER, authentication.getName(), getAuthorities(authentication));
+        }
     }
 
     // AccessToken이 만료일자만 초과한 유효한 Token인지 검사
     public boolean validate(String requestAccessTokenInHeader){
+        System.out.println("====================================");
+        System.out.println("Access To Validate AccessToken");
+        System.out.println("====================================");
+
         String requestAccessToken=resolveToken(requestAccessTokenInHeader);
         return jwtTokenProvider.validateAccessTokenOnlyExpired(requestAccessToken); // true->재발급
     }
@@ -58,11 +75,15 @@ public class AuthService {
     // Token 재발급 : validate 메서드가 true를 반환할 때만 사용함 -> AccessToken, RefreshToken 재발급
     @Transactional
     public AuthDTO.TokenDto reissue(String requestAccessTokenInHeader, String requestRefreshToken){
+        System.out.println("====================================");
+        System.out.println("Access To reissue AccessToken");
+        System.out.println("====================================");
+
         String requestAccessToken=resolveToken(requestAccessTokenInHeader);
         Authentication authentication= jwtTokenProvider.getAuthentication(requestAccessToken);
         String principal = getPrincipal(requestAccessToken);
 
-        String refreshTokenInRedis = redisService.getValues("RT("+SERVER+"):"+principal);
+        String refreshTokenInRedis = redisService.getValues("RT("+SERVER+")"+principal);
         if(refreshTokenInRedis==null)       // Redis에 저장되어있는 RefreshToken이 없을 경우
             return null;                    // 재로그인 요청
 
@@ -85,12 +106,21 @@ public class AuthService {
     // Token 발급
     @Transactional
     public AuthDTO.TokenDto generateToken(String provider, String memberID, String authorities){
+        System.out.println("====================================");
+        System.out.println("Access To Generate Token");
+        System.out.println("====================================");
+
         // RefreshToken이 이미 있는 경우
-        if(redisService.getValues("RT("+provider+"):"+memberID)!=null)
-            redisService.deleteValues("RT("+provider+"):"+memberID);    // 삭제
+        if(redisService.getValues("RT("+provider+"):"+memberID)!=null) {
+            System.out.println("RefreshToken is already exists. Delete RefreshToken");
+            redisService.deleteValues("RT(" + provider + "):" + memberID);    // 삭제
+        }
 
         // AccessToken, RefreshToken 생성 및 Redis에 RefreshToken 저장
         AuthDTO.TokenDto tokenDto=jwtTokenProvider.createToken(memberID, authorities);
+        System.out.println("Get TokenDTO");
+        System.out.println("AccessToken : "+tokenDto.getAccessToken());
+        System.out.println("RefreshToken : "+tokenDto.getRefreshToken());
         saveRefreshToken(provider, memberID, tokenDto.getRefreshToken());
         return tokenDto;
     }
@@ -99,6 +129,10 @@ public class AuthService {
     // RfreshToken을 Redis에 저장
     @Transactional
     public void saveRefreshToken(String provider, String principal, String refreshToken){
+        System.out.println("====================================");
+        System.out.println("Access To SaveRefreshToken : "+refreshToken);;
+        System.out.println("====================================");
+
         redisService.setValuesWithTimeout("RT("+provider+"):"+principal,  //key
                 refreshToken,    // value
                 jwtTokenProvider.getTokenExpirationTime(refreshToken)); // timeout(milliseconds)

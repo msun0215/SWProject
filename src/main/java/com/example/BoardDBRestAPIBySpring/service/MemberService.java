@@ -1,9 +1,14 @@
 package com.example.BoardDBRestAPIBySpring.service;
 
 import com.example.BoardDBRestAPIBySpring.config.jwt.TokenUtils;
+import com.example.BoardDBRestAPIBySpring.domain.Member;
 import com.example.BoardDBRestAPIBySpring.domain.Token;
 import com.example.BoardDBRestAPIBySpring.repository.MemberRepository;
+import com.example.BoardDBRestAPIBySpring.service.exception.BusinessLogicException;
+import com.example.BoardDBRestAPIBySpring.service.exception.ExceptionCode;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
@@ -11,6 +16,13 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
+import java.time.Duration;
+import java.util.Optional;
+import java.util.Random;
+
+@Slf4j
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
@@ -18,6 +30,7 @@ public class MemberService {
     private final MemberRepository memberRepository;
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
     private final TokenUtils tokenUtils;
+
 
     /*
      * 1. 로그인 요청으로 들어온 ID, PWD 기반으로 Authentication 객체 생성
@@ -38,4 +51,5 @@ public class MemberService {
         // 3. 인증 정보를 기반으로 JWT 토큰 생성
         return tokenUtils.createToken(authentication);
     }
+
 }

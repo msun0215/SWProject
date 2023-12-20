@@ -23,6 +23,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -40,7 +42,6 @@ import org.springframework.web.servlet.ModelAndView;
 public class LoginController {
     private final MemberService memberService;
     private final AuthService authService;
-    private final long COOKIE_EXPIRATION=7776000;       // 90일
     @Autowired
     private BCryptPasswordEncoder bCryptPasswordEncoder;    // 암호화
     @Autowired
@@ -63,39 +64,41 @@ public class LoginController {
 
     // 로그인->Token 발급
     @PostMapping(value = "/login", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> loginByJson(@RequestBody @Valid AuthDTO.LoginDto loginDto){
+    public ResponseEntity<?> loginByJson(Model model, @RequestBody @Valid AuthDTO.LoginDto loginDto) {
         String memberID = loginDto.getMemberID();
         String memberPW = loginDto.getMemberPW();
 
-        if(memberRepository.findByMemberID(loginDto.getMemberID())==null){
-            throw new IllegalArgumentException("등록된 정보가 없습니다. 다시 시도해주세요!");
-        }
-
         // Member 등록 및 RefreshToken 저장
-        AuthDTO.TokenDto tokenDto=authService.login(loginDto);
+        AuthDTO.TokenDto tokenDto = authService.login(loginDto);
 
-        return ResponseEntity.ok()
-                .body(tokenDto);
+        if(tokenDto==null){
+            throw new IllegalArgumentException("등록된 정보가 없습니다. 다시 시도해주세요!");
+        } else {
+            return ResponseEntity.ok()
+                    .body(tokenDto);
+        }
     }
 
 
     @PostMapping(value = "/login", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-    public ResponseEntity<?> loginByWWW(@Valid AuthDTO.LoginDto loginDto){
+    public ResponseEntity<?> loginByWWW(Model model, @Valid AuthDTO.LoginDto loginDto){
         String memberID = loginDto.getMemberID();
         String memberPW = loginDto.getMemberPW();
 
-        if(memberRepository.findByMemberID(loginDto.getMemberID())==null){
-            throw new IllegalArgumentException("등록된 정보가 없습니다. 다시 시도해주세요!");
-        }
 
         // Member 등록 및 RefreshToken 저장
         AuthDTO.TokenDto tokenDto=authService.login(loginDto);
 
-        return ResponseEntity.ok()
-                .body(tokenDto);
+        if(tokenDto==null){
+            throw new IllegalArgumentException("등록된 정보가 없습니다. 다시 시도해주세요!");
+        }
+        else {
+            return ResponseEntity.ok()
+                    .body(tokenDto);
+        }
     }
 
-    @PostMapping("/validate")
+    @RequestMapping("/validate")
     public ResponseEntity<?> validate(@RequestHeader("Authorization") String requestAccessToken){
         if(!authService.validate(requestAccessToken))
             return ResponseEntity.status(HttpStatus.OK).build();    // 재발급 필요 없음
@@ -126,7 +129,7 @@ public class LoginController {
 
     // 토큰 재발급
     @PostMapping("/reissue")
-    public ResponseEntity<?> reissue(@RequestHeader("Refresh-Token") String requestRefreshToken,
+    public ResponseEntity<?> reissue(@CookieValue(name="refresh-token") String requestRefreshToken,
                                     @RequestHeader("Authorization") String requestAccessToken) {
         AuthDTO.TokenDto reissuedTokenDto = authService.reissue(requestAccessToken, requestRefreshToken);
 
