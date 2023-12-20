@@ -62,7 +62,7 @@ public class MailService {
         checkDuplicatedEmail(toEmail); // 중복 확인
         System.out.println("Complete to Check DuplicatedEmail");
         String title = "SWProject 이메일 인증번호입니다.";
-        String authCode=createCode();
+        String authCode="SWProject 이메일 인증번호입니다.\n인증번호의 유효시간은 5분입니다.\n"+createCode();
         System.out.println("sendCodeToEmail에서 authCode : "+authCode);
         sendEmail(toEmail, title, authCode);
 

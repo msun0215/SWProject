@@ -59,7 +59,7 @@ spring:
           connectiontimeout: 5000
           timeout: 5000
           writetimeout: 5000
-    auth-code-expiration-millis: 1800000  # 30*60*1000==30min
+    auth-code-expiration-millis: 300000  # 5*60*1000==5min
 
 jwt:
   secret: TXlTV1Byb2plY3RVc2luZ0pXVHdpdGhTcHJpbmdCb290QW5kU3ByaW5nU2VjdXJpdHk=TXlTV1Byb2plY3RVc2luZ0pXVHdpdGhTcHJpbmdCb290QW5kU3ByaW5nU2VjdXJpdHk= # 임의의 문자열을 Base64로 인코딩한 값
