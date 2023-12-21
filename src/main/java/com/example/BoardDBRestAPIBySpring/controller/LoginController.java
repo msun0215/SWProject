@@ -39,16 +39,13 @@ import org.springframework.web.servlet.ModelAndView;
 public class LoginController {
     private final MemberService memberService;
     private final AuthService authService;
+    private final long COOKIE_EXPIRATION=7776000;       // 90일
     @Autowired
     private BCryptPasswordEncoder bCryptPasswordEncoder;    // 암호화
     @Autowired
     private MemberRepository memberRepository;
     @Autowired
     private RoleRepository roleRepository;
-
-//    Role role1=roleRepository.save(new Role(1,"ROLE_ADMIN"));
-//    Role role2=roleRepository.save(new Role(2,"ROLE_MANAGER"));
-//    Role role3=roleRepository.save(new Role(3,"ROLE_USER"));
 
     @GetMapping({"", "/"})
     // @RestController를 사용할 경우 ModelAndView를 사용해야 html 페이지로 이동할 수 있다.
@@ -77,8 +74,10 @@ public class LoginController {
     }
 
 
+
     @PostMapping(value = "/login", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
     public ResponseEntity<?> loginByWWW(Model model, @Valid AuthDTO.LoginDto loginDto){
+
         String memberID = loginDto.getMemberID();
         String memberPW = loginDto.getMemberPW();
 
@@ -93,6 +92,7 @@ public class LoginController {
             return ResponseEntity.ok()
                     .body(tokenDto);
         }
+
     }
 
     @RequestMapping("/validate")
@@ -146,6 +146,7 @@ public class LoginController {
         return ResponseEntity.ok().build();
     }
 
+
     @GetMapping("/user/list")
     public ResponseEntity<MemberResponseDTO> findAll(){
         final MemberResponseDTO memberResponseDTO=MemberResponseDTO.builder()
@@ -153,6 +154,7 @@ public class LoginController {
 
         return ResponseEntity.ok(memberResponseDTO);
     }
+
 
     @GetMapping("login/successLogin")
     public ModelAndView successLogin(ModelAndView mv, @RequestHeader("Authorization") String requestAccessToken){
@@ -167,7 +169,6 @@ public class LoginController {
         ModelAndView modelAndView=new ModelAndView();
         Member member=new Member();
         //member.setRole("ROLE_USER");
-
         if(memberRepository.findByMemberID(reqmember.getMemberID())!=null){
             throw new IllegalArgumentException("이미 존재하는 회원입니다! 다시 입력해주세요.");
         }
@@ -190,12 +191,6 @@ public class LoginController {
         return modelAndView;   // member 저장이 완료되면 loginForm으로 되돌아가기
     }
 
-    @GetMapping("/loginForm")
-    public ModelAndView loginForm(){
-        ModelAndView modelAndView=new ModelAndView();
-        modelAndView.setViewName("loginForm");
-        return modelAndView;
-    }
 /*
     @GetMapping("/login")
     public String login(@RequestParam(value = "error", required = false) String error, @RequestParam(value="exception", required = false) String exception, Model model){
@@ -214,6 +209,13 @@ public ResponseEntity<Void> logout(HttpServletRequest servletRequest) {
 }
 
      */
+
+    @GetMapping("/loginForm")
+    public ModelAndView loginForm(){
+        ModelAndView modelAndView=new ModelAndView();
+        modelAndView.setViewName("loginForm");
+        return modelAndView;
+    }
 
     @GetMapping("/joinForm")
     public ModelAndView joinForm(){

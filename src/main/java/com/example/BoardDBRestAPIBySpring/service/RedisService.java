@@ -42,13 +42,6 @@ public class RedisService {
         redisTemplate.delete(key);
     }
 
-//    public void setValues(String authCodePrefix, String toEmail, String authCode, Duration duration) {
-//        String key = authCodePrefix+toEmail;
-//        String Email = toEmail.substring(9).replace("%40","@");
-//        String value = authCode+duration;
-//        redisTemplate.opsForValue().set(key,value);
-//        redisTemplate.set
-//    }
 
     @Transactional
     public boolean checkExistsValue(String value, String key){

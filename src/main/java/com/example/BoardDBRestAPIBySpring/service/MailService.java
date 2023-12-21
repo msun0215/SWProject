@@ -104,5 +104,8 @@ public class MailService {
         if (!authResult) {
             throw new BusinessLogicException(ExceptionCode.AUTH_CODE_IS_NOT_SAME);
         }
+        else{
+            redisService.deleteValues(AUTH_CODE_PREFIX+email);  // redis 삭제
+        }
     }
 }

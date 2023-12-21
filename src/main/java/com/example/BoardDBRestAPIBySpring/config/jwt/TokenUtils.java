@@ -66,22 +66,6 @@ public class TokenUtils {
 
         return JWTProperties.TOKEN_PREFIX+accessToken;
 
-
-//        Date now=new Date();
-//        JwtBuilder builder = Jwts.builder()
-//                .setSubject("ACCESSTOKEN")
-//                .setHeader(createHeader())
-//                .setIssuedAt(now)
-//                .setClaims(createClaims(member))
-//                .setExpiration(createExpireDateForOneYear())
-//                .signWith(SignatureAlgorithm.HS256, createSigningKey());
-//        String accessToken = builder.compact();
-
-//        String refreshToken=Jwts.builder()
-//                .setSubject(member.getMemberID())
-//                .setHeader(createHeader())
-//                .setIssuedAt(now)
-//                .setExpiration(new Date(now.getTime()+))
     }
 
     public String generateRefreshToken(Authentication authentication) {

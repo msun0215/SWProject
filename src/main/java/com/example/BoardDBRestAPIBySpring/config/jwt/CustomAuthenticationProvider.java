@@ -33,12 +33,14 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
     // 인증 구현
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException{
-        //Class<? extends Authentication> toTest=authentication.getClass();
+
         System.out.println("=========================================");
         System.out.println("Provider 접근!");
+
         // 전달 받은 UsernamePasswordAuthenticationToken
         UsernamePasswordAuthenticationToken token = (UsernamePasswordAuthenticationToken) authentication;
         System.out.println("Provider에서의 token : "+token);
+
         // JWTAuthenticationFilter에서 생성된 Token으로부터 ID와 PW 추출
         String memberID = token.getName();
         String memberPW = token.getCredentials().toString();
@@ -49,10 +51,10 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
         PrincipalDetailsService principalDetailsService=new PrincipalDetailsService(memberRepository, encodePWD);
 
         // 해당 회원에 대해 DB 조회
-        //PrincipalDetails principalDetails= (PrincipalDetails)  principalDetailsService.loadUserByUsername(memberID);
         PrincipalDetails principalDetails=(PrincipalDetails) principalDetailsService.loadUserByUsername(memberID);
         System.out.println("CustomAuthenticationProvider에서 받은 principalDetails : "+principalDetails);
         System.out.println("CustomAuthenticationProvider에서 받은 principalDetails의 memberPW : "+principalDetails.getPassword());
+
         // 비밀번호 확인
         if(!encodePWD.matches(memberPW, principalDetails.getPassword())){
             System.out.println("=========================================");

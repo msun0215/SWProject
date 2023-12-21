@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
@@ -25,7 +26,6 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.web.filter.CorsFilter;
 
 @Log4j2
@@ -64,14 +64,10 @@ public class WebConfig {
 	@Bean
 	public CustomLoginSuccessHandler myCustomLoginSuccessHandler(TokenUtils tokenUtils){return new CustomLoginSuccessHandler(tokenUtils);}
 
-
-
 	@Bean
 	public AuthenticationManager authenticationManagerBean(AuthenticationConfiguration authenticationConfiguration) throws Exception{
 		return authenticationConfiguration.getAuthenticationManager();
 	}
-
-
 
 	// ACL(Access Control List, 접근 제어 목록)의 예외 URL 설정
 	@Bean
@@ -87,27 +83,41 @@ public class WebConfig {
 				.formLogin(f->f.disable())
 				.httpBasic(h->h.disable())
 				.addFilterBefore(new CustomAuthenticationFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class);
-				//.apply(new MyCustomDs1());	// CustomFilter
-						//.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
-		//.authorizeHttpRequests(authorize->{
-		//.addFilter(new JWTAuthenticationFilter(authenticationManager))
-		//.addFilter(new JWTAuthorizationFilter(authenticationManager, userRepository))
 		http.authorizeRequests(authorize-> {     // 권한 부여
 			// authorizeRequests가 deprecated됨에 따라 authorizeHttpRequests 사용 권장
 			authorize
-//                  .requestMatchers("/user/**").hasAnyRole("hasRole('ROLE_USER') or hasRole('ROLE_MANAGER') or hasRole('ROLE_ADMIN')")
-//                  .requestMatchers("/manager/**").hasAnyRole("hasRole('ROLE_MANAGER') or hasRole('ROLE_ADMIN')")
-//                  .requestMatchers("/admin/**").hasAnyRole("hasRole('ROLE_ADMIN')")
+					// 회원가입
+					.requestMatchers(HttpMethod.POST,"/join/**").permitAll()
 
-//					.requestMatchers(new AntPathRequestMatcher("/login/**")).authenticated()
-//					.requestMatchers(new AntPathRequestMatcher("/login/**")).hasAnyRole("USER","MANAGER","ADMIN")
-					.requestMatchers(new AntPathRequestMatcher("/user/**", "GET, POST")).hasAnyRole("USER","MANAGER","ADMIN")
-//					.requestMatchers(HttpMethod.POST, "/boards").hasAnyRole("USER","MANAGER","ADMIN")
+					// 로그인
+					.requestMatchers(HttpMethod.POST,"/login/**").permitAll()
+
+					// 로그아웃
+					.requestMatchers(HttpMethod.POST,"/logout/**").hasAnyRole("USER","MANAGER","ADMIN")
+
+					// 회원
+					.requestMatchers(HttpMethod.GET,"/users/**").hasRole("ADMIN")
+					.requestMatchers(HttpMethod.PUT, "/users/**").hasAnyRole("USER","MANAGER","ADMIN")
+					.requestMatchers(HttpMethod.DELETE,"/users/**").hasAnyRole("USER","MANAGER","ADMIN")
+
+					// 게시글
+					.requestMatchers(HttpMethod.GET,"/boards/**").permitAll()
+					.requestMatchers(HttpMethod.GET,"/boards/{boardId}/**").permitAll()
+					.requestMatchers(HttpMethod.POST,"/boards/**").hasAnyRole("USER","MANAGER","ADMIN")
+					.requestMatchers(HttpMethod.PUT,"/boards/{boardId}/**").hasAnyRole("USER","MANAGER","ADMIN")
+					.requestMatchers(HttpMethod.DELETE,"/boards/{boardId}/**").hasAnyRole("USER","MANAGER","ADMIN")
+					.requestMatchers(HttpMethod.POST,"/boards/users/roles/**").hasRole("USER")
+
+					// 댓글
+					.requestMatchers(HttpMethod.GET,"/boards/{boardId}/replies/**").permitAll()
+					.requestMatchers(HttpMethod.POST,"/boards/{boardId}/replies/**").hasAnyRole("USER","MANAGER","ADMIN")
+					.requestMatchers(HttpMethod.PUT,"/boards/{boardId}/replies/{repliesId}/**").hasAnyRole("USER","MANAGER","ADMIN")
+					.requestMatchers(HttpMethod.DELETE,"/boards/{boardId}/replies/{repliesId}/**").hasAnyRole("USER","MANAGER","ADMIN")
+
 //					.requestMatchers("/manager/**").hasAnyRole("MANAGER","ADMIN")
 //					.requestMatchers("/admin/**").hasAnyRole("ADMIN")
 					// hasAnyRole() 메소드는 자동으로 앞에 ROLE_을 추가해서 체크해준다
-					//.requestMatchers(new AntPathRequestMatcher("/**")).authenticated()
 					.anyRequest().permitAll();  // 이외의 요청은 모두 허용함
 		});
 		//		.logout(logout->logout.logoutSuccessUrl("/"))
@@ -118,71 +128,7 @@ public class WebConfig {
 
 		http.headers().frameOptions().sameOrigin();
 
-
-//		http.logout()
-//				.logoutUrl("/logout")	// 로그인과 마찬가지로 POST 요청이 와야 함
-//				.addLogoutHandler(((request, response, authentication) -> {
-//					HttpSession session=request.getSession();
-//					if(session!=null){
-//						session.invalidate();	// 세션 삭제
-//					}
-//				})).logoutSuccessHandler(((request, response, authentication) -> {
-//					response.sendRedirect("/");
-//				}));
-
-        /* Spring Security 사용 시
-        http.formLogin(f->f{
-            f.loginProcessingUrl("/login");     // 로그인 url 설정
-        });
-         */
-
 		// /user, /manager, /admin으로 들어가도 /loginForm으로 접근하도록
 		return http.build();
 	}
-
-	/*
-	public class MyCustomDs1 extends AbstractHttpConfigurer<MyCustomDs1, HttpSecurity> { // custom Filter
-		@Override
-		public void configure(HttpSecurity http) throws Exception {
-			AuthenticationManager authenticationManager=http.getSharedObject(AuthenticationManager.class);	// null값으로 받아들임?
-			System.out.println("authenticationManager : "+authenticationManager);
-			JWTAuthenticationFilter jwtAuthenticationFilter=new JWTAuthenticationFilter(authenticationManager,mycustomAuthenticationProvider());
-			jwtAuthenticationFilter.setAuthenticationSuccessHandler(new CustomLoginSuccessHandler(tokenUtils));
-			JWTAuthorizationFilter jwtAuthorizationFilter=new JWTAuthorizationFilter(authenticationManager, memberRepository);
-			http.addFilter(corsConfig.corsFilter())
-			http.addFilter(corsFilter)
-					//.addFilter(new JWTAuthenticationFilter(authenticationManager, mycustomAuthenticationProvider()))  // AuthenticationManager를 Parameter로 넘겨줘야 함(로그인을 진행하는 데이터이기 때문)
-					//.addFilter(jwtAuthenticationFilter)
-					.addFilter(jwtAuthorizationFilter);
-
-			System.out.println("authenticationManager3 : " + authenticationManager);    // log
-		}
-
-	}
-	
-	 */
-
-/*
-	@Bean
-	public CustomLoginSuccessHandler customLoginSuccessHandler(){
-		return new CustomLoginSuccessHandler();
-	}
-
- */
-    /*
-    기존: WebSecurityConfigurerAdapter를 상속하고 configure매소드를 오버라이딩하여 설정하는 방법
-    => 현재: SecurityFilterChain을 리턴하는 메소드를 빈에 등록하는 방식(컴포넌트 방식으로 컨테이너가 관리)
-    //https://spring.io/blog/2022/02/21/spring-security-without-the-websecurityconfigureradapter
-
-    @Override
-    protected void configure(HttpSecurity http) throws  Exception{
-        http.csrf().disable();
-        http.authorizeRequests()
-                .antMatchers("/user/**").authenticated()
-                .antMatchers("/manager/**").access("hasRole('ROLE_ADMIN') or hasRole('ROLE_MANAGER')")
-                .antMatchers("/admin").access("\"hasRole('ROLE_ADMIN')")
-                .anyRequest().permitAll();
-    }
-
-     */
 }
