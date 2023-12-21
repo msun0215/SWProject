@@ -4,6 +4,9 @@ import com.example.BoardDBRestAPIBySpring.domain.Member;
 import com.example.BoardDBRestAPIBySpring.repository.MemberRepository;
 import com.example.BoardDBRestAPIBySpring.service.exception.BusinessLogicException;
 import com.example.BoardDBRestAPIBySpring.service.exception.ExceptionCode;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
+import java.util.Random;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -12,22 +15,15 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
-import java.time.Duration;
-import java.util.Random;
-
 @Slf4j
 @Service
 @Transactional
 @RequiredArgsConstructor
 public class MailService {
+    private static final String AUTH_CODE_PREFIX = "AuthCode ";
     private final JavaMailSender javaMailSender;
-
     private final RedisService redisService;
     private final MemberRepository memberRepository;
-    private static final String AUTH_CODE_PREFIX = "AuthCode ";
-
     @Value("${spring.mail.auth-code-expiration-millis}")
     private long authCodeExpirationMillis;
 
@@ -62,9 +58,10 @@ public class MailService {
         checkDuplicatedEmail(toEmail); // 중복 확인
         System.out.println("Complete to Check DuplicatedEmail");
         String title = "SWProject 이메일 인증번호입니다.";
-        String authCode="SWProject 이메일 인증번호입니다.\n인증번호의 유효시간은 5분입니다.\n"+createCode();
+        String authCode = createCode();
+        String authCodeMessage = "SWProject 이메일 인증번호입니다.\n인증번호의 유효시간은 5분입니다.\n"+ authCode;
         System.out.println("sendCodeToEmail에서 authCode : "+authCode);
-        sendEmail(toEmail, title, authCode);
+        sendEmail(toEmail, title, authCodeMessage);
 
         // 이메일 인증 요청 시 인정번호를 Redis에 저장함.
         // key = "AuthCode " + Email/value=AuthCode

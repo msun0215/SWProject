@@ -92,3 +92,11 @@ Content-Type: application/json
 {
   "content": "내용입니다."
 }
+
+
+### 이메일 전송
+POST http://localhost:8080/emails/verification-requests?memberID=hesjs5@skuniv.ac.kr
+
+
+### 이메일 확인
+POST http://localhost:8080/emails/verifications?memberID=hesjs5@skuniv.ac.kr&authCode=565352
