@@ -10,14 +10,24 @@
 == 로그인
 
 === Form으로 로그인
-operation::login-controller-test/login-by-www[snippets="http-request,form-parameters,http-response,response-headers"]
+operation::login-controller-test/login-by-www[snippets="http-request,form-parameters,http-response,response-fields"]
 
 === Json으로 로그인
-operation::login-controller-test/login-by-json[snippets="http-request,request-fields,http-response,response-headers"]
+operation::login-controller-test/login-by-json[snippets="http-request,request-fields,http-response,response-fields"]
 
 == 회원가입
 
 operation::login-controller-test/signup[snippets="http-request,form-parameters"]
+
+
+== 토큰 재발급
+
+operation::login-controller-test/reissue[snippets="http-request,request-headers,http-response,response-fields"]
+
+
+== 로그인한 사용자 정보 조회
+
+operation::login-controller-test/login-status-check[snippets="http-request,request-headers,http-response,response-fields"]
 
 
 == 게시글 조회
