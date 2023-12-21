@@ -21,8 +21,6 @@ public enum Role {
 }
 */
 
-
-
 @Data   // GETTER & SETTER
 @Entity
 @NoArgsConstructor
@@ -33,8 +31,6 @@ public class Role {
     private String roleName;
     // camelCase error로 인한 _제거
 
-//    @OneToMany(mappedBy = "roles", fetch = FetchType.EAGER)
-//    private List<Member> members;
 
     @Builder
     public Role(long roleID, String roleName) {

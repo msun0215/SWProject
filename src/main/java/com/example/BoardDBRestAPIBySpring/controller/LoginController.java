@@ -1,35 +1,24 @@
 package com.example.BoardDBRestAPIBySpring.controller;
 
-import com.example.BoardDBRestAPIBySpring.config.auth.PrincipalDetails;
 import com.example.BoardDBRestAPIBySpring.domain.*;
 import com.example.BoardDBRestAPIBySpring.repository.MemberRepository;
 import com.example.BoardDBRestAPIBySpring.repository.RoleRepository;
 import com.example.BoardDBRestAPIBySpring.service.AuthService;
 import com.example.BoardDBRestAPIBySpring.service.MemberService;
 import com.example.BoardDBRestAPIBySpring.service.ThymeleafUtil;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.log4j.Log4j2;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
-import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
-import org.springframework.web.servlet.view.RedirectView;
 
-import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 
-// https://velog.io/@u-nij/
 @Slf4j
 @RestController
 @RequiredArgsConstructor
@@ -47,10 +36,6 @@ public class LoginController {
     private final MemberService memberService;
     private final AuthService authService;
     private final long COOKIE_EXPIRATION=7776000;       // 90일
-
-//    Role role1=roleRepository.save(new Role(1,"ROLE_ADMIN"));
-//    Role role2=roleRepository.save(new Role(2,"ROLE_MANAGER"));
-//    Role role3=roleRepository.save(new Role(3,"ROLE_USER"));
 
     @GetMapping({"", "/"})
     // @RestController를 사용할 경우 ModelAndView를 사용해야 html 페이지로 이동할 수 있다.
@@ -93,37 +78,11 @@ public class LoginController {
             headers.add(HttpHeaders.AUTHORIZATION, "Bearer " + tokenDto.getAccessToken());
 
             return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, httpCookie.toString())
-                    .headers(headers)
-//                .header(HttpHeaders.AUTHORIZATION, "Bearer "+tokenDto.getAccessToken()) // AccessToken 저장
-                    .build();
+                    .headers(headers).build();
         }
     }
 
 
-//    @PostMapping(value = "/login", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-//    public ResponseEntity<?> loginByWWW(@Valid AuthDTO.LoginDto loginDto){
-//        String memberID = loginDto.getMemberID();
-//        String memberPW = loginDto.getMemberPW();
-//
-//        // Member 등록 및 RefreshToken 저장
-//        AuthDTO.TokenDto tokenDto=authService.login(loginDto);
-//
-//        // RefreshToken 저장
-//        HttpCookie httpCookie= ResponseCookie.from("refresh-token", tokenDto.getRefreshToken())
-//                .maxAge(COOKIE_EXPIRATION)
-//                .httpOnly(true)
-//                .secure(true)
-//                .build();
-//
-//        HttpHeaders headers=new HttpHeaders();
-//        headers.add(HttpHeaders.LOCATION,"/validate");
-//
-//
-//        return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, httpCookie.toString())
-//                .headers(headers)
-//                .header(HttpHeaders.AUTHORIZATION, "Bearer "+tokenDto.getAccessToken()) // AccessToken 저장
-//                .build();
-//    }
 
     @PostMapping(value = "/login", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
     public ResponseEntity<?> loginByWWW(Model model, @Valid AuthDTO.LoginDto loginDto){
@@ -159,14 +118,9 @@ public class LoginController {
             headers.add(HttpHeaders.AUTHORIZATION, "Bearer " + tokenDto.getAccessToken());
 
             return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, httpCookie.toString())
-                    .headers(headers)
-//                .header(HttpHeaders.AUTHORIZATION, "Bearer "+tokenDto.getAccessToken()) // AccessToken 저장
-                    .build();
+                    .headers(headers).build();
         }
-//        ModelAndView mv=new ModelAndView();
-//        mv.setView(new RedirectView("/validate"));   // validate 페이지로 이동
 
-//        return mv;
     }
 
     @RequestMapping("/validate")

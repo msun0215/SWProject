@@ -12,5 +12,4 @@ public interface RoleRepository extends JpaRepository<Role, Long> {
     // select * from ROLE where roleID=?
 
     public Role findByRoleID(long roleID);    // JPA Query Method
-    //public String findRoleNameByRoldID(long roleID);
 }

@@ -28,15 +28,5 @@ public class Member {
 	@CreationTimestamp
 	private Timestamp createDate;
 
-	//@Builder
-//	public Member(String memberID, String memberPW, String memberName, String memberNickname, Role memberRoleId, String provider, String providerId, Timestamp createDate) {
-//		this.memberID = memberID;
-//		this.memberPW = memberPW;
-//		this.memberName = memberName;
-//		this.memberNickname = memberNickname;
-//		this.roles=memberRoleId;
-//		this.provider = provider;
-//		this.providerId = providerId;
-//		this.createDate = createDate;
-//	}
+
 }

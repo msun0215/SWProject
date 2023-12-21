@@ -39,13 +39,6 @@ public class PrincipalDetails implements UserDetails {
 
     public Member getMember(){return member;}
 
-//    // OAuth 로그인 객체
-//    public PrincipalDetails(Member member, Map<String, Object> attributes){
-//        this.member=member;
-//        this.attributes=attributes;
-//    }
-
-
     // 해당 User의 권한을 return하는 곳
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -60,16 +53,6 @@ public class PrincipalDetails implements UserDetails {
         });
         return collect;
     }
-
-    // 권한 목록
-//    //https://velog.io/@u-nij
-//    @Override
-//    public Collection <? extends GrantedAuthority> getAuthorities(){
-//        Collection<GrantedAuthority> authorities=new ArrayList<GrantedAuthority>();
-//        authorities.add(()->member.getRoles().getRoleName());        // key : ROLE_권한
-//        return authorities;
-//    }
-
 
     // 비밀번호
     @Override

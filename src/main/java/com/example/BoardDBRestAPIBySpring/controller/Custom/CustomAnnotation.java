@@ -12,12 +12,6 @@ import java.lang.annotation.Target;
 import static java.lang.annotation.ElementType.*;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
-/**
- * CustomAnnotationCollection 설명: Custom 애너테이션 인터페이스 관리
- * 작성자: 김찬빈
- * 버전 정보: 1.0.0
- * 작성일자: 2023/04/20
- **/
 public class CustomAnnotation {
 
     @Documented

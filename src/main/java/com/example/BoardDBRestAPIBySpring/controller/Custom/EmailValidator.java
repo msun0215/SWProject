@@ -6,12 +6,6 @@ import jakarta.validation.ConstraintValidatorContext;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-/**
- * CustomEmailValdator 설명: CustomEmail 애너테이션 인터페이스 구현
- * 작성자: 김찬빈
- * 버전 정보: 1.0.0
- * 작성일자: 2023/04/20
- **/
 public class EmailValidator implements ConstraintValidator<CustomAnnotation.CustomEmail, String> {
 
     private static final String EMAIL_PATTERN =

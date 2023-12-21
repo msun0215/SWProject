@@ -30,9 +30,6 @@ public class EmailController {
     @PostMapping("/emails/verifications")
     public ResponseEntity<?> verificationEmail(@RequestParam @Valid String memberID,
                                             @RequestParam String authCode) {
-//        String request=memberID.split("&")[0].substring(9).replace("%40","@");
-//        System.out.println("Controller : "+request);
-//        System.out.println("Controller AuthCode : " +authCode);
         System.out.println("Controller memberID : "+memberID);
         System.out.println("Controller authCode : "+authCode);
         mailService.verifiedCode(memberID, authCode);

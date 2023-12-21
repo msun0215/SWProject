@@ -38,7 +38,6 @@ public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
     // 인증이나 권한이 필요한 주소 요청이 있을 때 해당 필터를 타게 됨
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws IOException, ServletException {
-        //String header=request.getHeader("Authorization");
         System.out.println("=========================================");
         System.out.println("JWTAuthorizationFilter 시작");
         System.out.println("=========================================");
@@ -46,13 +45,6 @@ public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
         System.out.println("Authorization : "+request.getHeader(JWTProperties.HEADER_STRING));
         String header=request.getHeader(JWTProperties.HEADER_STRING);
         System.out.println("JWTAuthorizationFilter에서의 JWTHeader : "+header);  // JWT Token
-
-//        Enumeration<String> headerNames = request.getHeaderNames();
-//        while (headerNames.hasMoreElements()) {
-//            String headerName = headerNames.nextElement();
-//            System.out.println("Header: " + headerName + ", Value: " + request.getHeader(headerName));
-//        }
-
 
         // header가 있는지(유효한지) 확인
         // 토큰이 잘못될 경우 다음 filter로 흘려 보낸다.
@@ -67,6 +59,7 @@ public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
         String memberID = JWT.require(Algorithm.HMAC512(JWTProperties.SECRET)).build().verify(token).getClaim("memberID").asString();  // verify()를 통해서 서명
         System.out.println("token : "+token);
         System.out.println("memberID : "+memberID);
+
         // 서명이 정상적으로 동작했을 경우
         if(memberID!=null){
             Member memberEntity = memberRepository.findByMemberID(memberID);
@@ -82,7 +75,6 @@ public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
             System.out.println("Successfully Saved Authentication" + authentication);
 
         }
-        // super.doFilterInternal(request, response, chain);
         chain.doFilter(request,response);
     }
 }
