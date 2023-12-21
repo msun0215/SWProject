@@ -15,10 +15,8 @@ import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -141,16 +139,11 @@ public class LoginController {
         }
     }
 
-    // todo 응답값 변경
-
-    @PostMapping("/logout")
+    @PostMapping("/user/logout")
     public ResponseEntity<?> logout(@RequestHeader("Authorization") String requestAccessToken){
         authService.logout(requestAccessToken);
-        ResponseCookie responseCookie=ResponseCookie.from("refresh-token","")
-                .maxAge(0).path("/").build();
 
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                .header(HttpHeaders.SET_COOKIE, responseCookie.toString()).build();
+        return ResponseEntity.ok().build();
     }
 
     @GetMapping("/user/list")

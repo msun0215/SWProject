@@ -25,6 +25,11 @@ operation::login-controller-test/signup[snippets="http-request,form-parameters"]
 operation::login-controller-test/reissue[snippets="http-request,request-headers,http-response,response-fields"]
 
 
+== 로그아웃
+
+operation::login-controller-test/logout[snippets="http-request,request-headers,http-response"]
+
+
 == 로그인한 사용자 정보 조회
 
 operation::login-controller-test/login-status-check[snippets="http-request,request-headers,http-response,response-fields"]

@@ -102,7 +102,8 @@ public class WebConfig {
 
 //					.requestMatchers(new AntPathRequestMatcher("/login/**")).authenticated()
 //					.requestMatchers(new AntPathRequestMatcher("/login/**")).hasAnyRole("USER","MANAGER","ADMIN")
-					.requestMatchers(new AntPathRequestMatcher("/user/**")).hasAnyRole("USER","MANAGER","ADMIN")
+					.requestMatchers(new AntPathRequestMatcher("/user/**", "GET, POST")).hasAnyRole("USER","MANAGER","ADMIN")
+//					.requestMatchers(HttpMethod.POST, "/boards").hasAnyRole("USER","MANAGER","ADMIN")
 //					.requestMatchers("/manager/**").hasAnyRole("MANAGER","ADMIN")
 //					.requestMatchers("/admin/**").hasAnyRole("ADMIN")
 					// hasAnyRole() 메소드는 자동으로 앞에 ROLE_을 추가해서 체크해준다

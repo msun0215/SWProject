@@ -251,6 +251,41 @@ class LoginControllerTest extends AbstractRestDocsTest {
                 ));
     }
 
+    @Test
+    void logout() throws Exception {
+        // given
+        var memberID = "test@test.com";
+        var memberPW = "test";
+
+        Member member = new Member();
+        member.setMemberID(memberID);
+        member.setMemberPW(bCryptPasswordEncoder.encode(memberPW));
+        member.setMemberName("test");
+        member.setMemberNickname("testk");
+        var role = new Role();
+        role.setRoleName("USER");
+        roleRepository.save(role);
+        member.setRoles(role);
+
+        memberRepository.save(member);
+
+        var url = "/user/logout";
+
+        var accessJwtToken = generateJwtToken(member);
+        var authorizationHeader = JWTProperties.TOKEN_PREFIX.concat(accessJwtToken);
+
+        // expected
+        mockMvc.perform(post(url)
+                        .header(AUTHORIZATION, authorizationHeader))
+                .andExpect(status().isOk())
+                .andDo(print())
+                .andDo(restDocs.document(
+                        requestHeaders(
+                                headerWithName(AUTHORIZATION).description(JWT_TOKEN)
+                        )
+                ));
+    }
+
     private String generateJwtToken(final Member member) {
         String AUTHROITIES_KEY="role";
         String MEMBERID_KEY="memberID";
