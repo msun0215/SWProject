@@ -24,7 +24,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -129,8 +128,8 @@ public class LoginController {
 
     // 토큰 재발급
     @PostMapping("/reissue")
-    public ResponseEntity<?> reissue(@CookieValue(name="refresh-token") String requestRefreshToken,
-                                    @RequestHeader("Authorization") String requestAccessToken) {
+    public ResponseEntity<?> reissue(@RequestHeader(name = "Refresh-Token") String requestRefreshToken,
+                                     @RequestHeader("Authorization") String requestAccessToken) {
         AuthDTO.TokenDto reissuedTokenDto = authService.reissue(requestAccessToken, requestRefreshToken);
 
         if (reissuedTokenDto != null) {     // 토큰 재발급 성공
@@ -141,6 +140,8 @@ public class LoginController {
             throw new IllegalArgumentException("다시 로그인하세요.");
         }
     }
+
+    // todo 응답값 변경
 
     @PostMapping("/logout")
     public ResponseEntity<?> logout(@RequestHeader("Authorization") String requestAccessToken){
