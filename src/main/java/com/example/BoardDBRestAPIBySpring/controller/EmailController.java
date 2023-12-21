@@ -1,6 +1,5 @@
 package com.example.BoardDBRestAPIBySpring.controller;
 
-import com.example.BoardDBRestAPIBySpring.controller.Custom.CustomAnnotation;
 import com.example.BoardDBRestAPIBySpring.service.MailService;
 import com.example.BoardDBRestAPIBySpring.service.MemberService;
 import jakarta.validation.Valid;
@@ -8,7 +7,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 @Slf4j
 @RestController
@@ -36,6 +37,7 @@ public class EmailController {
         System.out.println("Controller memberID : "+memberID);
         System.out.println("Controller authCode : "+authCode);
         mailService.verifiedCode(memberID, authCode);
-        return new ResponseEntity<>(HttpStatus.OK);
+        return ResponseEntity.ok()
+                .body("인증 완료");
     }
 }
