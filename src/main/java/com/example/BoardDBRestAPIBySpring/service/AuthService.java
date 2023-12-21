@@ -97,7 +97,7 @@ public class AuthService {
         String authorities=getAuthorities(authentication);
 
         // Token 재발급 및 Redis 업데이트
-        redisService.deleteValues("RT("+SERVER+"):"+principal);     // 기존 RefreshToken 삭제
+        redisService.deleteValues("RT("+SERVER+")"+principal);     // 기존 RefreshToken 삭제
         AuthDTO.TokenDto tokenDto=jwtTokenProvider.createToken(principal,authorities);
         saveRefreshToken(SERVER, principal, tokenDto.getRefreshToken());
         return tokenDto;
@@ -113,7 +113,7 @@ public class AuthService {
         // RefreshToken이 이미 있는 경우
         if(redisService.getValues("RT("+provider+"):"+memberID)!=null) {
             System.out.println("RefreshToken is already exists. Delete RefreshToken");
-            redisService.deleteValues("RT(" + provider + "):" + memberID);    // 삭제
+            redisService.deleteValues("RT(" + provider + ")" + memberID);    // 삭제
         }
 
         // AccessToken, RefreshToken 생성 및 Redis에 RefreshToken 저장
@@ -133,7 +133,7 @@ public class AuthService {
         System.out.println("Access To SaveRefreshToken : "+refreshToken);;
         System.out.println("====================================");
 
-        redisService.setValuesWithTimeout("RT("+provider+"):"+principal,  //key
+        redisService.setValuesWithTimeout("RT("+provider+")"+principal,  //key
                 refreshToken,    // value
                 jwtTokenProvider.getTokenExpirationTime(refreshToken)); // timeout(milliseconds)
     }
@@ -175,9 +175,9 @@ public class AuthService {
         String principal=getPrincipal(requestAccessToken);
 
         // Redis에 저장되어 있는 RefreshToken 삭제
-        String refreshTokenInRedis=redisService.getValues("RT("+SERVER+"):"+principal);
+        String refreshTokenInRedis=redisService.getValues("RT("+SERVER+")"+principal);
         if(refreshTokenInRedis!=null)
-            redisService.deleteValues("RT("+SERVER+"):"+principal);
+            redisService.deleteValues("RT("+SERVER+")"+principal);
 
         // Redis에 logout 처리한 AccessToken 저장
         long expiration=jwtTokenProvider.getTokenExpirationTime(requestAccessToken)-new Date().getTime();
