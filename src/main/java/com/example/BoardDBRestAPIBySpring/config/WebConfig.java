@@ -26,6 +26,8 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.security.web.util.matcher.RegexRequestMatcher;
 import org.springframework.web.filter.CorsFilter;
 
 @Log4j2
@@ -88,32 +90,38 @@ public class WebConfig {
 			// authorizeRequests가 deprecated됨에 따라 authorizeHttpRequests 사용 권장
 			authorize
 					// 회원가입
-					.requestMatchers(HttpMethod.POST,"/join/**").permitAll()
+					.requestMatchers(new AntPathRequestMatcher("/join/**", "POST")).permitAll()
 
 					// 로그인
-					.requestMatchers(HttpMethod.POST,"/login/**").permitAll()
+					.requestMatchers(new AntPathRequestMatcher("/login/**", "POST")).permitAll()
 
 					// 로그아웃
-					.requestMatchers(HttpMethod.POST,"/logout/**").hasAnyRole("USER","MANAGER","ADMIN")
+					.requestMatchers(new AntPathRequestMatcher("/logout/**", "POST")).hasAnyRole("USER","MANAGER","ADMIN")
 
 					// 회원
-					.requestMatchers(HttpMethod.GET,"/users/**").hasRole("ADMIN")
-					.requestMatchers(HttpMethod.PUT, "/users/**").hasAnyRole("USER","MANAGER","ADMIN")
-					.requestMatchers(HttpMethod.DELETE,"/users/**").hasAnyRole("USER","MANAGER","ADMIN")
+					.requestMatchers(new AntPathRequestMatcher("/user/**", "GET")).hasRole("ADMIN")
+					.requestMatchers(new AntPathRequestMatcher("/user/**", "PUT")).hasAnyRole("USER","MANAGER","ADMIN")
+					.requestMatchers(new AntPathRequestMatcher("/user/**", "DELETE")).hasAnyRole("USER","MANAGER","ADMIN")
+
+					// 토큰 재발급
+					.requestMatchers(new AntPathRequestMatcher("/reissue", "POST")).hasAnyRole("USER","MANAGER","ADMIN")
+
+					// 로그인 회원 정보 조회
+					.requestMatchers(new AntPathRequestMatcher("/token", "GET")).hasAnyRole("USER","MANAGER","ADMIN")
+
 
 					// 게시글
-					.requestMatchers(HttpMethod.GET,"/boards/**").permitAll()
-					.requestMatchers(HttpMethod.GET,"/boards/{boardId}/**").permitAll()
-					.requestMatchers(HttpMethod.POST,"/boards/**").hasAnyRole("USER","MANAGER","ADMIN")
-					.requestMatchers(HttpMethod.PUT,"/boards/{boardId}/**").hasAnyRole("USER","MANAGER","ADMIN")
-					.requestMatchers(HttpMethod.DELETE,"/boards/{boardId}/**").hasAnyRole("USER","MANAGER","ADMIN")
-					.requestMatchers(HttpMethod.POST,"/boards/users/roles/**").hasRole("USER")
+//					.requestMatchers(new AntPathRequestMatcher("/boards", "GET")).permitAll()
+//					.requestMatchers(new AntPathRequestMatcher("/boards/{boardId}/**", "GET")).permitAll()
+					.requestMatchers(new RegexRequestMatcher("/boards/(\\d+)", "POST")).hasAnyRole("USER","MANAGER","ADMIN")
+					.requestMatchers(new RegexRequestMatcher("/boards/(\\d+)", "PUT")).hasAnyRole("USER")
+					.requestMatchers(new RegexRequestMatcher("/boards/(\\d+)", "DELETE")).hasAnyRole("USER","MANAGER","ADMIN")
+					.requestMatchers(new AntPathRequestMatcher("/boards/users/roles/**", "POST")).hasRole("USER")
 
 					// 댓글
-					.requestMatchers(HttpMethod.GET,"/boards/{boardId}/replies/**").permitAll()
-					.requestMatchers(HttpMethod.POST,"/boards/{boardId}/replies/**").hasAnyRole("USER","MANAGER","ADMIN")
-					.requestMatchers(HttpMethod.PUT,"/boards/{boardId}/replies/{repliesId}/**").hasAnyRole("USER","MANAGER","ADMIN")
-					.requestMatchers(HttpMethod.DELETE,"/boards/{boardId}/replies/{repliesId}/**").hasAnyRole("USER","MANAGER","ADMIN")
+					.requestMatchers(new RegexRequestMatcher("/boards/(\\d+)/replies/(\\d+)", "POST")).hasAnyRole("USER","MANAGER","ADMIN")
+					.requestMatchers(new RegexRequestMatcher("/boards/(\\d+)/replies/(\\d+)", "PUT")).hasAnyRole("USER")
+					.requestMatchers(new RegexRequestMatcher("/boards/(\\d+)/replies/(\\d+)", "DELETE")).hasAnyRole("USER","MANAGER","ADMIN")
 
 //					.requestMatchers("/manager/**").hasAnyRole("MANAGER","ADMIN")
 //					.requestMatchers("/admin/**").hasAnyRole("ADMIN")

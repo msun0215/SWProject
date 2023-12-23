@@ -7,8 +7,8 @@ POST http://localhost:8080/login
 Content-Type: application/json
 
 {
-  "memberID": "b@b.com",
-  "memberPW": "b"
+  "memberID": "a@a.com",
+  "memberPW": "a"
 }
 
 > {%
@@ -41,11 +41,25 @@ Content-Type: application/x-www-form-urlencoded
 %}
 
 
+
+### logout
+POST http://localhost:8080/user/logout
+Authorization: {{access_token}}
+
+
+
 ### reissue
 POST http://localhost:8080/reissue
 Content-Type: application/json
 Authorization: {{access_token}}
 Refresh-Token: {{refresh_token}}
+
+
+
+### token
+GET http://localhost:8080/token
+Authorization: {{access_token}}
+
 
 
 ### user list
@@ -72,6 +86,7 @@ Content-Type: application/json
 ### 게시글 수정
 PUT http://localhost:8080/boards/15
 Content-Type: application/json
+Authorization: {{access_token}}
 
 {
   "title": "수정된 제목입니다.",
@@ -80,18 +95,35 @@ Content-Type: application/json
 
 
 ### 게시글 삭제
-DELETE http://localhost:8080/boards/15
+DELETE http://localhost:8080/boards/1
 Authorization: {{access_token}}
 
 
 ### 댓글 생성
-POST http://localhost:8080/boards/14/replies
+POST http://localhost:8080/boards/1/replies
 Authorization: {{access_token}}
 Content-Type: application/json
 
 {
   "content": "내용입니다."
 }
+
+
+### 댓글 수정
+PUT http://localhost:8080/boards/1/replies/17
+Content-Type: application/json
+Authorization: {{access_token}}
+
+{
+  "title": "수정된 제목입니다.",
+  "content": "수정된 내용입니다."
+}
+
+
+### 댓글 삭제
+DELETE http://localhost:8080/boards/1/replies/17
+Authorization: {{access_token}}
+
 
 
 ### 이메일 전송
