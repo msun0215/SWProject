@@ -7,8 +7,8 @@ POST http://localhost:8080/login
 Content-Type: application/json
 
 {
-  "memberID": "a@a.com",
-  "memberPW": "a"
+  "memberID": "b@b.com",
+  "memberPW": "b"
 }
 
 > {%
@@ -95,12 +95,12 @@ Authorization: {{access_token}}
 
 
 ### 게시글 삭제
-DELETE http://localhost:8080/boards/1
+DELETE http://localhost:8080/boards/13
 Authorization: {{access_token}}
 
 
 ### 댓글 생성
-POST http://localhost:8080/boards/1/replies
+POST http://localhost:8080/boards/13/replies
 Authorization: {{access_token}}
 Content-Type: application/json
 
