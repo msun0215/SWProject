@@ -114,13 +114,13 @@ public class WebConfig {
 //					.requestMatchers(new AntPathRequestMatcher("/boards", "GET")).permitAll()
 //					.requestMatchers(new AntPathRequestMatcher("/boards/{boardId}/**", "GET")).permitAll()
 					.requestMatchers(new RegexRequestMatcher("/boards/(\\d+)", "POST")).hasAnyRole("USER","MANAGER","ADMIN")
-					.requestMatchers(new RegexRequestMatcher("/boards/(\\d+)", "PUT")).hasAnyRole("USER")
+					.requestMatchers(new RegexRequestMatcher("/boards/(\\d+)", "PUT")).hasAnyRole("USER","MANAGER","ADMIN")
 					.requestMatchers(new RegexRequestMatcher("/boards/(\\d+)", "DELETE")).hasAnyRole("USER","MANAGER","ADMIN")
 					.requestMatchers(new AntPathRequestMatcher("/boards/users/roles/**", "POST")).hasRole("USER")
 
 					// 댓글
 					.requestMatchers(new RegexRequestMatcher("/boards/(\\d+)/replies/(\\d+)", "POST")).hasAnyRole("USER","MANAGER","ADMIN")
-					.requestMatchers(new RegexRequestMatcher("/boards/(\\d+)/replies/(\\d+)", "PUT")).hasAnyRole("USER")
+					.requestMatchers(new RegexRequestMatcher("/boards/(\\d+)/replies/(\\d+)", "PUT")).hasAnyRole("USER","MANAGER","ADMIN")
 					.requestMatchers(new RegexRequestMatcher("/boards/(\\d+)/replies/(\\d+)", "DELETE")).hasAnyRole("USER","MANAGER","ADMIN")
 
 //					.requestMatchers("/manager/**").hasAnyRole("MANAGER","ADMIN")
